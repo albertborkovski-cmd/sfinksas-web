@@ -1,6 +1,6 @@
 'use client';
 
-import { FormEvent, useMemo, useState } from 'react';
+import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
 
 type Category = 'Šampūnai' | 'Kondicionieriai' | 'Aliejukai' | 'Priedai' | 'Rinkiniai';
 type Shape = 'pump' | 'tube' | 'dropper' | 'jar' | 'brush' | 'set';
@@ -48,6 +48,7 @@ function ProductArt({ shape, tone, small = false }: { shape: Shape; tone: Produc
 }
 
 export default function Home() {
+  const [previewMode, setPreviewMode] = useState<'desktop' | 'phone'>('desktop');
   const [activeCategory, setActiveCategory] = useState<Category | 'Visi'>('Visi');
   const [searchOpen, setSearchOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
@@ -56,6 +57,28 @@ export default function Home() {
   const [cart, setCart] = useState<Record<number, number>>({});
   const [notice, setNotice] = useState('');
   const [messageSent, setMessageSent] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [previewQuantity, setPreviewQuantity] = useState(1);
+  const [previewVariant, setPreviewVariant] = useState(0);
+  const [rotation, setRotation] = useState(0);
+  const dragRef = useRef<{ pointerId: number; x: number } | null>(null);
+
+  useEffect(() => {
+    document.body.classList.toggle('phone-preview-active', previewMode === 'phone');
+    return () => document.body.classList.remove('phone-preview-active');
+  }, [previewMode]);
+
+  useEffect(() => {
+    function closeDialogs(event: KeyboardEvent) {
+      if (event.key !== 'Escape') return;
+      setSelectedProduct(null);
+      setSearchOpen(false);
+      setCartOpen(false);
+      setMenuOpen(false);
+    }
+    document.addEventListener('keydown', closeDialogs);
+    return () => document.removeEventListener('keydown', closeDialogs);
+  }, []);
 
   const visibleProducts = useMemo(
     () => activeCategory === 'Visi' ? products.slice(0, 8) : products.filter((product) => product.category === activeCategory),
@@ -71,11 +94,30 @@ export default function Home() {
   const cartItems = products.filter((product) => cart[product.id]);
   const cartCount = Object.values(cart).reduce((sum, quantity) => sum + quantity, 0);
   const cartTotal = cartItems.reduce((sum, product) => sum + product.price * cart[product.id], 0);
+  const previewVariants = selectedProduct?.category === 'Priedai'
+    ? ['1 vnt.']
+    : selectedProduct?.category === 'Rinkiniai'
+      ? ['Standartinis', 'Dovaninis']
+      : ['250 ml', '500 ml'];
+  const previewPrice = selectedProduct ? selectedProduct.price + (previewVariant > 0 ? 18 : 0) : 0;
 
-  function addToCart(product: Product) {
-    setCart((current) => ({ ...current, [product.id]: (current[product.id] || 0) + 1 }));
+  function addToCart(product: Product, quantity = 1) {
+    setCart((current) => ({ ...current, [product.id]: (current[product.id] || 0) + quantity }));
     setNotice(`${product.name} pridėta į krepšelį`);
     window.setTimeout(() => setNotice(''), 2200);
+  }
+
+  function openProduct(product: Product) {
+    setSelectedProduct(product);
+    setPreviewQuantity(1);
+    setPreviewVariant(0);
+    setRotation(0);
+  }
+
+  function moveProduct(direction: number) {
+    if (!selectedProduct) return;
+    const currentIndex = products.findIndex((product) => product.id === selectedProduct.id);
+    openProduct(products[(currentIndex + direction + products.length) % products.length]);
   }
 
   function changeQuantity(id: number, change: number) {
@@ -98,7 +140,17 @@ export default function Home() {
   }
 
   return (
-    <main>
+    <>
+      <div className="preview-switcher" role="group" aria-label="Svetainės peržiūros dydis">
+        <span>Peržiūra</span>
+        <button type="button" className={previewMode === 'desktop' ? 'selected' : ''} aria-pressed={previewMode === 'desktop'} onClick={() => setPreviewMode('desktop')}>
+          <i className="desktop-preview-icon" aria-hidden="true" /> PC
+        </button>
+        <button type="button" className={previewMode === 'phone' ? 'selected' : ''} aria-pressed={previewMode === 'phone'} onClick={() => setPreviewMode('phone')}>
+          <i className="phone-preview-icon" aria-hidden="true" /> Telefonas
+        </button>
+      </div>
+      <main className={`site-canvas${previewMode === 'phone' ? ' is-phone-preview' : ''}`}>
       <section className="hero" id="namai">
         <header className="site-header">
           <a className="wordmark" href="#namai" aria-label="Sfinksas – pradžia">SFINKSAS</a>
@@ -175,9 +227,10 @@ export default function Home() {
               <div className="product-image">
                 <span className="product-category">{product.category}</span>
                 <ProductArt shape={product.shape} tone={product.tone} />
+                <button className="product-preview-trigger" type="button" onClick={() => openProduct(product)} aria-label={`Peržiūrėti ${product.name}`}><span className="sr-only">Peržiūrėti produktą</span></button>
                 <button className="quick-add" type="button" onClick={() => addToCart(product)} aria-label={`Pridėti ${product.name} į krepšelį`}>+</button>
               </div>
-              <div className="product-info"><div><h3>{product.name}</h3><p>{product.note}</p></div><strong>{money.format(product.price)}</strong></div>
+              <div className="product-info"><div><button className="product-name-button" type="button" onClick={() => openProduct(product)}><h3>{product.name}</h3></button><p>{product.note}</p></div><strong>{money.format(product.price)}</strong></div>
             </article>
           ))}
         </div>
@@ -216,6 +269,73 @@ export default function Home() {
         <div><a href="#kolekcija">Kolekcija</a><a href="#kontaktai">Kontaktai</a><button type="button" onClick={() => setSearchOpen(true)}>Paieška</button></div>
         <span>© 2026 Sfinksas · Demonstracinė parduotuvė</span>
       </footer>
+
+      {selectedProduct && (
+        <div className="product-preview-backdrop" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setSelectedProduct(null); }}>
+          <section className="product-preview-modal" role="dialog" aria-modal="true" aria-label={`${selectedProduct.name} produkto peržiūra`}>
+            <button className="product-preview-close" type="button" onClick={() => setSelectedProduct(null)} aria-label="Uždaryti produkto peržiūrą">×</button>
+            <button className="product-preview-previous" type="button" onClick={() => moveProduct(-1)} aria-label="Ankstesnis produktas">←</button>
+            <button className="product-preview-next" type="button" onClick={() => moveProduct(1)} aria-label="Kitas produktas">→</button>
+
+            <div
+              className="product-preview-stage"
+              onPointerDown={(event) => {
+                dragRef.current = { pointerId: event.pointerId, x: event.clientX };
+                event.currentTarget.setPointerCapture(event.pointerId);
+              }}
+              onPointerMove={(event) => {
+                if (!dragRef.current || dragRef.current.pointerId !== event.pointerId) return;
+                const delta = event.clientX - dragRef.current.x;
+                dragRef.current.x = event.clientX;
+                setRotation((current) => (current + delta * .45 + 100) % 100);
+              }}
+              onPointerUp={() => { dragRef.current = null; }}
+            >
+              <span className="preview-category">{selectedProduct.category}</span>
+              <span className="rotation-degree">{Math.round(rotation * 3.6)}°</span>
+              <div className="preview-art-rotator" style={{ transform: `perspective(900px) rotateY(${rotation * .36 - 18}deg)` }}>
+                <ProductArt shape={selectedProduct.shape} tone={selectedProduct.tone} />
+              </div>
+              <div className="rotation-control">
+                <span><i>↔</i> Vilkite arba sukite</span>
+                <label>
+                  <span className="sr-only">Pasukti produktą 360 laipsnių</span>
+                  <input aria-label="Pasukti produktą 360 laipsnių" type="range" min="0" max="100" value={rotation} onChange={(event) => setRotation(Number(event.target.value))} />
+                </label>
+              </div>
+            </div>
+
+            <div className="product-preview-details">
+              <p className="section-kicker">Produkto peržiūra</p>
+              <span className="preview-product-number">NO. {selectedProduct.id.toString().padStart(2, '0')}</span>
+              <h2>{selectedProduct.name}</h2>
+              <p className="preview-product-note">{selectedProduct.note}</p>
+              <p className="preview-product-description">Subalansuota profesionali formulė kasdieniam ritualui. Padeda išlaikyti plaukus minkštus, žvilgančius ir lengvai valdomus jų neapsunkindama.</p>
+              <ul>
+                <li><span>✓</span> Profesionaliai atrinkta formulė</li>
+                <li><span>✓</span> Tinka kasdieniam ritualui</li>
+                <li><span>✓</span> Be nereikalingo apsunkinimo</li>
+              </ul>
+              <fieldset className="variant-picker">
+                <legend>{selectedProduct.category === 'Rinkiniai' ? 'Pakuotė' : selectedProduct.category === 'Priedai' ? 'Kiekis' : 'Talpa'}</legend>
+                <div>{previewVariants.map((variant, index) => <button key={variant} type="button" className={previewVariant === index ? 'selected' : ''} onClick={() => setPreviewVariant(index)}>{variant}</button>)}</div>
+              </fieldset>
+              <div className="preview-purchase-row">
+                <div className="preview-quantity" aria-label="Kiekis">
+                  <button type="button" onClick={() => setPreviewQuantity((quantity) => Math.max(1, quantity - 1))} aria-label="Mažinti kiekį">−</button>
+                  <span>{previewQuantity}</span>
+                  <button type="button" onClick={() => setPreviewQuantity((quantity) => quantity + 1)} aria-label="Didinti kiekį">+</button>
+                </div>
+                <strong>{money.format(previewPrice * previewQuantity)}</strong>
+              </div>
+              <button className="preview-add-button" type="button" onClick={() => { addToCart(selectedProduct, previewQuantity); setSelectedProduct(null); }}>
+                Pridėti į krepšelį <span>↗</span>
+              </button>
+              <small className="preview-delivery">Nemokamas pristatymas užsakymams nuo 60 €</small>
+            </div>
+          </section>
+        </div>
+      )}
 
       {searchOpen && (
         <div className="overlay search-overlay" role="dialog" aria-modal="true" aria-label="Produktų paieška">
@@ -270,6 +390,7 @@ export default function Home() {
       )}
 
       {notice && <div className="toast" role="status">{notice}<span>✓</span></div>}
-    </main>
+      </main>
+    </>
   );
 }
