@@ -1,0 +1,45 @@
+import type { Metadata } from 'next';
+import { Geist, Geist_Mono } from 'next/font/google';
+import './globals.css';
+
+const geistSans = Geist({
+  variable: '--font-geist-sans',
+  subsets: ['latin'],
+});
+
+const geistMono = Geist_Mono({
+  variable: '--font-geist-mono',
+  subsets: ['latin'],
+});
+
+export const metadata: Metadata = {
+  title: 'Sfinksas — profesionali plaukų priežiūra',
+  description: 'Atrinktos profesionalios plaukų priežiūros priemonės jūsų kasdieniam grožio ritualui.',
+  openGraph: {
+    title: 'Sfinksas — grožio ritualas, sukurtas jums',
+    description: 'Atrinkta profesionali plaukų priežiūra: šampūnai, kondicionieriai, aliejukai, priedai ir rinkiniai.',
+    locale: 'lt_LT',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Sfinksas — grožio ritualas, sukurtas jums',
+    description: 'Atrinkta profesionali plaukų priežiūra.',
+  },
+};
+
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  return (
+    <html lang="lt">
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+      >
+        {children}
+      </body>
+    </html>
+  );
+}

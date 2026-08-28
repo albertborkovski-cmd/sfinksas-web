@@ -1,0 +1,275 @@
+'use client';
+
+import { FormEvent, useMemo, useState } from 'react';
+
+type Category = 'Šampūnai' | 'Kondicionieriai' | 'Aliejukai' | 'Priedai' | 'Rinkiniai';
+type Shape = 'pump' | 'tube' | 'dropper' | 'jar' | 'brush' | 'set';
+
+type Product = {
+  id: number;
+  name: string;
+  category: Category;
+  note: string;
+  price: number;
+  shape: Shape;
+  tone: 'bronze' | 'sand' | 'olive' | 'smoke' | 'amber';
+};
+
+const categories: { name: Category; index: string; shape: Shape; note: string }[] = [
+  { name: 'Šampūnai', index: '01', shape: 'pump', note: 'Švelniam, tikslingam valymui' },
+  { name: 'Kondicionieriai', index: '02', shape: 'tube', note: 'Glotnumui ir elastingumui' },
+  { name: 'Aliejukai', index: '03', shape: 'dropper', note: 'Žvilgesiui be apsunkinimo' },
+  { name: 'Priedai', index: '04', shape: 'brush', note: 'Kasdienio ritualo detalės' },
+  { name: 'Rinkiniai', index: '05', shape: 'set', note: 'Suderinta priežiūra ir dovanos' },
+];
+
+const products: Product[] = [
+  { id: 1, name: 'Silk Reset', category: 'Šampūnai', note: 'Drėkinantis šampūnas · 250 ml', price: 26, shape: 'pump', tone: 'smoke' },
+  { id: 2, name: 'Density Wash', category: 'Šampūnai', note: 'Apimties suteikiantis · 250 ml', price: 29, shape: 'pump', tone: 'olive' },
+  { id: 3, name: 'Smooth Veil', category: 'Kondicionieriai', note: 'Glotninantis kondicionierius · 200 ml', price: 28, shape: 'tube', tone: 'sand' },
+  { id: 4, name: 'Repair Crème', category: 'Kondicionieriai', note: 'Atkuriamoji kaukė · 180 ml', price: 32, shape: 'jar', tone: 'bronze' },
+  { id: 5, name: 'No. 03', category: 'Aliejukai', note: 'Lengvas plaukų aliejus · 50 ml', price: 34, shape: 'dropper', tone: 'amber' },
+  { id: 6, name: 'Glow Drops', category: 'Aliejukai', note: 'Žvilgesio serumas · 30 ml', price: 31, shape: 'dropper', tone: 'olive' },
+  { id: 7, name: 'Scalp Ritual', category: 'Priedai', note: 'Galvos odos masažuoklis', price: 18, shape: 'brush', tone: 'sand' },
+  { id: 8, name: 'Silk Loop', category: 'Priedai', note: 'Šilkinė plaukų gumytė', price: 12, shape: 'jar', tone: 'smoke' },
+  { id: 9, name: 'Daily Ritual', category: 'Rinkiniai', note: 'Šampūnas, kondicionierius, aliejus', price: 68, shape: 'set', tone: 'bronze' },
+  { id: 10, name: 'Restore Duo', category: 'Rinkiniai', note: 'Atkuriamasis šampūnas ir kaukė', price: 54, shape: 'set', tone: 'olive' },
+];
+
+const money = new Intl.NumberFormat('lt-LT', { style: 'currency', currency: 'EUR' });
+
+function ProductArt({ shape, tone, small = false }: { shape: Shape; tone: Product['tone']; small?: boolean }) {
+  return (
+    <div className={`product-art shape-${shape} tone-${tone}${small ? ' product-art-small' : ''}`} aria-hidden="true">
+      <span className="product-shadow" />
+      <span className="product-form"><i className="product-cap" /><b>S</b></span>
+    </div>
+  );
+}
+
+export default function Home() {
+  const [activeCategory, setActiveCategory] = useState<Category | 'Visi'>('Visi');
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [cartOpen, setCartOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [query, setQuery] = useState('');
+  const [cart, setCart] = useState<Record<number, number>>({});
+  const [notice, setNotice] = useState('');
+  const [messageSent, setMessageSent] = useState(false);
+
+  const visibleProducts = useMemo(
+    () => activeCategory === 'Visi' ? products.slice(0, 8) : products.filter((product) => product.category === activeCategory),
+    [activeCategory],
+  );
+
+  const searchResults = useMemo(() => {
+    const normalized = query.trim().toLocaleLowerCase('lt');
+    if (!normalized) return products.slice(0, 5);
+    return products.filter((product) => `${product.name} ${product.category} ${product.note}`.toLocaleLowerCase('lt').includes(normalized));
+  }, [query]);
+
+  const cartItems = products.filter((product) => cart[product.id]);
+  const cartCount = Object.values(cart).reduce((sum, quantity) => sum + quantity, 0);
+  const cartTotal = cartItems.reduce((sum, product) => sum + product.price * cart[product.id], 0);
+
+  function addToCart(product: Product) {
+    setCart((current) => ({ ...current, [product.id]: (current[product.id] || 0) + 1 }));
+    setNotice(`${product.name} pridėta į krepšelį`);
+    window.setTimeout(() => setNotice(''), 2200);
+  }
+
+  function changeQuantity(id: number, change: number) {
+    setCart((current) => {
+      const next = Math.max(0, (current[id] || 0) + change);
+      const updated = { ...current, [id]: next };
+      if (!next) delete updated[id];
+      return updated;
+    });
+  }
+
+  function chooseCategory(category: Category) {
+    setActiveCategory(category);
+    window.setTimeout(() => document.querySelector('#produktai')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 30);
+  }
+
+  function submitContact(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setMessageSent(true);
+  }
+
+  return (
+    <main>
+      <section className="hero" id="namai">
+        <header className="site-header">
+          <a className="wordmark" href="#namai" aria-label="Sfinksas – pradžia">SFINKSAS</a>
+          <nav className="desktop-nav" aria-label="Pagrindinis meniu">
+            <a className="active" href="#namai">Namai</a>
+            <button type="button" onClick={() => setSearchOpen(true)}>Paieška</button>
+            <a href="#kolekcija">Kolekcija</a>
+            <a href="#kontaktai">Kontaktai</a>
+          </nav>
+          <div className="header-actions">
+            <button className="cart-button" type="button" onClick={() => setCartOpen(true)} aria-label={`Atverti krepšelį, prekių: ${cartCount}`}>
+              <span>Krepšelis</span><span className="cart-count">({cartCount})</span><span className="bag-icon" aria-hidden="true" />
+            </button>
+            <button className="menu-button" type="button" onClick={() => setMenuOpen(true)} aria-label="Atverti meniu"><span /><span /></button>
+          </div>
+        </header>
+
+        <div className="hero-shade" />
+        <div className="hero-content">
+          <p className="eyebrow"><span /> Atrinkta plaukų priežiūra</p>
+          <h1>Grožio ritualas,<br /><em>sukurtas jums.</em></h1>
+          <p className="hero-copy">Profesionalios priemonės plaukų stiprumui, žvilgesiui ir kasdieniam ritualui. Atrinkta tai, kas iš tiesų veikia.</p>
+          <div className="hero-ctas">
+            <a className="primary-cta" href="#kolekcija">Atrasti kolekciją <span aria-hidden="true">↗</span></a>
+            <a className="text-cta" href="#apie">Mūsų požiūris <span aria-hidden="true">→</span></a>
+          </div>
+        </div>
+        <div className="hero-meta" aria-hidden="true"><span>01</span><i /><span>Grožio ritualai</span></div>
+        <a className="scroll-cue" href="#kolekcija" aria-label="Slinkti į kolekciją"><span /></a>
+      </section>
+
+      <section className="manifesto" id="apie">
+        <p className="section-kicker">Mūsų filosofija</p>
+        <div className="manifesto-copy">
+          <h2>Mažiau triukšmo.<br />Daugiau to, <em>kas veikia.</em></h2>
+          <div>
+            <p>„Sfinksas“ – tai kruopščiai atrinkta profesionali plaukų priežiūra: nuo kasdienio švelnaus valymo iki intensyvaus atkūrimo ir išbaigtų ritualų.</p>
+            <p className="small-copy">Kiekviena kategorija sukurta taip, kad lengvai rastumėte priemonę pagal savo ritualą.</p>
+          </div>
+        </div>
+        <div className="manifesto-rule"><span>01</span><i /><span>05</span></div>
+      </section>
+
+      <section className="collection" id="kolekcija">
+        <div className="collection-heading">
+          <div><p className="section-kicker light">Kolekcija</p><h2>Pasirinkite savo <em>ritualą</em></h2></div>
+          <p>Penkios kryptys, vienas tikslas – sveikai atrodantys, gyvybingi plaukai ir maloni kasdienė rutina.</p>
+        </div>
+
+        <div className="category-stage">
+          {categories.map((category) => (
+            <button key={category.name} className={`category-card${activeCategory === category.name ? ' selected' : ''}`} type="button" onClick={() => chooseCategory(category.name)}>
+              <span className="category-index">{category.index}</span>
+              <ProductArt shape={category.shape} tone={category.index === '02' ? 'sand' : category.index === '03' ? 'amber' : category.index === '04' ? 'olive' : 'smoke'} small />
+              <span className="category-name">{category.name}</span>
+              <span className="category-note">{category.note}</span>
+              <span className="category-arrow" aria-hidden="true">↗</span>
+            </button>
+          ))}
+        </div>
+
+        <div className="products-toolbar" id="produktai">
+          <div>
+            <span>Rodyti:</span>
+            <button className={activeCategory === 'Visi' ? 'current' : ''} type="button" onClick={() => setActiveCategory('Visi')}>Visi</button>
+            {categories.map((category) => <button key={category.name} className={activeCategory === category.name ? 'current' : ''} type="button" onClick={() => setActiveCategory(category.name)}>{category.name}</button>)}
+          </div>
+          <span>{visibleProducts.length.toString().padStart(2, '0')} produktai</span>
+        </div>
+
+        <div className="product-grid">
+          {visibleProducts.map((product) => (
+            <article className="product-card" key={product.id}>
+              <div className="product-image">
+                <span className="product-category">{product.category}</span>
+                <ProductArt shape={product.shape} tone={product.tone} />
+                <button className="quick-add" type="button" onClick={() => addToCart(product)} aria-label={`Pridėti ${product.name} į krepšelį`}>+</button>
+              </div>
+              <div className="product-info"><div><h3>{product.name}</h3><p>{product.note}</p></div><strong>{money.format(product.price)}</strong></div>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="editorial">
+        <div className="editorial-image" role="img" aria-label="Sfinksas plaukų priežiūros priemonės ant akmens pakylos" />
+        <div className="editorial-copy">
+          <p className="section-kicker">Ritualas nuo pradžios iki pabaigos</p>
+          <h2>Priežiūra, kuri<br /><em>jaučiasi kitaip.</em></h2>
+          <p>Suderinkite valymą, drėkinimą ir apsaugą. Atrinkti rinkiniai leidžia pradėti paprastai, o kiekvieną žingsnį – suprasti.</p>
+          <a className="dark-cta" href="#kolekcija">Rinktis rinkinį <span>↗</span></a>
+          <dl><div><dt>5</dt><dd>aiškios kategorijos</dd></div><div><dt>1</dt><dd>vientisas ritualas</dd></div></dl>
+        </div>
+      </section>
+
+      <section className="contacts" id="kontaktai">
+        <div className="contact-intro">
+          <p className="section-kicker light">Kontaktai</p>
+          <h2>Turite klausimą?<br /><em>Pasikalbėkime.</em></h2>
+          <p>Padėsime išsirinkti produktą ar suderinti kasdienį plaukų priežiūros ritualą.</p>
+          <a href="mailto:labas@sfinksas.lt">labas@sfinksas.lt <span>↗</span></a>
+        </div>
+        <form className="contact-form" onSubmit={submitContact}>
+          <label>Jūsų vardas<input required name="name" placeholder="Įrašykite vardą" /></label>
+          <label>El. paštas<input required type="email" name="email" placeholder="vardas@pastas.lt" /></label>
+          <label>Žinutė<textarea required name="message" rows={3} placeholder="Kuo galime padėti?" /></label>
+          <button type="submit">{messageSent ? 'Žinutė paruošta ✓' : 'Siųsti žinutę'} <span>↗</span></button>
+          <small>Demonstracinėje versijoje žinutė nėra išsiunčiama.</small>
+        </form>
+      </section>
+
+      <footer>
+        <a className="wordmark footer-mark" href="#namai">SFINKSAS</a>
+        <p>Profesionali plaukų priežiūra jūsų kasdieniam ritualui.</p>
+        <div><a href="#kolekcija">Kolekcija</a><a href="#kontaktai">Kontaktai</a><button type="button" onClick={() => setSearchOpen(true)}>Paieška</button></div>
+        <span>© 2026 Sfinksas · Demonstracinė parduotuvė</span>
+      </footer>
+
+      {searchOpen && (
+        <div className="overlay search-overlay" role="dialog" aria-modal="true" aria-label="Produktų paieška">
+          <button className="overlay-close" type="button" onClick={() => { setSearchOpen(false); setQuery(''); }} aria-label="Uždaryti paiešką">×</button>
+          <div className="search-panel">
+            <p className="section-kicker">Paieška kolekcijoje</p>
+            <label><span className="sr-only">Ieškoti produkto</span><input autoFocus value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Ko ieškote?" /><i>⌕</i></label>
+            <p className="search-status">{query ? `Rasta: ${searchResults.length}` : 'Populiaru dabar'}</p>
+            <div className="search-results">
+              {searchResults.map((product) => (
+                <button key={product.id} type="button" onClick={() => { addToCart(product); setSearchOpen(false); setQuery(''); }}>
+                  <ProductArt shape={product.shape} tone={product.tone} small />
+                  <span><b>{product.name}</b><small>{product.category}</small></span><strong>{money.format(product.price)}</strong><i>+</i>
+                </button>
+              ))}
+              {!searchResults.length && <p className="no-results">Nieko neradome. Pabandykite „aliejus“ arba „rinkinys“.</p>}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {cartOpen && (
+        <div className="drawer-backdrop" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setCartOpen(false); }}>
+          <aside className="cart-drawer" role="dialog" aria-modal="true" aria-label="Krepšelis">
+            <div className="drawer-header"><div><p className="section-kicker">Jūsų pasirinkimai</p><h2>Krepšelis <span>({cartCount})</span></h2></div><button type="button" onClick={() => setCartOpen(false)} aria-label="Uždaryti krepšelį">×</button></div>
+            <div className="cart-items">
+              {!cartItems.length && <div className="empty-cart"><span>○</span><h3>Krepšelis dar tuščias</h3><p>Atraskite ritualą, kuris tinka jūsų plaukams.</p><button type="button" onClick={() => setCartOpen(false)}>Grįžti į kolekciją</button></div>}
+              {cartItems.map((product) => (
+                <div className="cart-row" key={product.id}>
+                  <div className="cart-art"><ProductArt shape={product.shape} tone={product.tone} small /></div>
+                  <div className="cart-row-copy"><b>{product.name}</b><small>{product.note}</small><div><button type="button" onClick={() => changeQuantity(product.id, -1)} aria-label="Mažinti kiekį">−</button><span>{cart[product.id]}</span><button type="button" onClick={() => changeQuantity(product.id, 1)} aria-label="Didinti kiekį">+</button></div></div>
+                  <strong>{money.format(product.price * cart[product.id])}</strong>
+                </div>
+              ))}
+            </div>
+            {!!cartItems.length && <div className="cart-summary"><div><span>Suma</span><strong>{money.format(cartTotal)}</strong></div><button type="button" onClick={() => setNotice('Apmokėjimas šioje demonstracijoje išjungtas')}>Tęsti apmokėjimą <span>↗</span></button><small>Pristatymas apskaičiuojamas kitame žingsnyje.</small></div>}
+          </aside>
+        </div>
+      )}
+
+      {menuOpen && (
+        <div className="mobile-menu" role="dialog" aria-modal="true" aria-label="Mobilus meniu">
+          <div className="mobile-menu-top"><span className="wordmark">SFINKSAS</span><button type="button" onClick={() => setMenuOpen(false)} aria-label="Uždaryti meniu">×</button></div>
+          <nav>
+            <a href="#namai" onClick={() => setMenuOpen(false)}><span>01</span>Namai</a>
+            <button type="button" onClick={() => { setMenuOpen(false); setSearchOpen(true); }}><span>02</span>Paieška</button>
+            <a href="#kolekcija" onClick={() => setMenuOpen(false)}><span>03</span>Kolekcija</a>
+            <a href="#kontaktai" onClick={() => setMenuOpen(false)}><span>04</span>Kontaktai</a>
+          </nav>
+          <button className="mobile-cart" type="button" onClick={() => { setMenuOpen(false); setCartOpen(true); }}>Krepšelis ({cartCount}) <span>↗</span></button>
+        </div>
+      )}
+
+      {notice && <div className="toast" role="status">{notice}<span>✓</span></div>}
+    </main>
+  );
+}
