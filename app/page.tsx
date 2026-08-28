@@ -1,6 +1,7 @@
 'use client';
 
-import { type CSSProperties, FormEvent, useEffect, useMemo, useRef, useState } from 'react';
+import Image from 'next/image';
+import { type CSSProperties, FormEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
 type Category = 'Šampūnai' | 'Kondicionieriai' | 'Aliejukai' | 'Priedai' | 'Rinkiniai';
@@ -78,10 +79,10 @@ function productStory(product: Product) {
   };
 }
 
-function ProductArt({ shape, tone, image, small = false }: { shape: Shape; tone: Product['tone']; image?: string; small?: boolean }) {
+function ProductArt({ shape, tone, image }: { shape: Shape; tone: Product['tone']; image?: string }) {
   return (
-    <div className={`product-art shape-${shape} tone-${tone}${image ? ' has-photo' : ''}${small ? ' product-art-small' : ''}`} aria-hidden="true">
-      {image ? <img src={image} alt="" draggable="false" /> : <><span className="product-shadow" /><span className="product-form"><i className="product-cap" /><b>S</b></span></>}
+    <div className={`product-art shape-${shape} tone-${tone}${image ? ' has-photo' : ''}`} aria-hidden="true">
+      {image ? <Image src={image} alt="" fill sizes="(max-width: 760px) 74vw, 38vw" draggable={false} /> : <><span className="product-shadow" /><span className="product-form"><i className="product-cap" /><b>S</b></span></>}
     </div>
   );
 }
@@ -119,9 +120,36 @@ export default function Home() {
   const viewerMotionLockRef = useRef(false);
   const viewerMotionTimersRef = useRef<number[]>([]);
   const viewerProductTimerRef = useRef<number | null>(null);
+  const viewerClickTimerRef = useRef<number | null>(null);
+  const noticeTimerRef = useRef<number | null>(null);
+
+  const clearViewerTimers = useCallback(() => {
+    viewerMotionTimersRef.current.forEach((timer) => window.clearTimeout(timer));
+    viewerMotionTimersRef.current = [];
+    if (viewerProductTimerRef.current !== null) window.clearTimeout(viewerProductTimerRef.current);
+    viewerProductTimerRef.current = null;
+  }, []);
+
+  const resetViewerMotion = useCallback(() => {
+    clearViewerTimers();
+    viewerMotionLockRef.current = false;
+    setViewerMotion('idle');
+    setOpeningProductId(null);
+    setOpeningProductOffset(0);
+    setViewerOpeningMode(null);
+  }, [clearViewerTimers]);
+
+  const closeCategoryViewer = useCallback(() => {
+    resetViewerMotion();
+    setViewerCategory(null);
+  }, [resetViewerMotion]);
 
   useEffect(() => {
-    setPortalReady(true);
+    const frame = window.requestAnimationFrame(() => setPortalReady(true));
+    return () => window.cancelAnimationFrame(frame);
+  }, []);
+
+  useEffect(() => {
     document.body.classList.toggle('phone-preview-active', previewMode === 'phone');
     return () => document.body.classList.remove('phone-preview-active');
   }, [previewMode]);
@@ -134,29 +162,17 @@ export default function Home() {
       setNavPanel(null);
       setCartOpen(false);
       setMenuOpen(false);
-      setViewerCategory(null);
+      closeCategoryViewer();
     }
     document.addEventListener('keydown', closeDialogs);
     return () => document.removeEventListener('keydown', closeDialogs);
-  }, []);
+  }, [closeCategoryViewer]);
 
   useEffect(() => () => {
-    viewerMotionTimersRef.current.forEach((timer) => window.clearTimeout(timer));
-    if (viewerProductTimerRef.current) window.clearTimeout(viewerProductTimerRef.current);
-  }, []);
-
-  useEffect(() => {
-    if (viewerCategory) return;
-    viewerMotionTimersRef.current.forEach((timer) => window.clearTimeout(timer));
-    viewerMotionTimersRef.current = [];
-    viewerMotionLockRef.current = false;
-    setViewerMotion('idle');
-    if (viewerProductTimerRef.current) window.clearTimeout(viewerProductTimerRef.current);
-    viewerProductTimerRef.current = null;
-    setOpeningProductId(null);
-    setOpeningProductOffset(0);
-    setViewerOpeningMode(null);
-  }, [viewerCategory]);
+    clearViewerTimers();
+    if (viewerClickTimerRef.current !== null) window.clearTimeout(viewerClickTimerRef.current);
+    if (noticeTimerRef.current !== null) window.clearTimeout(noticeTimerRef.current);
+  }, [clearViewerTimers]);
 
   const visibleProducts = useMemo(
     () => activeCategory === 'Visi' ? products.slice(0, 8) : products.filter((product) => product.category === activeCategory),
@@ -195,7 +211,11 @@ export default function Home() {
   function addToCart(product: Product, quantity = 1) {
     setCart((current) => ({ ...current, [product.id]: (current[product.id] || 0) + quantity }));
     setNotice(`${product.name} pridėta į krepšelį`);
-    window.setTimeout(() => setNotice(''), 2200);
+    if (noticeTimerRef.current !== null) window.clearTimeout(noticeTimerRef.current);
+    noticeTimerRef.current = window.setTimeout(() => {
+      setNotice('');
+      noticeTimerRef.current = null;
+    }, 2200);
   }
 
   function openProduct(product: Product, fromCategoryViewer = false, fromDesktopViewer = false) {
@@ -223,15 +243,7 @@ export default function Home() {
   }
 
   function openCategoryViewer(category: Category) {
-    viewerMotionTimersRef.current.forEach((timer) => window.clearTimeout(timer));
-    viewerMotionTimersRef.current = [];
-    viewerMotionLockRef.current = false;
-    setViewerMotion('idle');
-    if (viewerProductTimerRef.current) window.clearTimeout(viewerProductTimerRef.current);
-    viewerProductTimerRef.current = null;
-    setOpeningProductId(null);
-    setOpeningProductOffset(0);
-    setViewerOpeningMode(null);
+    resetViewerMotion();
     setActiveCategory(category);
     setViewerIndex(0);
     setViewerCategory(category);
@@ -270,12 +282,8 @@ export default function Home() {
     setOpeningProductOffset(offset);
     setViewerOpeningMode(phoneLayout ? 'phone' : 'desktop');
     viewerProductTimerRef.current = window.setTimeout(() => {
-      setViewerCategory(null);
+      closeCategoryViewer();
       openProduct(product, phoneLayout, !phoneLayout);
-      setOpeningProductId(null);
-      setOpeningProductOffset(0);
-      setViewerOpeningMode(null);
-      viewerProductTimerRef.current = null;
     }, phoneLayout ? 760 : 880);
   }
 
@@ -428,7 +436,7 @@ export default function Home() {
           <div className="category-viewer-topbar">
             <span className="category-viewer-mark">SFINKSAS</span>
             <span>{viewerCategory}</span>
-            <button type="button" onClick={() => setViewerCategory(null)} aria-label="Uždaryti kategorijos peržiūrą">×</button>
+            <button type="button" onClick={closeCategoryViewer} aria-label="Uždaryti kategorijos peržiūrą">×</button>
           </div>
 
           {viewerOpeningMode === 'desktop' && openingProductId !== null && (
@@ -489,7 +497,11 @@ export default function Home() {
               const delta = Math.abs(deltaY) > Math.abs(deltaX) ? deltaY : deltaX;
               if (Math.abs(delta) > 28) {
                 viewerSuppressClickRef.current = true;
-                window.setTimeout(() => { viewerSuppressClickRef.current = false; }, 300);
+                if (viewerClickTimerRef.current !== null) window.clearTimeout(viewerClickTimerRef.current);
+                viewerClickTimerRef.current = window.setTimeout(() => {
+                  viewerSuppressClickRef.current = false;
+                  viewerClickTimerRef.current = null;
+                }, 300);
                 cycleCategoryViewer(deltaY >= 0 ? 1 : -1);
               }
             }}
