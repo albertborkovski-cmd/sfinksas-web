@@ -76,10 +76,13 @@ export default function Home() {
   const [rotation, setRotation] = useState(0);
   const [viewerCategory, setViewerCategory] = useState<Category | null>(null);
   const [viewerIndex, setViewerIndex] = useState(0);
+  const [viewerMotion, setViewerMotion] = useState<'idle' | 'moving' | 'settling'>('idle');
   const [portalReady, setPortalReady] = useState(false);
   const dragRef = useRef<{ pointerId: number; x: number } | null>(null);
   const viewerDragRef = useRef<{ pointerId: number; x: number; y: number } | null>(null);
   const viewerWheelLockRef = useRef(0);
+  const viewerMotionLockRef = useRef(false);
+  const viewerMotionTimersRef = useRef<number[]>([]);
 
   useEffect(() => {
     setPortalReady(true);
@@ -99,6 +102,18 @@ export default function Home() {
     document.addEventListener('keydown', closeDialogs);
     return () => document.removeEventListener('keydown', closeDialogs);
   }, []);
+
+  useEffect(() => () => {
+    viewerMotionTimersRef.current.forEach((timer) => window.clearTimeout(timer));
+  }, []);
+
+  useEffect(() => {
+    if (viewerCategory) return;
+    viewerMotionTimersRef.current.forEach((timer) => window.clearTimeout(timer));
+    viewerMotionTimersRef.current = [];
+    viewerMotionLockRef.current = false;
+    setViewerMotion('idle');
+  }, [viewerCategory]);
 
   const visibleProducts = useMemo(
     () => activeCategory === 'Visi' ? products.slice(0, 8) : products.filter((product) => product.category === activeCategory),
@@ -161,14 +176,35 @@ export default function Home() {
   }
 
   function openCategoryViewer(category: Category) {
+    viewerMotionTimersRef.current.forEach((timer) => window.clearTimeout(timer));
+    viewerMotionTimersRef.current = [];
+    viewerMotionLockRef.current = false;
+    setViewerMotion('idle');
     setActiveCategory(category);
     setViewerIndex(0);
     setViewerCategory(category);
   }
 
   function cycleCategoryViewer(direction: number) {
-    if (!viewerProducts.length) return;
-    setViewerIndex((current) => (current + direction + viewerProducts.length) % viewerProducts.length);
+    if (!viewerProducts.length || viewerMotionLockRef.current) return;
+    const phoneLayout = previewMode === 'phone' || window.matchMedia('(max-width: 760px)').matches;
+    if (!phoneLayout) {
+      setViewerIndex((current) => (current + direction + viewerProducts.length) % viewerProducts.length);
+      return;
+    }
+
+    viewerMotionLockRef.current = true;
+    setViewerMotion('moving');
+    const moveTimer = window.setTimeout(() => {
+      setViewerIndex((current) => (current + direction + viewerProducts.length) % viewerProducts.length);
+      setViewerMotion('settling');
+    }, 560);
+    const settleTimer = window.setTimeout(() => {
+      setViewerMotion('idle');
+      viewerMotionLockRef.current = false;
+      viewerMotionTimersRef.current = [];
+    }, 980);
+    viewerMotionTimersRef.current = [moveTimer, settleTimer];
   }
 
   function viewerOffset(index: number) {
@@ -316,7 +352,7 @@ export default function Home() {
       </footer>
 
       {portalReady && viewerCategory && activeViewerProduct && createPortal(
-        <section className={`category-viewer${previewMode === 'phone' ? ' is-phone-viewer' : ''}${viewerProducts.some((product) => product.image) ? ' has-product-photos' : ''}`} role="dialog" aria-modal="true" aria-label={`${viewerCategory} prekių peržiūra`}>
+        <section className={`category-viewer${previewMode === 'phone' ? ' is-phone-viewer' : ''}${viewerProducts.some((product) => product.image) ? ' has-product-photos' : ''}${viewerMotion !== 'idle' ? ` is-phone-${viewerMotion}` : ''}`} role="dialog" aria-modal="true" aria-label={`${viewerCategory} prekių peržiūra`}>
           <div className="category-viewer-topbar">
             <span className="category-viewer-mark">SFINKSAS</span>
             <span>{viewerCategory}</span>
