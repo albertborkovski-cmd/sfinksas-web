@@ -104,6 +104,8 @@ export default function Home() {
   const [viewerCategory, setViewerCategory] = useState<Category | null>(null);
   const [viewerIndex, setViewerIndex] = useState(0);
   const [viewerMotion, setViewerMotion] = useState<'idle' | 'moving' | 'settling'>('idle');
+  const [viewerDirection, setViewerDirection] = useState<1 | -1>(1);
+  const [viewerMotionKey, setViewerMotionKey] = useState(0);
   const [openingProductId, setOpeningProductId] = useState<number | null>(null);
   const [openingProductOffset, setOpeningProductOffset] = useState(0);
   const [viewerOpeningMode, setViewerOpeningMode] = useState<'phone' | 'desktop' | null>(null);
@@ -112,6 +114,7 @@ export default function Home() {
   const [portalReady, setPortalReady] = useState(false);
   const dragRef = useRef<{ pointerId: number; x: number } | null>(null);
   const viewerDragRef = useRef<{ pointerId: number; x: number; y: number } | null>(null);
+  const viewerSuppressClickRef = useRef(false);
   const viewerWheelLockRef = useRef(0);
   const viewerMotionLockRef = useRef(false);
   const viewerMotionTimersRef = useRef<number[]>([]);
@@ -233,23 +236,26 @@ export default function Home() {
 
   function cycleCategoryViewer(direction: number) {
     if (!viewerProducts.length || viewerMotionLockRef.current) return;
+    const normalizedDirection: 1 | -1 = direction >= 0 ? 1 : -1;
     const phoneLayout = previewMode === 'phone' || window.matchMedia('(max-width: 760px)').matches;
     if (!phoneLayout) {
-      setViewerIndex((current) => (current + direction + viewerProducts.length) % viewerProducts.length);
+      setViewerIndex((current) => (current + normalizedDirection + viewerProducts.length) % viewerProducts.length);
       return;
     }
 
     viewerMotionLockRef.current = true;
+    setViewerDirection(normalizedDirection);
+    setViewerMotionKey((current) => current + 1);
     setViewerMotion('moving');
     const moveTimer = window.setTimeout(() => {
-      setViewerIndex((current) => (current + direction + viewerProducts.length) % viewerProducts.length);
+      setViewerIndex((current) => (current + normalizedDirection + viewerProducts.length) % viewerProducts.length);
       setViewerMotion('settling');
-    }, 700);
+    }, 720);
     const settleTimer = window.setTimeout(() => {
       setViewerMotion('idle');
       viewerMotionLockRef.current = false;
       viewerMotionTimersRef.current = [];
-    }, 1160);
+    }, 980);
     viewerMotionTimersRef.current = [moveTimer, settleTimer];
   }
 
@@ -415,7 +421,7 @@ export default function Home() {
       </footer>
 
       {portalReady && viewerCategory && activeViewerProduct && createPortal(
-        <section className={`category-viewer${previewMode === 'phone' ? ' is-phone-viewer' : ''}${viewerProducts.some((product) => product.image) ? ' has-product-photos' : ''}${viewerMotion !== 'idle' ? ` is-phone-${viewerMotion}` : ''}${openingProductId !== null ? ` is-opening-product is-opening-${viewerOpeningMode}` : ''}`} role="dialog" aria-modal="true" aria-label={`${viewerCategory} prekių peržiūra`}>
+        <section className={`category-viewer${previewMode === 'phone' ? ' is-phone-viewer' : ''}${viewerProducts.some((product) => product.image) ? ' has-product-photos' : ''}${viewerMotion !== 'idle' ? ` is-phone-${viewerMotion} is-direction-${viewerDirection > 0 ? 'next' : 'previous'}` : ''}${openingProductId !== null ? ` is-opening-product is-opening-${viewerOpeningMode}` : ''}`} role="dialog" aria-modal="true" aria-label={`${viewerCategory} prekių peržiūra`}>
           <div className="category-viewer-topbar">
             <span className="category-viewer-mark">SFINKSAS</span>
             <span>{viewerCategory}</span>
@@ -446,6 +452,7 @@ export default function Home() {
           </div>
 
           <div
+            key={`viewer-wheel-${viewerMotionKey}`}
             className="category-wheel-stage"
             tabIndex={0}
             aria-label="Sukama produktų karuselė"
@@ -462,7 +469,13 @@ export default function Home() {
             }}
             onPointerDown={(event) => {
               viewerDragRef.current = { pointerId: event.pointerId, x: event.clientX, y: event.clientY };
+              viewerSuppressClickRef.current = false;
               event.currentTarget.setPointerCapture(event.pointerId);
+            }}
+            onPointerMove={(event) => {
+              const start = viewerDragRef.current;
+              if (!start || start.pointerId !== event.pointerId) return;
+              if (Math.abs(event.clientY - start.y) > 8 || Math.abs(event.clientX - start.x) > 8) event.preventDefault();
             }}
             onPointerUp={(event) => {
               const start = viewerDragRef.current;
@@ -471,7 +484,11 @@ export default function Home() {
               const deltaX = event.clientX - start.x;
               const deltaY = event.clientY - start.y;
               const delta = Math.abs(deltaY) > Math.abs(deltaX) ? deltaY : deltaX;
-              if (Math.abs(delta) > 32) cycleCategoryViewer(delta < 0 ? 1 : -1);
+              if (Math.abs(delta) > 28) {
+                viewerSuppressClickRef.current = true;
+                window.setTimeout(() => { viewerSuppressClickRef.current = false; }, 300);
+                cycleCategoryViewer(deltaY >= 0 ? 1 : -1);
+              }
             }}
             onPointerCancel={() => { viewerDragRef.current = null; }}
           >
@@ -485,8 +502,13 @@ export default function Home() {
                   type="button"
                   aria-label={`Atidaryti ${product.name} informaciją`}
                   aria-current={offset === 0 ? 'true' : undefined}
-                  onPointerDown={(event) => event.stopPropagation()}
-                  onClick={() => openViewerProduct(product, offset)}
+                  onClick={() => {
+                    if (viewerSuppressClickRef.current) {
+                      viewerSuppressClickRef.current = false;
+                      return;
+                    }
+                    openViewerProduct(product, offset);
+                  }}
                 >
                   <ProductArt shape={product.shape} tone={product.tone} image={product.image} />
                 </button>
