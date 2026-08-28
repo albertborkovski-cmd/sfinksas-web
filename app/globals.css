@@ -440,16 +440,16 @@ body.phone-preview-active { overflow: hidden; background: radial-gradient(circle
 .category-viewer.is-phone-viewer .category-wheel-item[data-offset="-3"],
 .category-viewer.is-phone-viewer .category-wheel-item[data-offset="4"],
 .category-viewer.is-phone-viewer .category-wheel-item[data-offset="-4"] { display: none; }
-.category-viewer.is-phone-viewer .category-wheel-item.is-after { z-index: 7; opacity: .7; pointer-events: none; transform: translate(-50%,calc(-50% - 175px)) translateZ(-85px) scale(.68); filter: saturate(.74) contrast(.97) brightness(.98); }
+.category-viewer.is-phone-viewer .category-wheel-item.is-after { z-index: 7; opacity: 1; pointer-events: none; transform: translate(-50%,calc(-50% - 175px)) translateZ(-85px) scale(.68); filter: brightness(.82) saturate(.72) contrast(.94); }
 .category-viewer.is-phone-viewer .category-wheel-item[data-offset="1"] { z-index: 7; }
-.category-viewer.is-phone-viewer .category-wheel-item[data-offset="2"] { z-index: 6; opacity: .4; transform: translate(-50%,calc(-50% - 285px)) translateZ(-170px) scale(.48); filter: saturate(.48) contrast(.95) brightness(.94); }
+.category-viewer.is-phone-viewer .category-wheel-item[data-offset="2"] { z-index: 6; opacity: 1; transform: translate(-50%,calc(-50% - 285px)) translateZ(-170px) scale(.48); filter: brightness(.66) saturate(.45) contrast(.88); }
 .category-viewer.is-phone-viewer .category-wheel-item .product-art,
 .category-viewer.is-phone-viewer .category-wheel-item .product-art img { backface-visibility: hidden; }
 .category-viewer.is-phone-viewer.is-phone-moving .category-wheel-item { will-change: transform, opacity; }
 .category-viewer.is-phone-viewer.is-phone-moving .category-wheel-item.is-active { z-index: 9; animation: phone-bottle-exit-motion .68s cubic-bezier(.22,.61,.36,1) both, phone-bottle-exit-opacity .68s linear both; }
 .category-viewer.is-phone-viewer.is-phone-moving .category-wheel-item[data-offset="1"] { z-index: 8; animation: phone-bottle-next-to-front .68s cubic-bezier(.22,.61,.36,1) both; }
 .category-viewer.is-phone-viewer.is-phone-moving .category-wheel-item[data-offset="2"] { z-index: 7; animation: phone-bottle-back-to-middle .68s cubic-bezier(.22,.61,.36,1) both; }
-.category-viewer.is-phone-viewer.is-phone-settling .category-wheel-item[data-offset="2"] { z-index: 6; animation: phone-bottle-new-back-in .42s cubic-bezier(.16,.78,.18,1) both; }
+.category-viewer.is-phone-viewer.is-phone-moving .category-wheel-item[data-offset="3"] { display: block; z-index: 5; pointer-events: none; animation: phone-bottle-new-back-in .68s cubic-bezier(.22,.61,.36,1) both; }
 .category-viewer.is-phone-viewer .category-wheel-item[data-offset="1"] .product-art.has-photo,
 .category-viewer.is-phone-viewer .category-wheel-item[data-offset="2"] .product-art.has-photo { clip-path: none; }
 .category-viewer.is-phone-viewer .category-wheel-item.is-active .product-art.has-photo img { filter: drop-shadow(0 30px 20px rgba(37,22,13,.36)) drop-shadow(-8px 0 12px rgba(255,255,255,.12)); }
@@ -493,15 +493,15 @@ body.phone-preview-active { overflow: hidden; background: radial-gradient(circle
   .category-wheel-item[data-offset="-3"],
   .category-wheel-item[data-offset="4"],
   .category-wheel-item[data-offset="-4"] { display: none; }
-  .category-wheel-item.is-after { z-index: 7; opacity: .7; pointer-events: none; transform: translate(-50%,calc(-50% - 175px)) translateZ(-85px) scale(.68); filter: saturate(.74) contrast(.97) brightness(.98); }
+  .category-wheel-item.is-after { z-index: 7; opacity: 1; pointer-events: none; transform: translate(-50%,calc(-50% - 175px)) translateZ(-85px) scale(.68); filter: brightness(.82) saturate(.72) contrast(.94); }
   .category-wheel-item[data-offset="1"] { z-index: 7; }
-  .category-wheel-item[data-offset="2"] { z-index: 6; opacity: .4; transform: translate(-50%,calc(-50% - 285px)) translateZ(-170px) scale(.48); filter: saturate(.48) contrast(.95) brightness(.94); }
+  .category-wheel-item[data-offset="2"] { z-index: 6; opacity: 1; transform: translate(-50%,calc(-50% - 285px)) translateZ(-170px) scale(.48); filter: brightness(.66) saturate(.45) contrast(.88); }
   .category-wheel-item .product-art, .category-wheel-item .product-art img { backface-visibility: hidden; }
   .category-viewer.is-phone-moving .category-wheel-item { will-change: transform, opacity; }
   .category-viewer.is-phone-moving .category-wheel-item.is-active { z-index: 9; animation: phone-bottle-exit-motion .68s cubic-bezier(.22,.61,.36,1) both, phone-bottle-exit-opacity .68s linear both; }
   .category-viewer.is-phone-moving .category-wheel-item[data-offset="1"] { z-index: 8; animation: phone-bottle-next-to-front .68s cubic-bezier(.22,.61,.36,1) both; }
   .category-viewer.is-phone-moving .category-wheel-item[data-offset="2"] { z-index: 7; animation: phone-bottle-back-to-middle .68s cubic-bezier(.22,.61,.36,1) both; }
-  .category-viewer.is-phone-settling .category-wheel-item[data-offset="2"] { z-index: 6; animation: phone-bottle-new-back-in .42s cubic-bezier(.16,.78,.18,1) both; }
+  .category-viewer.is-phone-moving .category-wheel-item[data-offset="3"] { display: block; z-index: 5; pointer-events: none; animation: phone-bottle-new-back-in .68s cubic-bezier(.22,.61,.36,1) both; }
   .category-wheel-item[data-offset="1"] .product-art.has-photo,
   .category-wheel-item[data-offset="2"] .product-art.has-photo { clip-path: none; }
   .category-wheel-item.is-active .product-art.has-photo img { filter: drop-shadow(0 30px 20px rgba(37,22,13,.36)) drop-shadow(-8px 0 12px rgba(255,255,255,.12)); }
@@ -623,16 +623,16 @@ body.phone-preview-active { overflow: hidden; background: radial-gradient(circle
   to { opacity: 0; }
 }
 @keyframes phone-bottle-next-to-front {
-  0% { opacity: .7; transform: translate(-50%,calc(-50% - 175px)) translateZ(-85px) scale(.68); }
-  100% { opacity: 1; transform: translate(-50%,-50%) translateZ(105px) scale(.96); }
+  0% { opacity: 1; transform: translate(-50%,calc(-50% - 175px)) translateZ(-85px) scale(.68); filter: brightness(.82) saturate(.72) contrast(.94); }
+  100% { opacity: 1; transform: translate(-50%,-50%) translateZ(105px) scale(.96); filter: none; }
 }
 @keyframes phone-bottle-back-to-middle {
-  0% { opacity: .4; transform: translate(-50%,calc(-50% - 285px)) translateZ(-170px) scale(.48); }
-  100% { opacity: .7; transform: translate(-50%,calc(-50% - 175px)) translateZ(-85px) scale(.68); }
+  0% { opacity: 1; transform: translate(-50%,calc(-50% - 285px)) translateZ(-170px) scale(.48); filter: brightness(.66) saturate(.45) contrast(.88); }
+  100% { opacity: 1; transform: translate(-50%,calc(-50% - 175px)) translateZ(-85px) scale(.68); filter: brightness(.82) saturate(.72) contrast(.94); }
 }
 @keyframes phone-bottle-new-back-in {
-  0% { opacity: 0; transform: translate(-50%,calc(-50% - 390px)) translateZ(-250px) scale(.32); }
-  100% { opacity: .4; transform: translate(-50%,calc(-50% - 285px)) translateZ(-170px) scale(.48); }
+  0% { opacity: 0; transform: translate(-50%,calc(-50% - 390px)) translateZ(-250px) scale(.32); filter: brightness(.52) saturate(.25) contrast(.84); }
+  100% { opacity: 1; transform: translate(-50%,calc(-50% - 285px)) translateZ(-170px) scale(.48); filter: brightness(.66) saturate(.45) contrast(.88); }
 }
 
 /* Clean phone product detail: information above, purchase controls lower left, bottle lower right */
