@@ -363,9 +363,9 @@ export default function Home() {
                   className={`category-wheel-item${offset === 0 ? ' is-active' : offset < 0 ? ' is-before' : ' is-after'}`}
                   data-offset={offset}
                   type="button"
-                  aria-label={offset === 0 ? `${product.name}, aktyvi prekė` : `Rodyti ${product.name}`}
+                  aria-label={`Atidaryti ${product.name} informaciją`}
                   aria-current={offset === 0 ? 'true' : undefined}
-                  onClick={() => { if (offset) cycleCategoryViewer(offset > 0 ? 1 : -1); }}
+                  onClick={() => { setViewerCategory(null); openProduct(product); }}
                 >
                   <ProductArt shape={product.shape} tone={product.tone} image={product.image} />
                   <span className="wheel-product-label">{product.name}</span>
@@ -409,7 +409,7 @@ export default function Home() {
             >
               <span className="preview-category">{selectedProduct.category}</span>
               <span className="rotation-degree">{Math.round(rotation * 3.6)}°</span>
-              <div className="preview-art-rotator" style={{ transform: `perspective(900px) rotateY(${rotation * .36 - 18}deg)` }}>
+              <div className="preview-art-rotator" style={{ transform: `perspective(900px) rotateY(${rotation * 3.6}deg)` }}>
                 <ProductArt shape={selectedProduct.shape} tone={selectedProduct.tone} image={selectedProduct.image} />
               </div>
               <div className="rotation-control">

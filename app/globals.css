@@ -500,16 +500,22 @@ body.phone-preview-active { overflow: hidden; background: radial-gradient(circle
   .category-viewer-hint { display: none; }
   .category-viewer-footer > button { min-width: 0; width: 100%; padding: 12px 13px; gap: 14px; font-size: 9px; }
   .product-preview-backdrop { display: block; padding: 0; background: var(--paper); backdrop-filter: none; }
-  .product-preview-modal { grid-template-columns: 1fr; width: 100%; min-height: 100%; overflow: visible; box-shadow: none; }
-  .product-preview-stage { min-height: 430px; }
-  .product-preview-details { padding: 60px 22px 44px; }
-  .product-preview-details h2 { font-size: 52px; }
-  .product-preview-next { left: auto; right: 18px; top: 385px; }
-  .product-preview-previous { left: 18px; top: 385px; }
+  .product-preview-modal { display: block; width: 100%; min-height: 100svh; overflow: visible; box-shadow: none; background: linear-gradient(180deg,#d8c8b7 0 510px,var(--paper) 510px); }
+  .product-preview-stage { min-height: 520px; background: radial-gradient(circle at 78% 50%,#efe4d7 0%,#bdab98 43%,#705e51 100%); }
+  .product-preview-stage::before { inset: 7% -18% 7% 28%; }
+  .product-preview-stage::after { left: 48%; right: -8%; bottom: 9%; }
+  .preview-art-rotator { left: 72%; width: 220px; height: 370px; margin: -185px 0 0 -110px; }
+  .product-preview-details { z-index: 5; width: calc(100% - 76px); min-height: 470px; margin: -225px 76px 0 0; padding: 28px 20px 38px; background: rgba(244,238,229,.97); box-shadow: 20px 22px 50px rgba(40,24,15,.16); }
+  .product-preview-details h2 { padding-right: 18px; font-size: 38px; }
+  .preview-product-description { margin: 20px 0 18px; font-size: 14px; line-height: 1.5; }
+  .product-preview-details ul { margin-bottom: 20px; }
+  .preview-product-number { right: 16px; top: 30px; }
+  .product-preview-next { left: auto; right: 14px; top: 458px; }
+  .product-preview-previous { left: 14px; top: 458px; }
   .product-preview-close { position: fixed; right: 18px; top: 18px; }
-  .preview-art-rotator { width: 185px; height: 310px; margin: -155px 0 0 -92px; }
-  .rotation-control { right: 72px; }
-  .preview-product-number { top: 74px; }
+  .rotation-control { left: 48%; right: 18px; bottom: 23px; grid-template-columns: 1fr; gap: 5px; }
+  .rotation-control > span { font-size: 7px; }
+  .rotation-degree { right: 18px; bottom: 74px; }
 }
 
 @media (max-width: 1100px) {
