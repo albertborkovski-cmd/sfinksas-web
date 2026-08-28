@@ -14,6 +14,8 @@ type Product = {
   price: number;
   shape: Shape;
   tone: 'bronze' | 'sand' | 'olive' | 'smoke' | 'amber';
+  image?: string;
+  variants?: string[];
 };
 
 const categories: { name: Category; index: string; shape: Shape; note: string }[] = [
@@ -25,8 +27,8 @@ const categories: { name: Category; index: string; shape: Shape; note: string }[
 ];
 
 const products: Product[] = [
-  { id: 1, name: 'Silk Reset', category: 'Šampūnai', note: 'Drėkinantis šampūnas · 250 ml', price: 26, shape: 'pump', tone: 'smoke' },
-  { id: 2, name: 'Density Wash', category: 'Šampūnai', note: 'Apimties suteikiantis · 250 ml', price: 29, shape: 'pump', tone: 'olive' },
+  { id: 1, name: 'Keune Style Refresh', category: 'Šampūnai', note: 'Sausas šampūnas · 200 ml', price: 24, shape: 'pump', tone: 'smoke', image: '/keune-style-refresh-dry-shampoo.png', variants: ['200 ml'] },
+  { id: 2, name: 'milk_shake Colour Care', category: 'Šampūnai', note: 'Spalvą tausojantis šampūnas · 300 ml', price: 23, shape: 'pump', tone: 'amber', image: '/milk-shake-colour-care-shampoo.png', variants: ['300 ml'] },
   { id: 3, name: 'Smooth Veil', category: 'Kondicionieriai', note: 'Glotninantis kondicionierius · 200 ml', price: 28, shape: 'tube', tone: 'sand' },
   { id: 4, name: 'Repair Crème', category: 'Kondicionieriai', note: 'Atkuriamoji kaukė · 180 ml', price: 32, shape: 'jar', tone: 'bronze' },
   { id: 5, name: 'No. 03', category: 'Aliejukai', note: 'Lengvas plaukų aliejus · 50 ml', price: 34, shape: 'dropper', tone: 'amber' },
@@ -35,20 +37,21 @@ const products: Product[] = [
   { id: 8, name: 'Silk Loop', category: 'Priedai', note: 'Šilkinė plaukų gumytė', price: 12, shape: 'jar', tone: 'smoke' },
   { id: 9, name: 'Daily Ritual', category: 'Rinkiniai', note: 'Šampūnas, kondicionierius, aliejus', price: 68, shape: 'set', tone: 'bronze' },
   { id: 10, name: 'Restore Duo', category: 'Rinkiniai', note: 'Atkuriamasis šampūnas ir kaukė', price: 54, shape: 'set', tone: 'olive' },
-  { id: 11, name: 'Color Balance', category: 'Šampūnai', note: 'Spalvą tausojantis šampūnas · 250 ml', price: 31, shape: 'pump', tone: 'bronze' },
+  { id: 11, name: 'milk_shake Integrity', category: 'Šampūnai', note: 'Maitinamasis šampūnas · 1000 ml', price: 39, shape: 'pump', tone: 'sand', image: '/milk-shake-integrity-shampoo.png', variants: ['1000 ml'] },
   { id: 12, name: 'Hydrate Melt', category: 'Kondicionieriai', note: 'Intensyviai drėkinantis · 200 ml', price: 30, shape: 'tube', tone: 'olive' },
   { id: 13, name: 'Satin Mist', category: 'Aliejukai', note: 'Lengva apsauginė dulksna · 50 ml', price: 33, shape: 'dropper', tone: 'smoke' },
   { id: 14, name: 'Wide Tooth', category: 'Priedai', note: 'Plačių dantukų ritualo šukos', price: 16, shape: 'brush', tone: 'bronze' },
   { id: 15, name: 'Night Repair', category: 'Rinkiniai', note: 'Naktinis atkuriamasis trejetas', price: 72, shape: 'set', tone: 'smoke' },
+  { id: 16, name: 'Kérastase Chronologiste', category: 'Šampūnai', note: 'Atgaivinantis šampūnas · 500 ml', price: 46, shape: 'pump', tone: 'smoke', image: '/kerastase-chronologiste-shampoo.png', variants: ['500 ml'] },
+  { id: 17, name: 'Kérastase Discipline', category: 'Šampūnai', note: 'Glotninantis šampūnas · 250 ml', price: 34, shape: 'tube', tone: 'bronze', image: '/kerastase-discipline-shampoo.png', variants: ['250 ml'] },
 ];
 
 const money = new Intl.NumberFormat('lt-LT', { style: 'currency', currency: 'EUR' });
 
-function ProductArt({ shape, tone, small = false }: { shape: Shape; tone: Product['tone']; small?: boolean }) {
+function ProductArt({ shape, tone, image, small = false }: { shape: Shape; tone: Product['tone']; image?: string; small?: boolean }) {
   return (
-    <div className={`product-art shape-${shape} tone-${tone}${small ? ' product-art-small' : ''}`} aria-hidden="true">
-      <span className="product-shadow" />
-      <span className="product-form"><i className="product-cap" /><b>S</b></span>
+    <div className={`product-art shape-${shape} tone-${tone}${image ? ' has-photo' : ''}${small ? ' product-art-small' : ''}`} aria-hidden="true">
+      {image ? <img src={image} alt="" draggable="false" /> : <><span className="product-shadow" /><span className="product-form"><i className="product-cap" /><b>S</b></span></>}
     </div>
   );
 }
@@ -113,11 +116,11 @@ export default function Home() {
   const cartItems = products.filter((product) => cart[product.id]);
   const cartCount = Object.values(cart).reduce((sum, quantity) => sum + quantity, 0);
   const cartTotal = cartItems.reduce((sum, product) => sum + product.price * cart[product.id], 0);
-  const previewVariants = selectedProduct?.category === 'Priedai'
+  const previewVariants = selectedProduct?.variants ?? (selectedProduct?.category === 'Priedai'
     ? ['1 vnt.']
     : selectedProduct?.category === 'Rinkiniai'
       ? ['Standartinis', 'Dovaninis']
-      : ['250 ml', '500 ml'];
+      : ['250 ml', '500 ml']);
   const previewPrice = selectedProduct ? selectedProduct.price + (previewVariant > 0 ? 18 : 0) : 0;
 
   function addToCart(product: Product, quantity = 1) {
@@ -257,9 +260,9 @@ export default function Home() {
         <div className="product-grid">
           {visibleProducts.map((product) => (
             <article className="product-card" key={product.id}>
-              <div className="product-image">
+              <div className={`product-image${product.image ? ' has-product-photo' : ''}`}>
                 <span className="product-category">{product.category}</span>
-                <ProductArt shape={product.shape} tone={product.tone} />
+                <ProductArt shape={product.shape} tone={product.tone} image={product.image} />
                 <button className="product-preview-trigger" type="button" onClick={() => openProduct(product)} aria-label={`Peržiūrėti ${product.name}`}><span className="sr-only">Peržiūrėti produktą</span></button>
                 <button className="quick-add" type="button" onClick={() => addToCart(product)} aria-label={`Pridėti ${product.name} į krepšelį`}>+</button>
               </div>
@@ -304,7 +307,7 @@ export default function Home() {
       </footer>
 
       {portalReady && viewerCategory && activeViewerProduct && createPortal(
-        <section className={`category-viewer${previewMode === 'phone' ? ' is-phone-viewer' : ''}`} role="dialog" aria-modal="true" aria-label={`${viewerCategory} prekių peržiūra`}>
+        <section className={`category-viewer${previewMode === 'phone' ? ' is-phone-viewer' : ''}${viewerProducts.some((product) => product.image) ? ' has-product-photos' : ''}`} role="dialog" aria-modal="true" aria-label={`${viewerCategory} prekių peržiūra`}>
           <div className="category-viewer-topbar">
             <span className="category-viewer-mark">SFINKSAS</span>
             <span>{viewerCategory}</span>
@@ -354,12 +357,13 @@ export default function Home() {
                 <button
                   key={product.id}
                   className={`category-wheel-item${offset === 0 ? ' is-active' : offset < 0 ? ' is-before' : ' is-after'}`}
+                  data-offset={offset}
                   type="button"
                   aria-label={offset === 0 ? `${product.name}, aktyvi prekė` : `Rodyti ${product.name}`}
                   aria-current={offset === 0 ? 'true' : undefined}
                   onClick={() => { if (offset) cycleCategoryViewer(offset > 0 ? 1 : -1); }}
                 >
-                  <ProductArt shape={product.shape} tone={product.tone} />
+                  <ProductArt shape={product.shape} tone={product.tone} image={product.image} />
                   <span className="wheel-product-label">{product.name}</span>
                 </button>
               );
@@ -386,7 +390,7 @@ export default function Home() {
             <button className="product-preview-next" type="button" onClick={() => moveProduct(1)} aria-label="Kitas produktas">→</button>
 
             <div
-              className="product-preview-stage"
+              className={`product-preview-stage${selectedProduct.image ? ' has-product-photo' : ''}`}
               onPointerDown={(event) => {
                 dragRef.current = { pointerId: event.pointerId, x: event.clientX };
                 event.currentTarget.setPointerCapture(event.pointerId);
@@ -402,7 +406,7 @@ export default function Home() {
               <span className="preview-category">{selectedProduct.category}</span>
               <span className="rotation-degree">{Math.round(rotation * 3.6)}°</span>
               <div className="preview-art-rotator" style={{ transform: `perspective(900px) rotateY(${rotation * .36 - 18}deg)` }}>
-                <ProductArt shape={selectedProduct.shape} tone={selectedProduct.tone} />
+                <ProductArt shape={selectedProduct.shape} tone={selectedProduct.tone} image={selectedProduct.image} />
               </div>
               <div className="rotation-control">
                 <span><i>↔</i> Vilkite arba sukite</span>
@@ -455,7 +459,7 @@ export default function Home() {
             <div className="search-results">
               {searchResults.map((product) => (
                 <button key={product.id} type="button" onClick={() => { addToCart(product); setSearchOpen(false); setQuery(''); }}>
-                  <ProductArt shape={product.shape} tone={product.tone} small />
+                  <ProductArt shape={product.shape} tone={product.tone} image={product.image} small />
                   <span><b>{product.name}</b><small>{product.category}</small></span><strong>{money.format(product.price)}</strong><i>+</i>
                 </button>
               ))}
@@ -473,7 +477,7 @@ export default function Home() {
               {!cartItems.length && <div className="empty-cart"><span>○</span><h3>Krepšelis dar tuščias</h3><p>Atraskite ritualą, kuris tinka jūsų plaukams.</p><button type="button" onClick={() => setCartOpen(false)}>Grįžti į kolekciją</button></div>}
               {cartItems.map((product) => (
                 <div className="cart-row" key={product.id}>
-                  <div className="cart-art"><ProductArt shape={product.shape} tone={product.tone} small /></div>
+                  <div className={`cart-art${product.image ? ' has-product-photo' : ''}`}><ProductArt shape={product.shape} tone={product.tone} image={product.image} small /></div>
                   <div className="cart-row-copy"><b>{product.name}</b><small>{product.note}</small><div><button type="button" onClick={() => changeQuantity(product.id, -1)} aria-label="Mažinti kiekį">−</button><span>{cart[product.id]}</span><button type="button" onClick={() => changeQuantity(product.id, 1)} aria-label="Didinti kiekį">+</button></div></div>
                   <strong>{money.format(product.price * cart[product.id])}</strong>
                 </div>
