@@ -431,9 +431,9 @@ body.phone-preview-active { overflow: hidden; background: radial-gradient(circle
 .category-viewer.is-phone-viewer .category-wheel-item[data-offset="-3"],
 .category-viewer.is-phone-viewer .category-wheel-item[data-offset="4"],
 .category-viewer.is-phone-viewer .category-wheel-item[data-offset="-4"] { display: none; }
-.category-viewer.is-phone-viewer .category-wheel-item.is-after { z-index: 7; opacity: 1; pointer-events: none; transform: translate(-50%,calc(-50% - 145px)) translateZ(-85px) scale(.7); filter: brightness(.64) saturate(.55) contrast(.9); }
+.category-viewer.is-phone-viewer .category-wheel-item.is-after { z-index: 7; opacity: 1; pointer-events: none; transform: translate(-50%,calc(-50% - 170px)) translateZ(-85px) scale(.7); filter: brightness(.7) saturate(.68) contrast(.93); }
 .category-viewer.is-phone-viewer .category-wheel-item[data-offset="1"] { z-index: 7; }
-.category-viewer.is-phone-viewer .category-wheel-item[data-offset="2"] { z-index: 6; opacity: 1; transform: translate(-50%,calc(-50% - 235px)) translateZ(-170px) scale(.49); filter: brightness(.33) saturate(.25) contrast(.84); }
+.category-viewer.is-phone-viewer .category-wheel-item[data-offset="2"] { z-index: 6; opacity: 1; transform: translate(-50%,calc(-50% - 270px)) translateZ(-170px) scale(.49); filter: brightness(.4) saturate(.42) contrast(.88); }
 .category-viewer.is-phone-viewer .category-wheel-item[data-offset="1"] .product-art.has-photo img,
 .category-viewer.is-phone-viewer .category-wheel-item[data-offset="2"] .product-art.has-photo img { opacity: 1; mix-blend-mode: normal; }
 .category-viewer.is-phone-viewer .category-wheel-item .product-art,
@@ -501,9 +501,9 @@ body.phone-preview-active { overflow: hidden; background: radial-gradient(circle
   .category-wheel-item[data-offset="-3"],
   .category-wheel-item[data-offset="4"],
   .category-wheel-item[data-offset="-4"] { display: none; }
-  .category-wheel-item.is-after { z-index: 7; opacity: 1; pointer-events: none; transform: translate(-50%,calc(-50% - 145px)) translateZ(-85px) scale(.7); filter: brightness(.64) saturate(.55) contrast(.9); }
+  .category-wheel-item.is-after { z-index: 7; opacity: 1; pointer-events: none; transform: translate(-50%,calc(-50% - 170px)) translateZ(-85px) scale(.7); filter: brightness(.7) saturate(.68) contrast(.93); }
   .category-wheel-item[data-offset="1"] { z-index: 7; }
-  .category-wheel-item[data-offset="2"] { z-index: 6; opacity: 1; transform: translate(-50%,calc(-50% - 235px)) translateZ(-170px) scale(.49); filter: brightness(.33) saturate(.25) contrast(.84); }
+  .category-wheel-item[data-offset="2"] { z-index: 6; opacity: 1; transform: translate(-50%,calc(-50% - 270px)) translateZ(-170px) scale(.49); filter: brightness(.4) saturate(.42) contrast(.88); }
   .category-wheel-item[data-offset="1"] .product-art.has-photo img,
   .category-wheel-item[data-offset="2"] .product-art.has-photo img { opacity: 1; mix-blend-mode: normal; }
   .category-wheel-item .product-art, .category-wheel-item .product-art img { backface-visibility: hidden; }
@@ -584,16 +584,16 @@ body.phone-preview-active { overflow: hidden; background: radial-gradient(circle
   to { opacity: 0; transform: translate(-50%,calc(-50% + 220px)) translateZ(10px) scale(.54); }
 }
 @keyframes phone-bottle-next-to-front {
-  0% { opacity: 1; transform: translate(-50%,calc(-50% - 145px)) translateZ(-85px) scale(.7); filter: brightness(.64) saturate(.55) contrast(.9); }
+  0% { opacity: 1; transform: translate(-50%,calc(-50% - 170px)) translateZ(-85px) scale(.7); filter: brightness(.7) saturate(.68) contrast(.93); }
   100% { opacity: 1; transform: translate(-50%,-50%) translateZ(105px) scale(.96); filter: none; }
 }
 @keyframes phone-bottle-back-to-middle {
-  0% { opacity: 1; transform: translate(-50%,calc(-50% - 235px)) translateZ(-170px) scale(.49); filter: brightness(.33) saturate(.25) contrast(.84); }
-  100% { opacity: 1; transform: translate(-50%,calc(-50% - 145px)) translateZ(-85px) scale(.7); filter: brightness(.64) saturate(.55) contrast(.9); }
+  0% { opacity: 1; transform: translate(-50%,calc(-50% - 270px)) translateZ(-170px) scale(.49); filter: brightness(.4) saturate(.42) contrast(.88); }
+  100% { opacity: 1; transform: translate(-50%,calc(-50% - 170px)) translateZ(-85px) scale(.7); filter: brightness(.7) saturate(.68) contrast(.93); }
 }
 @keyframes phone-bottle-new-back-in {
-  0% { opacity: 0; transform: translate(-50%,calc(-50% - 340px)) translateZ(-250px) scale(.31); filter: brightness(.22) saturate(.2) contrast(.86); }
-  100% { opacity: 1; transform: translate(-50%,calc(-50% - 235px)) translateZ(-170px) scale(.49); filter: brightness(.33) saturate(.25) contrast(.84); }
+  0% { opacity: 0; transform: translate(-50%,calc(-50% - 380px)) translateZ(-250px) scale(.31); filter: brightness(.24) saturate(.22) contrast(.84); }
+  100% { opacity: 1; transform: translate(-50%,calc(-50% - 270px)) translateZ(-170px) scale(.49); filter: brightness(.4) saturate(.42) contrast(.88); }
 }
 @keyframes phone-bottle-exit-up {
   from { opacity: 1; transform: translate(-50%,-50%) translateZ(105px) scale(.96); }
@@ -605,7 +605,7 @@ body.phone-preview-active { overflow: hidden; background: radial-gradient(circle
 }
 @keyframes phone-bottle-previous-back-to-middle {
   0% { opacity: 0; transform: translate(-50%,calc(-50% + 320px)) translateZ(-150px) scale(.42); filter: brightness(.35) saturate(.35); }
-  100% { opacity: 1; transform: translate(-50%,calc(-50% - 145px)) translateZ(-85px) scale(.7); filter: brightness(.64) saturate(.55) contrast(.9); }
+  100% { opacity: 1; transform: translate(-50%,calc(-50% - 170px)) translateZ(-85px) scale(.7); filter: brightness(.7) saturate(.68) contrast(.93); }
 }
 @keyframes phone-product-ui-out {
   to { opacity: 0; transform: translateY(-8px); }
