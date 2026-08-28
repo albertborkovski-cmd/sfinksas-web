@@ -299,7 +299,7 @@ export default function Home() {
         <header className="site-header">
           <a className="wordmark" href="#namai" aria-label="Sfinksas – pradžia">SFINKSAS</a>
           <nav className="desktop-nav" aria-label="Pagrindinis meniu">
-            <button type="button" className={!searchOpen && !navPanel ? 'active' : ''} onClick={() => { setSearchOpen(false); setNavPanel(null); setCartOpen(false); setSelectedProduct(null); }}>Namai</button>
+            <button type="button" onClick={() => { setSearchOpen(false); setNavPanel(null); setCartOpen(false); setSelectedProduct(null); }}>Namai</button>
             <button type="button" className={searchOpen ? 'active' : ''} onClick={() => { setNavPanel(null); setSearchOpen(true); }}>Paieška</button>
             <button type="button" className={navPanel === 'collection' ? 'active' : ''} onClick={() => { setSearchOpen(false); setNavPanel('collection'); }}>Kolekcija</button>
             <button type="button" className={navPanel === 'contact' ? 'active' : ''} onClick={() => { setSearchOpen(false); setNavPanel('contact'); }}>Kontaktai</button>

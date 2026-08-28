@@ -19,9 +19,9 @@ button { color: inherit; }
 button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visible { outline: 2px solid #d7b493; outline-offset: 4px; }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; }
 
-.hero { position: relative; min-height: 100svh; overflow: hidden; background: #1d140f url('/sfinksas-hero.png') center / cover no-repeat; }
-.hero-shade { position: absolute; inset: 0; background: linear-gradient(90deg, rgba(10,7,5,.82) 0%, rgba(10,7,5,.42) 39%, rgba(10,7,5,.02) 72%), linear-gradient(180deg, rgba(7,5,4,.58) 0%, transparent 24%, transparent 72%, rgba(7,5,4,.4) 100%); }
-.site-header { position: relative; z-index: 5; height: 112px; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; padding: 0 clamp(28px,4.5vw,76px); border-bottom: 1px solid var(--line); }
+.hero { position: relative; min-height: 100svh; overflow: hidden; background: #8f5360 url('/sfinksas-hero.png') center / cover no-repeat; }
+.hero-shade { position: absolute; inset: 0; background: linear-gradient(90deg, rgba(62,24,34,.66) 0%, rgba(112,51,67,.32) 38%, rgba(220,129,145,.13) 73%), linear-gradient(180deg, rgba(208,116,137,.13) 0%, transparent 30%, transparent 72%, rgba(52,22,31,.3) 100%); }
+.site-header { position: relative; z-index: 5; height: 112px; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; padding: 0 clamp(28px,4.5vw,76px); border: 0; background: transparent; }
 .wordmark { font-family: Georgia, 'Times New Roman', serif; font-size: 24px; letter-spacing: .32em; }
 .desktop-nav { display: flex; align-items: center; gap: clamp(28px,3.8vw,64px); font-size: 14px; }
 .desktop-nav button { position: relative; opacity: .78; transition: opacity .25s ease; }
@@ -476,7 +476,7 @@ body.phone-preview-active { overflow: hidden; background: radial-gradient(circle
 .site-canvas.is-phone-preview .bag-icon::after { left: 14px; top: 9px; }
 .site-canvas.is-phone-preview .menu-button { display: block; }
 .site-canvas.is-phone-preview .hero { min-height: 800px; background-position: 69% center; }
-.site-canvas.is-phone-preview .hero-shade { background: linear-gradient(90deg,rgba(8,6,4,.88) 0%,rgba(8,6,4,.35) 90%), linear-gradient(180deg,rgba(8,6,4,.15),transparent 35%,rgba(8,6,4,.84) 100%); }
+.site-canvas.is-phone-preview .hero-shade { background: linear-gradient(90deg,rgba(63,24,35,.75) 0%,rgba(129,57,75,.36) 90%), linear-gradient(180deg,rgba(215,124,143,.12),transparent 38%,rgba(55,22,31,.62) 100%); }
 .site-canvas.is-phone-preview .hero-content { width: calc(100% - 40px); margin-left: 20px; padding-top: 116px; }
 .site-canvas.is-phone-preview .eyebrow { margin-bottom: 22px; }
 .site-canvas.is-phone-preview .hero h1 { font-size: 50px; }
@@ -680,7 +680,7 @@ body.phone-preview-active { overflow: hidden; background: radial-gradient(circle
   .bag-icon::after { left: 14px; top: 9px; }
   .menu-button { display: block; }
   .hero { background-position: 62% center; }
-  .hero-shade { background: linear-gradient(90deg,rgba(8,6,4,.8),rgba(8,6,4,.3)), linear-gradient(180deg,rgba(8,6,4,.25),transparent 55%,rgba(8,6,4,.55)); }
+  .hero-shade { background: linear-gradient(90deg,rgba(63,24,35,.72),rgba(133,59,78,.28)), linear-gradient(180deg,rgba(216,123,143,.1),transparent 55%,rgba(55,22,31,.5)); }
   .hero-content { width: min(520px,calc(100% - 40px)); margin-left: 20px; padding-top: clamp(110px,20vh,180px); }
   .hero h1 { font-size: clamp(44px,13vw,67px); }
   .hero-copy { max-width: 420px; }
@@ -700,7 +700,7 @@ body.phone-preview-active { overflow: hidden; background: radial-gradient(circle
 
 @media (max-width: 560px) {
   .hero { min-height: 800px; background-position: 69% center; }
-  .hero-shade { background: linear-gradient(90deg,rgba(8,6,4,.88) 0%,rgba(8,6,4,.35) 90%), linear-gradient(180deg,rgba(8,6,4,.15),transparent 35%,rgba(8,6,4,.84) 100%); }
+  .hero-shade { background: linear-gradient(90deg,rgba(63,24,35,.78) 0%,rgba(134,59,78,.34) 90%), linear-gradient(180deg,rgba(216,123,143,.1),transparent 38%,rgba(55,22,31,.64) 100%); }
   .hero-content { padding-top: 116px; }
   .eyebrow { margin-bottom: 22px; }
   .hero h1 { font-size: clamp(43px,14vw,58px); }
