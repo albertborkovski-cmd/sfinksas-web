@@ -113,13 +113,11 @@ export default function Home() {
   const [productOpenedFromDesktopViewer, setProductOpenedFromDesktopViewer] = useState(false);
   const [portalReady, setPortalReady] = useState(false);
   const dragRef = useRef<{ pointerId: number; x: number } | null>(null);
-  const viewerDragRef = useRef<{ pointerId: number; x: number; y: number } | null>(null);
-  const viewerSuppressClickRef = useRef(false);
+  const viewerDragRef = useRef<{ pointerId: number; x: number; y: number; productId: number | null } | null>(null);
   const viewerWheelLockRef = useRef(0);
   const viewerMotionLockRef = useRef(false);
   const viewerMotionTimersRef = useRef<number[]>([]);
   const viewerProductTimerRef = useRef<number | null>(null);
-  const viewerClickTimerRef = useRef<number | null>(null);
   const noticeTimerRef = useRef<number | null>(null);
   const preloadedProductImagesRef = useRef<HTMLImageElement[]>([]);
 
@@ -183,7 +181,6 @@ export default function Home() {
 
   useEffect(() => () => {
     clearViewerTimers();
-    if (viewerClickTimerRef.current !== null) window.clearTimeout(viewerClickTimerRef.current);
     if (noticeTimerRef.current !== null) window.clearTimeout(noticeTimerRef.current);
   }, [clearViewerTimers]);
 
@@ -432,14 +429,20 @@ export default function Home() {
             }}
             onWheel={(event) => {
               event.preventDefault();
-              const now = Date.now();
+              const now = event.timeStamp;
               if (now - viewerWheelLockRef.current < 420) return;
               viewerWheelLockRef.current = now;
               cycleCategoryViewer(event.deltaY + event.deltaX > 0 ? 1 : -1);
             }}
             onPointerDown={(event) => {
-              viewerDragRef.current = { pointerId: event.pointerId, x: event.clientX, y: event.clientY };
-              viewerSuppressClickRef.current = false;
+              if (!event.isPrimary || event.button !== 0) return;
+              const productButton = (event.target as HTMLElement).closest<HTMLButtonElement>('.category-wheel-item');
+              viewerDragRef.current = {
+                pointerId: event.pointerId,
+                x: event.clientX,
+                y: event.clientY,
+                productId: productButton ? Number(productButton.dataset.productId) : null,
+              };
               event.currentTarget.setPointerCapture(event.pointerId);
             }}
             onPointerMove={(event) => {
@@ -455,13 +458,12 @@ export default function Home() {
               const deltaY = event.clientY - start.y;
               const delta = Math.abs(deltaY) > Math.abs(deltaX) ? deltaY : deltaX;
               if (Math.abs(delta) > 28) {
-                viewerSuppressClickRef.current = true;
-                if (viewerClickTimerRef.current !== null) window.clearTimeout(viewerClickTimerRef.current);
-                viewerClickTimerRef.current = window.setTimeout(() => {
-                  viewerSuppressClickRef.current = false;
-                  viewerClickTimerRef.current = null;
-                }, 0);
                 cycleCategoryViewer(deltaY >= 0 ? 1 : -1);
+                return;
+              }
+              if (start.productId !== null) {
+                const productIndex = viewerProducts.findIndex((product) => product.id === start.productId);
+                if (productIndex >= 0) openViewerProduct(viewerProducts[productIndex], viewerOffset(productIndex));
               }
             }}
             onPointerCancel={() => { viewerDragRef.current = null; }}
@@ -473,16 +475,11 @@ export default function Home() {
                   key={product.id}
                   className={`category-wheel-item${offset === 0 ? ' is-active' : offset < 0 ? ' is-before' : ' is-after'}${openingProductId === product.id ? ' is-launching' : ''}`}
                   data-offset={offset}
+                  data-product-id={product.id}
                   type="button"
                   aria-label={`Atidaryti ${product.name} informaciją`}
                   aria-current={offset === 0 ? 'true' : undefined}
-                  onClick={() => {
-                    if (viewerSuppressClickRef.current) {
-                      viewerSuppressClickRef.current = false;
-                      return;
-                    }
-                    openViewerProduct(product, offset);
-                  }}
+                  onClick={(event) => { if (event.detail === 0) openViewerProduct(product, offset); }}
                 >
                   <ProductArt shape={product.shape} tone={product.tone} image={product.image} priority={offset === 0} />
                 </button>
