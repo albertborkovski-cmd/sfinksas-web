@@ -101,7 +101,6 @@ export default function Home() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [previewQuantity, setPreviewQuantity] = useState(1);
   const [previewVariant, setPreviewVariant] = useState(0);
-  const [rotation, setRotation] = useState(0);
   const [viewerCategory, setViewerCategory] = useState<Category | null>(null);
   const [viewerIndex, setViewerIndex] = useState(0);
   const [viewerMotion, setViewerMotion] = useState<'idle' | 'moving'>('idle');
@@ -112,7 +111,6 @@ export default function Home() {
   const [productOpenedFromViewer, setProductOpenedFromViewer] = useState(false);
   const [productOpenedFromDesktopViewer, setProductOpenedFromDesktopViewer] = useState(false);
   const [portalReady, setPortalReady] = useState(false);
-  const dragRef = useRef<{ pointerId: number; x: number } | null>(null);
   const viewerDragRef = useRef<{ pointerId: number; x: number; y: number; productId: number | null } | null>(null);
   const viewerWheelLockRef = useRef(0);
   const viewerMotionLockRef = useRef(false);
@@ -229,7 +227,6 @@ export default function Home() {
     setSelectedProduct(product);
     setPreviewQuantity(1);
     setPreviewVariant(0);
-    setRotation(0);
   }
 
   function moveProduct(direction: number) {
@@ -515,40 +512,18 @@ export default function Home() {
               </div>
             )}
 
-            <div
-              className={`product-preview-stage${selectedProduct.image ? ' has-product-photo' : ''}`}
-              onPointerDown={(event) => {
-                dragRef.current = { pointerId: event.pointerId, x: event.clientX };
-                event.currentTarget.setPointerCapture(event.pointerId);
-              }}
-              onPointerMove={(event) => {
-                if (!dragRef.current || dragRef.current.pointerId !== event.pointerId) return;
-                const delta = event.clientX - dragRef.current.x;
-                dragRef.current.x = event.clientX;
-                setRotation((current) => (current + delta * .45 + 100) % 100);
-              }}
-              onPointerUp={() => { dragRef.current = null; }}
-            >
+            <div className={`product-preview-stage${selectedProduct.image ? ' has-product-photo' : ''}`}>
               <span className="preview-category">{selectedProduct.category}</span>
-              <span className="rotation-degree">{Math.round(rotation * 3.6)}°</span>
               <div
                 className="preview-art-rotator"
                 data-bottle-size={previewVariants[previewVariant]}
                 style={{
                   '--bottle-scale': previewBottleScale,
-                  '--bottle-turn': `${rotation * 3.6 - 22}deg`,
                 } as CSSProperties}
               >
                 <div className="preview-art-entry">
                   <ProductArt shape={selectedProduct.shape} tone={selectedProduct.tone} image={selectedProduct.image} />
                 </div>
-              </div>
-              <div className="rotation-control">
-                <span><i>↔</i> Vilkite arba sukite</span>
-                <label>
-                  <span className="sr-only">Pasukti produktą 360 laipsnių</span>
-                  <input aria-label="Pasukti produktą 360 laipsnių" type="range" min="0" max="100" value={rotation} onChange={(event) => setRotation(Number(event.target.value))} />
-                </label>
               </div>
             </div>
 
