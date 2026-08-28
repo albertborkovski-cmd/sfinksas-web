@@ -198,12 +198,12 @@ export default function Home() {
     const moveTimer = window.setTimeout(() => {
       setViewerIndex((current) => (current + direction + viewerProducts.length) % viewerProducts.length);
       setViewerMotion('settling');
-    }, 560);
+    }, 700);
     const settleTimer = window.setTimeout(() => {
       setViewerMotion('idle');
       viewerMotionLockRef.current = false;
       viewerMotionTimersRef.current = [];
-    }, 980);
+    }, 1160);
     viewerMotionTimersRef.current = [moveTimer, settleTimer];
   }
 
