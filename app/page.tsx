@@ -408,16 +408,22 @@ export default function Home() {
           <p className="eyebrow"><span /> Atrinkta plaukų priežiūra</p>
           <h1>Grožio ritualas,<br /><em>sukurtas jums.</em></h1>
           <p className="hero-copy">Profesionalios priemonės plaukų stiprumui, žvilgesiui ir kasdieniam ritualui. Atrinkta tai, kas iš tiesų veikia.</p>
-          <div className="hero-collections" aria-label="Produktų kategorijos">
-            {categories.map((category) => (
-              <button type="button" key={category.name} onClick={() => openCategoryViewer(category.name)} aria-label={`Atidaryti kategoriją ${category.name}`}>
-                <span className="hero-category-number">{category.index}</span>
-                <i className="hero-category-art" data-shape={category.shape} aria-hidden="true" />
-                <strong>{category.name}</strong>
-                <span className="hero-category-arrow" aria-hidden="true">↗</span>
-              </button>
-            ))}
-          </div>
+        </div>
+        <div className="hero-product-nav" aria-label="Produktų kategorijos">
+          {/* Transparent category composition supplied by the user. */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/home-category-products.webp" alt="Profesionalių plaukų priežiūros produktų kolekcija" draggable="false" />
+          {categories.map((category, index) => (
+            <button
+              type="button"
+              key={category.name}
+              data-product-index={index}
+              onClick={() => openCategoryViewer(category.name)}
+              aria-label={`Atidaryti kategoriją ${category.name}`}
+            >
+              <span>{category.name}</span>
+            </button>
+          ))}
         </div>
       </section>
 
