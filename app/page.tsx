@@ -289,10 +289,10 @@ export default function Home() {
     setOpeningProductId(product.id);
     setOpeningProductOffset(offset);
     setViewerOpeningMode(phoneLayout ? 'phone' : 'desktop');
+    openProduct(product, phoneLayout, !phoneLayout);
     viewerProductTimerRef.current = window.setTimeout(() => {
       closeCategoryViewer();
-      openProduct(product, phoneLayout, !phoneLayout);
-    }, phoneLayout ? 760 : 880);
+    }, phoneLayout ? 480 : 880);
   }
 
   function viewerOffset(index: number) {
@@ -460,7 +460,7 @@ export default function Home() {
                 viewerClickTimerRef.current = window.setTimeout(() => {
                   viewerSuppressClickRef.current = false;
                   viewerClickTimerRef.current = null;
-                }, 300);
+                }, 0);
                 cycleCategoryViewer(deltaY >= 0 ? 1 : -1);
               }
             }}

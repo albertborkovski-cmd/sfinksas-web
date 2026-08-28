@@ -107,7 +107,7 @@ h2 em, .hero h1 em { font-weight: 400; color: #c79876; }
 .category-wheel-stage:active { cursor: grabbing; }
 .category-wheel-stage::after { content: ''; position: absolute; z-index: 1; left: 50%; bottom: 5%; width: min(420px,34vw); height: 60px; border-radius: 50%; background: rgba(52,34,22,.18); filter: blur(22px); transform: translateX(-50%); }
 .category-wheel-item { position: absolute; z-index: 3; left: 50%; top: 53%; width: min(300px,24vw); height: min(500px,62vh); border: 0; padding: 0; background: transparent; color: var(--ink); cursor: pointer; transition: transform .68s cubic-bezier(.2,.75,.2,1), opacity .68s ease, filter .68s ease; }
-.category-wheel-item.is-active { z-index: 8; opacity: 1; transform: translate(-50%,-50%) scale(1); filter: saturate(1); }
+.category-wheel-item.is-active { z-index: 8; opacity: 1; pointer-events: auto; touch-action: manipulation; transform: translate(-50%,-50%) scale(1); filter: saturate(1); }
 .category-wheel-item.is-before { opacity: .7; transform: translate(calc(-50% - min(18vw,270px)),-49%) scale(.82); filter: saturate(.82); }
 .category-wheel-item.is-after { opacity: .7; transform: translate(calc(-50% + min(18vw,270px)),-49%) scale(.82); filter: saturate(.82); }
 .category-wheel-item .product-art { inset: 0; }
@@ -483,7 +483,7 @@ body.phone-preview-active { overflow: hidden; background: radial-gradient(circle
 .category-viewer.is-opening-product .category-viewer-footer { animation: phone-product-ui-out .3s ease both; pointer-events: none; }
 .category-viewer.is-opening-product .category-wheel-stage::after { animation: phone-product-ui-out .3s ease both; }
 .category-viewer.is-opening-phone .category-wheel-item:not(.is-launching) { animation: phone-product-gallery-out .34s ease both !important; pointer-events: none; }
-.category-viewer.is-opening-phone .category-wheel-item.is-launching { z-index: 20; will-change: transform, opacity; animation: phone-bottle-to-detail .76s cubic-bezier(.22,.61,.36,1) both !important; pointer-events: none; }
+.category-viewer.is-opening-phone .category-wheel-item.is-launching { z-index: 20; will-change: transform, opacity; animation: phone-bottle-to-detail .48s cubic-bezier(.22,.61,.36,1) both !important; pointer-events: none; }
 .category-viewer.is-opening-desktop .category-wheel-stage { transform-origin: left top; animation: desktop-carousel-to-corner .88s cubic-bezier(.22,.61,.36,1) both; pointer-events: none; }
 .category-viewer.is-opening-desktop .desktop-product-launch { position: absolute; z-index: 30; left: 50%; top: 53%; width: min(300px,24vw); height: min(500px,62vh); pointer-events: none; will-change: transform; animation: desktop-bottle-to-corner .88s cubic-bezier(.22,.61,.36,1) both; }
 .category-viewer.is-opening-desktop .desktop-product-launch .product-art { inset: 0; }
