@@ -188,6 +188,9 @@ export default function Home() {
   const previewPrice = selectedProduct
     ? selectedProduct.price + (selectedProduct.category === 'Šampūnai' ? shampooSizePremiums[previewVariant] ?? 0 : previewVariant > 0 ? 18 : 0)
     : 0;
+  const previewBottleScale = selectedProduct?.category === 'Šampūnai'
+    ? [0.82, 1, 1.18][previewVariant] ?? 1
+    : [0.9, 1.07][previewVariant] ?? 1;
 
   function addToCart(product: Product, quantity = 1) {
     setCart((current) => ({ ...current, [product.id]: (current[product.id] || 0) + quantity }));
@@ -561,7 +564,14 @@ export default function Home() {
             >
               <span className="preview-category">{selectedProduct.category}</span>
               <span className="rotation-degree">{Math.round(rotation * 3.6)}°</span>
-              <div className="preview-art-rotator" style={{ transform: `perspective(900px) rotateY(${rotation * 3.6}deg)` }}>
+              <div
+                className="preview-art-rotator"
+                data-bottle-size={previewVariants[previewVariant]}
+                style={{
+                  '--bottle-scale': previewBottleScale,
+                  '--bottle-turn': `${rotation * 3.6 - 22}deg`,
+                } as CSSProperties}
+              >
                 <div className="preview-art-entry">
                   <ProductArt shape={selectedProduct.shape} tone={selectedProduct.tone} image={selectedProduct.image} />
                 </div>
