@@ -55,6 +55,15 @@ const products: Product[] = [
   { id: 19, name: 'Olaplex No.4P Blonde Enhancer', category: 'Šampūnai', note: 'Tonuojantis šampūnas šviesiems plaukams · 250 ml', price: 32, shape: 'pump', tone: 'smoke', image: '/olaplex-no4p-shampoo-cutout.webp', variants: ['250 ml'] },
   { id: 20, name: 'Wella Ultimate Smooth', category: 'Šampūnai', note: 'Glotninantis ir maitinantis šampūnas · 250 ml', price: 28, shape: 'pump', tone: 'amber', image: '/wella-ultimate-smooth-shampoo-cutout.webp', variants: ['250 ml'] },
   { id: 21, name: 'Kevin.Murphy Plumping.Wash', category: 'Šampūnai', note: 'Tankinantis šampūnas ploniems plaukams · 250 ml', price: 35, shape: 'tube', tone: 'sand', image: '/kevin-murphy-plumping-wash-cutout.webp', variants: ['250 ml'] },
+  { id: 22, name: 'KITOKO Hydrating Conditioner', category: 'Kondicionieriai', note: 'Intensyviai drėkinantis kondicionierius · 250 ml', price: 26, shape: 'tube', tone: 'smoke', image: '/kitoko-hydrating-conditioner-cutout.webp', variants: ['250 ml'] },
+  { id: 23, name: 'Arkemusa Repair Flex', category: 'Kondicionieriai', note: 'Intensyvi atkuriamoji priemonė · 500 ml', price: 32, shape: 'pump', tone: 'smoke', image: '/arkemusa-repair-flex-treatment-cutout.webp', variants: ['500 ml'] },
+  { id: 24, name: 'Keune Velvet Smooth', category: 'Kondicionieriai', note: 'Glotninanti plaukų priežiūros priemonė · 60 kapsulių', price: 29, shape: 'tube', tone: 'sand', image: '/keune-velvet-smooth-treatment-cutout.webp', variants: ['60 kapsulių'] },
+  { id: 25, name: 'Olaplex No.5 Fine', category: 'Kondicionieriai', note: 'Lengvas stiprinantis kondicionierius · 1000 ml', price: 48, shape: 'pump', tone: 'sand', image: '/olaplex-no5-fine-conditioner-cutout.webp', variants: ['1000 ml'] },
+  { id: 26, name: 'mjuuk Colour Careness', category: 'Kondicionieriai', note: 'Spalvą tausojantis kondicionierius · 275 ml', price: 24, shape: 'tube', tone: 'bronze', image: '/mjuuk-colour-careness-conditioner-cutout.webp', variants: ['275 ml'] },
+  { id: 27, name: 'L’Occitane Intensive Repair', category: 'Kondicionieriai', note: 'Intensyviai atkurianti plaukų priemonė · 300 ml', price: 27, shape: 'tube', tone: 'amber', image: '/loccitane-intensive-repair-cutout.webp', variants: ['300 ml'] },
+  { id: 28, name: 'Davines MOMO Conditioner', category: 'Kondicionieriai', note: 'Drėkinantis kondicionierius su melionų ekstraktu · 1000 ml', price: 44, shape: 'tube', tone: 'olive', image: '/davines-momo-conditioner-cutout.webp', variants: ['1000 ml'] },
+  { id: 29, name: 'Olaplex No.5P Blonde Enhancer', category: 'Kondicionieriai', note: 'Tonuojantis kondicionierius šviesiems plaukams · 250 ml', price: 32, shape: 'tube', tone: 'smoke', image: '/olaplex-no5p-conditioner-cutout.webp', variants: ['250 ml'] },
+  { id: 30, name: 'K18 Damage Shield', category: 'Kondicionieriai', note: 'Apsauginis kondicionierius pažeistiems plaukams · 250 ml', price: 39, shape: 'tube', tone: 'smoke', image: '/k18-damage-shield-conditioner-cutout.webp', variants: ['250 ml'] },
 ];
 
 const money = new Intl.NumberFormat('lt-LT', { style: 'currency', currency: 'EUR' });
@@ -69,6 +78,15 @@ const productStories: Record<number, { description: string; benefits: [string, s
   19: { description: 'Violetinių pigmentų šampūnas neutralizuoja nepageidaujamus gelsvus tonus, drėkina ir padeda išlaikyti šviesių plaukų skaidrumą.', benefits: ['Neutralizuoja geltonumą', 'Drėkina šviesius plaukus', 'Palaiko šaltą atspalvį'] },
   20: { description: 'Švelniai valanti formulė su skvalanu ir omega-9 maitina sausus, besipučiančius plaukus ir suteikia jiems glotnaus žvilgesio.', benefits: ['Glotnina plaukus', 'Maitina ir minkština', 'Suteikia žvilgesio'] },
   21: { description: 'Tankinantis šampūnas švelniai valo plonus plaukus, suteikia jiems vizualaus pilnumo ir padeda išlaikyti lengvą apimtį.', benefits: ['Suteikia pilnumo', 'Pakelia nuo šaknų', 'Neapsunkina plaukų'] },
+  22: { description: 'Drėkinamasis kondicionierius su hialurono rūgštimi ir kokosais padeda atkurti drėgmės balansą, minkštumą ir elastingumą.', benefits: ['Intensyviai drėkina', 'Minkština plaukus', 'Puoselėja galvos odą'] },
+  23: { description: 'Intensyvi atkuriamoji priemonė stiprina pažeistus ir jautrius plaukus, padeda sumažinti lūžinėjimą bei atkurti glotnumą.', benefits: ['Atkuria pažeidimus', 'Stiprina plaukus', 'Be sulfatų ir parabenų'] },
+  24: { description: 'Glotninanti plaukų priežiūros priemonė padeda palaikyti sveiką plaukų išvaizdą, minkštumą ir lengvą valdymą.', benefits: ['Glotnina paviršių', 'Puoselėja plaukus', 'Patogi dienos dozė'] },
+  25: { description: 'Lengvos tekstūros kondicionierius ploniems plaukams padeda stiprinti jungtis, drėkina ir glotnina neapsunkindamas plaukų.', benefits: ['Skirta ploniems plaukams', 'Stiprina plauko jungtis', 'Neapsunkina'] },
+  26: { description: 'Veganiška formulė skirta dažytiems plaukams: padeda išlaikyti spalvos sodrumą, natūralų žvilgesį ir švelnumą.', benefits: ['Saugo spalvą', '100 % veganiška', 'Suteikia žvilgesio'] },
+  27: { description: 'Intensyviai atkurianti formulė su augaliniais keramidais puoselėja sausus, pažeistus plaukus ir padeda susigrąžinti minkštumą.', benefits: ['Atkuria sausus plaukus', 'Su augaliniais keramidais', 'Mažina šiurkštumą'] },
+  28: { description: 'Davines MOMO su melionų ekstraktu drėkina išsausėjusius plaukus, suteikia jiems minkštumo ir padeda lengviau iššukuoti.', benefits: ['Drėkina plaukus', 'Su melionų ekstraktu', 'Lengvina iššukavimą'] },
+  29: { description: 'Violetinių pigmentų kondicionierius drėkina šviesius plaukus ir padeda neutralizuoti nepageidaujamus gelsvus atspalvius.', benefits: ['Neutralizuoja geltonumą', 'Drėkina šviesius plaukus', 'Palaiko šaltą toną'] },
+  30: { description: 'Apsauginis kondicionierius padeda stiprinti pažeistus plaukus, išlaikyti glotnumą ir sukurti lengvą kasdienę apsaugą.', benefits: ['Saugo nuo pažeidimų', 'Stiprina plaukus', 'Glotnina neapsunkindamas'] },
 };
 
 function productStory(product: Product) {
