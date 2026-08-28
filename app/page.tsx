@@ -1,6 +1,7 @@
 'use client';
 
 import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 
 type Category = 'Šampūnai' | 'Kondicionieriai' | 'Aliejukai' | 'Priedai' | 'Rinkiniai';
 type Shape = 'pump' | 'tube' | 'dropper' | 'jar' | 'brush' | 'set';
@@ -34,6 +35,11 @@ const products: Product[] = [
   { id: 8, name: 'Silk Loop', category: 'Priedai', note: 'Šilkinė plaukų gumytė', price: 12, shape: 'jar', tone: 'smoke' },
   { id: 9, name: 'Daily Ritual', category: 'Rinkiniai', note: 'Šampūnas, kondicionierius, aliejus', price: 68, shape: 'set', tone: 'bronze' },
   { id: 10, name: 'Restore Duo', category: 'Rinkiniai', note: 'Atkuriamasis šampūnas ir kaukė', price: 54, shape: 'set', tone: 'olive' },
+  { id: 11, name: 'Color Balance', category: 'Šampūnai', note: 'Spalvą tausojantis šampūnas · 250 ml', price: 31, shape: 'pump', tone: 'bronze' },
+  { id: 12, name: 'Hydrate Melt', category: 'Kondicionieriai', note: 'Intensyviai drėkinantis · 200 ml', price: 30, shape: 'tube', tone: 'olive' },
+  { id: 13, name: 'Satin Mist', category: 'Aliejukai', note: 'Lengva apsauginė dulksna · 50 ml', price: 33, shape: 'dropper', tone: 'smoke' },
+  { id: 14, name: 'Wide Tooth', category: 'Priedai', note: 'Plačių dantukų ritualo šukos', price: 16, shape: 'brush', tone: 'bronze' },
+  { id: 15, name: 'Night Repair', category: 'Rinkiniai', note: 'Naktinis atkuriamasis trejetas', price: 72, shape: 'set', tone: 'smoke' },
 ];
 
 const money = new Intl.NumberFormat('lt-LT', { style: 'currency', currency: 'EUR' });
@@ -61,9 +67,15 @@ export default function Home() {
   const [previewQuantity, setPreviewQuantity] = useState(1);
   const [previewVariant, setPreviewVariant] = useState(0);
   const [rotation, setRotation] = useState(0);
+  const [viewerCategory, setViewerCategory] = useState<Category | null>(null);
+  const [viewerIndex, setViewerIndex] = useState(0);
+  const [portalReady, setPortalReady] = useState(false);
   const dragRef = useRef<{ pointerId: number; x: number } | null>(null);
+  const viewerDragRef = useRef<{ pointerId: number; x: number; y: number } | null>(null);
+  const viewerWheelLockRef = useRef(0);
 
   useEffect(() => {
+    setPortalReady(true);
     document.body.classList.toggle('phone-preview-active', previewMode === 'phone');
     return () => document.body.classList.remove('phone-preview-active');
   }, [previewMode]);
@@ -75,6 +87,7 @@ export default function Home() {
       setSearchOpen(false);
       setCartOpen(false);
       setMenuOpen(false);
+      setViewerCategory(null);
     }
     document.addEventListener('keydown', closeDialogs);
     return () => document.removeEventListener('keydown', closeDialogs);
@@ -90,6 +103,12 @@ export default function Home() {
     if (!normalized) return products.slice(0, 5);
     return products.filter((product) => `${product.name} ${product.category} ${product.note}`.toLocaleLowerCase('lt').includes(normalized));
   }, [query]);
+
+  const viewerProducts = useMemo(
+    () => viewerCategory ? products.filter((product) => product.category === viewerCategory) : [],
+    [viewerCategory],
+  );
+  const activeViewerProduct = viewerProducts[viewerIndex] || null;
 
   const cartItems = products.filter((product) => cart[product.id]);
   const cartCount = Object.values(cart).reduce((sum, quantity) => sum + quantity, 0);
@@ -129,9 +148,23 @@ export default function Home() {
     });
   }
 
-  function chooseCategory(category: Category) {
+  function openCategoryViewer(category: Category) {
     setActiveCategory(category);
-    window.setTimeout(() => document.querySelector('#produktai')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 30);
+    setViewerIndex(0);
+    setViewerCategory(category);
+  }
+
+  function cycleCategoryViewer(direction: number) {
+    if (!viewerProducts.length) return;
+    setViewerIndex((current) => (current + direction + viewerProducts.length) % viewerProducts.length);
+  }
+
+  function viewerOffset(index: number) {
+    if (!viewerProducts.length) return 0;
+    let offset = index - viewerIndex;
+    if (offset > viewerProducts.length / 2) offset -= viewerProducts.length;
+    if (offset < -viewerProducts.length / 2) offset += viewerProducts.length;
+    return offset;
   }
 
   function submitContact(event: FormEvent<HTMLFormElement>) {
@@ -202,7 +235,7 @@ export default function Home() {
 
         <div className="category-stage">
           {categories.map((category) => (
-            <button key={category.name} className={`category-card${activeCategory === category.name ? ' selected' : ''}`} type="button" onClick={() => chooseCategory(category.name)}>
+            <button key={category.name} className={`category-card${activeCategory === category.name ? ' selected' : ''}`} type="button" onClick={() => openCategoryViewer(category.name)}>
               <span className="category-index">{category.index}</span>
               <ProductArt shape={category.shape} tone={category.index === '02' ? 'sand' : category.index === '03' ? 'amber' : category.index === '04' ? 'olive' : 'smoke'} small />
               <span className="category-name">{category.name}</span>
@@ -269,6 +302,81 @@ export default function Home() {
         <div><a href="#kolekcija">Kolekcija</a><a href="#kontaktai">Kontaktai</a><button type="button" onClick={() => setSearchOpen(true)}>Paieška</button></div>
         <span>© 2026 Sfinksas · Demonstracinė parduotuvė</span>
       </footer>
+
+      {portalReady && viewerCategory && activeViewerProduct && createPortal(
+        <section className={`category-viewer${previewMode === 'phone' ? ' is-phone-viewer' : ''}`} role="dialog" aria-modal="true" aria-label={`${viewerCategory} prekių peržiūra`}>
+          <div className="category-viewer-topbar">
+            <span className="category-viewer-mark">SFINKSAS</span>
+            <span>{viewerCategory}</span>
+            <button type="button" onClick={() => setViewerCategory(null)} aria-label="Uždaryti kategorijos peržiūrą">×</button>
+          </div>
+
+          <div className="category-viewer-copy" aria-live="polite">
+            <p>{viewerCategory}</p>
+            <h2>{activeViewerProduct.name}</h2>
+            <strong>{money.format(activeViewerProduct.price)}</strong>
+            <span>{activeViewerProduct.note}</span>
+          </div>
+
+          <div
+            className="category-wheel-stage"
+            tabIndex={0}
+            aria-label="Sukama produktų karuselė"
+            onKeyDown={(event) => {
+              if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') cycleCategoryViewer(-1);
+              if (event.key === 'ArrowRight' || event.key === 'ArrowDown') cycleCategoryViewer(1);
+            }}
+            onWheel={(event) => {
+              event.preventDefault();
+              const now = Date.now();
+              if (now - viewerWheelLockRef.current < 420) return;
+              viewerWheelLockRef.current = now;
+              cycleCategoryViewer(event.deltaY + event.deltaX > 0 ? 1 : -1);
+            }}
+            onPointerDown={(event) => {
+              viewerDragRef.current = { pointerId: event.pointerId, x: event.clientX, y: event.clientY };
+              event.currentTarget.setPointerCapture(event.pointerId);
+            }}
+            onPointerUp={(event) => {
+              const start = viewerDragRef.current;
+              viewerDragRef.current = null;
+              if (!start || start.pointerId !== event.pointerId) return;
+              const deltaX = event.clientX - start.x;
+              const deltaY = event.clientY - start.y;
+              const delta = Math.abs(deltaY) > Math.abs(deltaX) ? deltaY : deltaX;
+              if (Math.abs(delta) > 32) cycleCategoryViewer(delta < 0 ? 1 : -1);
+            }}
+            onPointerCancel={() => { viewerDragRef.current = null; }}
+          >
+            {viewerProducts.map((product, index) => {
+              const offset = viewerOffset(index);
+              return (
+                <button
+                  key={product.id}
+                  className={`category-wheel-item${offset === 0 ? ' is-active' : offset < 0 ? ' is-before' : ' is-after'}`}
+                  type="button"
+                  aria-label={offset === 0 ? `${product.name}, aktyvi prekė` : `Rodyti ${product.name}`}
+                  aria-current={offset === 0 ? 'true' : undefined}
+                  onClick={() => { if (offset) cycleCategoryViewer(offset > 0 ? 1 : -1); }}
+                >
+                  <ProductArt shape={product.shape} tone={product.tone} />
+                  <span className="wheel-product-label">{product.name}</span>
+                </button>
+              );
+            })}
+          </div>
+
+          <button className="category-wheel-previous" type="button" onClick={() => cycleCategoryViewer(-1)} aria-label="Ankstesnė prekė">←</button>
+          <button className="category-wheel-next" type="button" onClick={() => cycleCategoryViewer(1)} aria-label="Kita prekė">→</button>
+
+          <div className="category-viewer-footer">
+            <span className="category-viewer-count">{(viewerIndex + 1).toString().padStart(2, '0')} / {viewerProducts.length.toString().padStart(2, '0')}</span>
+            <span className="category-viewer-hint"><i aria-hidden="true">↔</i> Braukite arba sukite</span>
+            <button type="button" onClick={() => { setViewerCategory(null); openProduct(activeViewerProduct); }}>Peržiūrėti produktą <span>↗</span></button>
+          </div>
+        </section>,
+        document.body,
+      )}
 
       {selectedProduct && (
         <div className="product-preview-backdrop" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setSelectedProduct(null); }}>
