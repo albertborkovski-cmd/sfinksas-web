@@ -369,6 +369,7 @@ export default function Home() {
                   type="button"
                   aria-label={`Atidaryti ${product.name} informaciją`}
                   aria-current={offset === 0 ? 'true' : undefined}
+                  onPointerDown={(event) => event.stopPropagation()}
                   onClick={() => { setViewerCategory(null); openProduct(product); }}
                 >
                   <ProductArt shape={product.shape} tone={product.tone} image={product.image} />
