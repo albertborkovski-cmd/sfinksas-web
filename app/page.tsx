@@ -26,6 +26,13 @@ const categories: { name: Category; index: string; shape: Shape; note: string }[
   { name: 'Rinkiniai', index: '05', shape: 'set', note: 'Suderinta priežiūra ir dovanos' },
 ];
 
+const searchShelves: { category: Category; label: string; number: string }[] = [
+  { category: 'Šampūnai', label: 'Šampūnai', number: '01' },
+  { category: 'Kondicionieriai', label: 'Kondicionieriai', number: '02' },
+  { category: 'Aliejukai', label: 'Aliejukai', number: '03' },
+  { category: 'Priedai', label: 'Priedai', number: '04' },
+];
+
 const products: Product[] = [
   { id: 1, name: 'Keune Style Refresh', category: 'Šampūnai', note: 'Sausas šampūnas · 200 ml', price: 24, shape: 'pump', tone: 'smoke', image: '/keune-style-refresh-dry-shampoo-cutout.png', variants: ['200 ml'] },
   { id: 2, name: 'milk_shake Colour Care', category: 'Šampūnai', note: 'Spalvą tausojantis šampūnas · 300 ml', price: 23, shape: 'pump', tone: 'amber', image: '/milk-shake-colour-care-shampoo-cutout.png', variants: ['300 ml'] },
@@ -153,8 +160,7 @@ export default function Home() {
 
   const searchResults = useMemo(() => {
     const normalized = query.trim().toLocaleLowerCase('lt');
-    if (!normalized) return products.slice(0, 5);
-    return products.filter((product) => `${product.name} ${product.category} ${product.note}`.toLocaleLowerCase('lt').includes(normalized));
+    return products.filter((product) => product.category !== 'Rinkiniai' && (!normalized || `${product.name} ${product.category} ${product.note}`.toLocaleLowerCase('lt').includes(normalized)));
   }, [query]);
 
   const viewerProducts = useMemo(
@@ -579,17 +585,36 @@ export default function Home() {
         <div className="overlay search-overlay" role="dialog" aria-modal="true" aria-label="Produktų paieška">
           <button className="overlay-close" type="button" onClick={() => { setSearchOpen(false); setQuery(''); }} aria-label="Uždaryti paiešką">×</button>
           <div className="search-panel">
-            <p className="section-kicker">Paieška kolekcijoje</p>
+            <div className="search-heading"><span className="wordmark">SFINKSAS</span><p className="section-kicker">Produktų galerija · paieška kolekcijoje</p></div>
             <label><span className="sr-only">Ieškoti produkto</span><input autoFocus value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Ko ieškote?" /><i>⌕</i></label>
-            <p className="search-status">{query ? `Rasta: ${searchResults.length}` : 'Populiaru dabar'}</p>
-            <div className="search-results">
-              {searchResults.map((product) => (
-                <button key={product.id} type="button" onClick={() => { addToCart(product); setSearchOpen(false); setQuery(''); }}>
-                  <ProductArt shape={product.shape} tone={product.tone} image={product.image} small />
-                  <span><b>{product.name}</b><small>{product.category}</small></span><strong>{money.format(product.price)}</strong><i>+</i>
-                </button>
-              ))}
-              {!searchResults.length && <p className="no-results">Nieko neradome. Pabandykite „aliejus“ arba „rinkinys“.</p>}
+            <p className="search-status">{query ? `Atitinka paiešką: ${searchResults.length}` : 'Visi produktai savo vietose'}</p>
+            <div className="search-shelves">
+              {searchShelves.map((shelf) => {
+                const shelfProducts = products.filter((product) => product.category === shelf.category);
+                return (
+                  <section className="search-shelf" key={shelf.category} aria-label={shelf.label}>
+                    <header><span>{shelf.number}</span><h2>{shelf.label}</h2><small>{shelfProducts.length} produktai · 20 vietų</small></header>
+                    <div className="search-shelf-scroll">
+                      <div className="search-shelf-track">
+                        {Array.from({ length: 20 }, (_, slot) => {
+                          const product = shelfProducts[slot];
+                          const matches = !!product && searchResults.some((result) => result.id === product.id);
+                          return (
+                            <div className={`search-shelf-slot${product ? ' has-product' : ''}${product && !matches ? ' is-filtered' : ''}`} key={`${shelf.category}-${slot}`}>
+                              {product && (
+                                <button type="button" tabIndex={matches ? 0 : -1} onClick={() => { setSearchOpen(false); setQuery(''); openProduct(product); }} aria-label={`Peržiūrėti ${product.name}`}>
+                                  <ProductArt shape={product.shape} tone={product.tone} image={product.image} small />
+                                  <span className="shelf-product-card"><b>{product.name}</b><small>{money.format(product.price)}</small></span>
+                                </button>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </section>
+                );
+              })}
             </div>
           </div>
         </div>
