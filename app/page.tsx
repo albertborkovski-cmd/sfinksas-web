@@ -289,7 +289,7 @@ export default function Home() {
     openProduct(product, phoneLayout, !phoneLayout);
     viewerProductTimerRef.current = window.setTimeout(() => {
       closeCategoryViewer();
-    }, phoneLayout ? 480 : 880);
+    }, phoneLayout ? 480 : 680);
   }
 
   function viewerOffset(index: number) {
@@ -493,7 +493,6 @@ export default function Home() {
           <div className="category-viewer-footer">
             <span className="category-viewer-count">{(viewerIndex + 1).toString().padStart(2, '0')} / {viewerProducts.length.toString().padStart(2, '0')}</span>
             <span className="category-viewer-hint"><i aria-hidden="true">↔</i> Braukite arba sukite</span>
-            <button type="button" onClick={() => openViewerProduct(activeViewerProduct, 0)}>Peržiūrėti produktą <span>↗</span></button>
           </div>
         </section>,
         document.body,

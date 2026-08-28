@@ -110,6 +110,8 @@ h2 em, .hero h1 em { font-weight: 400; color: #c79876; }
 .category-wheel-item.is-active { z-index: 8; opacity: 1; pointer-events: auto; touch-action: manipulation; transform: translate(-50%,-50%) scale(1); filter: saturate(1); }
 .category-wheel-item.is-before { opacity: .7; transform: translate(calc(-50% - min(18vw,270px)),-49%) scale(.82); filter: saturate(.82); }
 .category-wheel-item.is-after { opacity: .7; transform: translate(calc(-50% + min(18vw,270px)),-49%) scale(.82); filter: saturate(.82); }
+.category-wheel-item:focus-visible { outline: 0; }
+.category-wheel-item:focus-visible .product-art { filter: drop-shadow(0 0 16px rgba(255,244,226,.72)); }
 .category-wheel-item .product-art { inset: 0; }
 .category-wheel-item .product-form { width: 54%; box-shadow: inset 0 0 0 1px rgba(255,255,255,.16), 0 40px 44px rgba(45,27,16,.25); }
 .category-wheel-item .shape-dropper .product-form { width: 43%; }
@@ -118,12 +120,10 @@ h2 em, .hero h1 em { font-weight: 400; color: #c79876; }
 .category-wheel-previous, .category-wheel-next { position: absolute; z-index: 26; top: 53%; display: grid; place-items: center; width: 48px; height: 48px; border: 1px solid rgba(24,19,15,.3); border-radius: 50%; background: rgba(244,237,227,.44); color: var(--ink); font-size: 20px; cursor: pointer; backdrop-filter: blur(8px); }
 .category-wheel-previous { left: 34px; }
 .category-wheel-next { right: 34px; }
-.category-viewer-footer { position: absolute; z-index: 28; left: clamp(24px,4vw,64px); right: clamp(24px,4vw,64px); bottom: 22px; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; }
+.category-viewer-footer { position: absolute; z-index: 28; left: clamp(24px,4vw,64px); right: clamp(24px,4vw,64px); bottom: 22px; display: grid; grid-template-columns: 1fr auto; align-items: center; }
 .category-viewer-count { color: #756356; font-family: Georgia,serif; font-size: 16px; }
 .category-viewer-hint { display: flex; align-items: center; gap: 9px; color: #7b695a; font-size: 8px; letter-spacing: .13em; text-transform: uppercase; }
 .category-viewer-hint i { font-size: 18px; font-style: normal; }
-.category-viewer-footer > button { justify-self: end; display: flex; align-items: center; justify-content: space-between; gap: 35px; min-width: 224px; border: 1px solid rgba(24,19,15,.45); padding: 14px 16px; background: transparent; color: var(--ink); font-size: 11px; cursor: pointer; }
-.category-viewer-footer > button:hover { background: var(--ink); color: var(--cream); }
 .category-viewer.has-product-photos { background: radial-gradient(circle at 50% 48%,#eee3d5 0%,#baa691 45%,#6d5b4f 100%); color: var(--ink); }
 .category-viewer.has-product-photos::before { opacity: .18; background-image: linear-gradient(rgba(55,40,30,.1) 1px,transparent 1px),linear-gradient(90deg,rgba(55,40,30,.1) 1px,transparent 1px); }
 .category-viewer.has-product-photos .category-viewer-topbar { border-bottom-color: rgba(24,19,15,.16); }
@@ -136,8 +136,6 @@ h2 em, .hero h1 em { font-weight: 400; color: #c79876; }
 .category-viewer.has-product-photos .category-wheel-item .product-art.has-photo { background: transparent; }
 .category-viewer.has-product-photos .category-viewer-count,
 .category-viewer.has-product-photos .category-viewer-hint { color: #56463b; }
-.category-viewer.has-product-photos .category-viewer-footer > button { border-color: rgba(24,19,15,.48); color: var(--ink); }
-.category-viewer.has-product-photos .category-viewer-footer > button:hover { background: var(--ink); color: var(--cream); }
 .category-viewer.has-product-photos .category-wheel-item.is-active .product-art.has-photo { animation: bottle-float 4.4s ease-in-out infinite; }
 .category-viewer.has-product-photos .category-wheel-item.is-before .product-art.has-photo img,
 .category-viewer.has-product-photos .category-wheel-item.is-after .product-art.has-photo img { transform: translateZ(-35px); }
@@ -218,7 +216,7 @@ h2 em, .hero h1 em { font-weight: 400; color: #c79876; }
 .product-preview-backdrop.from-desktop-viewer .rotation-degree,
 .product-preview-backdrop.from-desktop-viewer .product-preview-previous,
 .product-preview-backdrop.from-desktop-viewer .product-preview-next { display: none; }
-.product-preview-backdrop.from-desktop-viewer .preview-art-rotator { left: auto; right: -5%; top: auto; bottom: -13%; width: min(38vw,500px); height: 96%; margin: 0; animation: desktop-product-settle .72s cubic-bezier(.22,.61,.36,1) both; }
+.product-preview-backdrop.from-desktop-viewer .preview-art-rotator { left: auto; right: -5%; top: auto; bottom: -13%; width: min(38vw,500px); height: 96%; margin: 0; animation: none; }
 .product-preview-backdrop.from-desktop-viewer .preview-art-entry { animation: none; }
 .product-preview-backdrop.from-desktop-viewer .product-preview-details { position: absolute; z-index: 5; left: 7%; top: 31%; width: min(500px,41%); min-height: 0; padding: 0; background: transparent; box-shadow: none; animation: desktop-product-info-in .64s .12s cubic-bezier(.2,.75,.2,1) both; }
 .product-preview-backdrop.from-desktop-viewer .product-preview-details .section-kicker { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; color: #9a6337; font-size: 9px; letter-spacing: .18em; }
@@ -240,8 +238,7 @@ h2 em, .hero h1 em { font-weight: 400; color: #c79876; }
 .product-preview-backdrop.from-desktop-viewer .preview-quantity { border-radius: 8px; background: rgba(255,255,255,.25); }
 .product-preview-backdrop.from-desktop-viewer .preview-add-button { border-radius: 10px; padding: 19px 21px; box-shadow: 0 16px 34px rgba(31,23,18,.18); font-size: 14px; transition: transform .2s ease,background .2s ease; }
 .product-preview-backdrop.from-desktop-viewer .preview-add-button:hover { transform: translateY(-2px); }
-.desktop-mini-carousel { position: absolute; z-index: 6; left: 5%; top: 4%; width: min(560px,43vw); height: 220px; opacity: .38; filter: saturate(.5) brightness(.93); animation: desktop-mini-carousel-in .7s cubic-bezier(.22,.61,.36,1) both; pointer-events: none; }
-.desktop-mini-carousel::before { content: ''; position: absolute; inset: 18px 5% 4px; border: 1px solid rgba(38,27,20,.26); border-radius: 50%; transform: perspective(500px) rotateX(68deg); }
+.desktop-mini-carousel { position: absolute; z-index: 6; left: 5%; top: 4%; width: min(560px,43vw); height: 220px; opacity: .38; filter: saturate(.5) brightness(.93); animation: none; pointer-events: none; }
 .desktop-mini-carousel > div { position: absolute; width: 92px; height: 155px; transform: translate(-50%,-50%) scale(var(--mini-scale)); }
 .desktop-mini-carousel > div[data-mini-index="0"] { --mini-scale: .48; left: 5%; top: 72%; }
 .desktop-mini-carousel > div[data-mini-index="1"] { --mini-scale: .62; left: 18%; top: 42%; }
@@ -252,14 +249,6 @@ h2 em, .hero h1 em { font-weight: 400; color: #c79876; }
 .desktop-mini-carousel > div[data-mini-index="6"] { --mini-scale: .48; left: 95%; top: 72%; }
 .desktop-mini-carousel .product-art { inset: 0; }
 .desktop-mini-carousel .product-art.has-photo img { filter: none; }
-@keyframes desktop-mini-carousel-in {
-  from { opacity: 0; transform: translate(34vw,34vh) scale(2.7); }
-  to { opacity: .38; transform: translate(0,0) scale(1); }
-}
-@keyframes desktop-product-settle {
-  from { opacity: .9; translate: -8vw -12vh; scale: .9; }
-  to { opacity: 1; translate: 0 0; scale: 1; }
-}
 @keyframes desktop-product-info-in {
   from { opacity: 0; transform: translateY(24px); }
   to { opacity: 1; transform: translateY(0); }
@@ -474,7 +463,6 @@ body.phone-preview-active { overflow: hidden; background: radial-gradient(circle
 .category-viewer.is-phone-viewer .category-viewer-footer { left: 16px; right: 16px; bottom: 13px; grid-template-columns: auto 1fr; gap: 12px; }
 .category-viewer.is-phone-viewer .category-viewer-count { font-size: 13px; }
 .category-viewer.is-phone-viewer .category-viewer-hint { display: none; }
-.category-viewer.is-phone-viewer .category-viewer-footer > button { display: none; }
 
 .category-viewer.is-opening-product .category-viewer-topbar,
 .category-viewer.is-opening-product .category-viewer-copy,
@@ -484,8 +472,9 @@ body.phone-preview-active { overflow: hidden; background: radial-gradient(circle
 .category-viewer.is-opening-product .category-wheel-stage::after { animation: phone-product-ui-out .3s ease both; }
 .category-viewer.is-opening-phone .category-wheel-item:not(.is-launching) { animation: phone-product-gallery-out .34s ease both !important; pointer-events: none; }
 .category-viewer.is-opening-phone .category-wheel-item.is-launching { z-index: 20; will-change: transform, opacity; animation: phone-bottle-to-detail .48s cubic-bezier(.22,.61,.36,1) both !important; pointer-events: none; }
-.category-viewer.is-opening-desktop .category-wheel-stage { transform-origin: left top; animation: desktop-carousel-to-corner .88s cubic-bezier(.22,.61,.36,1) both; pointer-events: none; }
-.category-viewer.is-opening-desktop .desktop-product-launch { position: absolute; z-index: 30; left: 50%; top: 53%; width: min(300px,24vw); height: min(500px,62vh); pointer-events: none; will-change: transform; animation: desktop-bottle-to-corner .88s cubic-bezier(.22,.61,.36,1) both; }
+.category-viewer.is-opening-desktop .category-wheel-stage { overflow: visible; border: 0; background: transparent; box-shadow: none; transform-origin: left top; animation: desktop-carousel-to-corner .68s cubic-bezier(.2,.72,.25,1) both; pointer-events: none; }
+.category-viewer.is-opening-desktop .category-wheel-stage::after { display: none; }
+.category-viewer.is-opening-desktop .desktop-product-launch { position: absolute; z-index: 30; left: 50%; top: 53%; width: min(300px,24vw); height: min(500px,62vh); pointer-events: none; will-change: transform; animation: desktop-bottle-to-corner .68s cubic-bezier(.2,.72,.25,1) both; }
 .category-viewer.is-opening-desktop .desktop-product-launch .product-art { inset: 0; }
 .category-viewer.is-opening-desktop .desktop-product-launch .product-art.has-photo img { filter: drop-shadow(0 38px 25px rgba(37,22,13,.32)); }
 
@@ -541,7 +530,6 @@ body.phone-preview-active { overflow: hidden; background: radial-gradient(circle
   .category-viewer-footer { left: 16px; right: 16px; bottom: 13px; display: block; }
   .category-viewer-count { font-size: 13px; }
   .category-viewer-hint { display: none; }
-  .category-viewer-footer > button { display: none; }
 }
 
 @keyframes phone-bottle-open-3d {
