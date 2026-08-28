@@ -319,7 +319,6 @@ export default function Home() {
           </div>
 
           <div className="category-viewer-copy" aria-live="polite">
-            <p>{viewerCategory}</p>
             <h2>{activeViewerProduct.name}</h2>
             <strong>{money.format(activeViewerProduct.price)}</strong>
             <span>{activeViewerProduct.note}</span>
@@ -368,7 +367,6 @@ export default function Home() {
                   onClick={() => { setViewerCategory(null); openProduct(product); }}
                 >
                   <ProductArt shape={product.shape} tone={product.tone} image={product.image} />
-                  <span className="wheel-product-label">{product.name}</span>
                 </button>
               );
             })}
