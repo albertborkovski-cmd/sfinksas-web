@@ -120,12 +120,17 @@ export default function Home() {
   const cartItems = products.filter((product) => cart[product.id]);
   const cartCount = Object.values(cart).reduce((sum, quantity) => sum + quantity, 0);
   const cartTotal = cartItems.reduce((sum, product) => sum + product.price * cart[product.id], 0);
-  const previewVariants = selectedProduct?.variants ?? (selectedProduct?.category === 'Priedai'
-    ? ['1 vnt.']
-    : selectedProduct?.category === 'Rinkiniai'
-      ? ['Standartinis', 'Dovaninis']
-      : ['250 ml', '500 ml']);
-  const previewPrice = selectedProduct ? selectedProduct.price + (previewVariant > 0 ? 18 : 0) : 0;
+  const previewVariants = selectedProduct?.category === 'Šampūnai'
+    ? ['250 ml', '500 ml', '1000 ml']
+    : selectedProduct?.variants ?? (selectedProduct?.category === 'Priedai'
+      ? ['1 vnt.']
+      : selectedProduct?.category === 'Rinkiniai'
+        ? ['Standartinis', 'Dovaninis']
+        : ['250 ml', '500 ml']);
+  const shampooSizePremiums = [0, 18, 42];
+  const previewPrice = selectedProduct
+    ? selectedProduct.price + (selectedProduct.category === 'Šampūnai' ? shampooSizePremiums[previewVariant] ?? 0 : previewVariant > 0 ? 18 : 0)
+    : 0;
 
   function addToCart(product: Product, quantity = 1) {
     setCart((current) => ({ ...current, [product.id]: (current[product.id] || 0) + quantity }));
