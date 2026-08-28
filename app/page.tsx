@@ -34,8 +34,8 @@ const searchShelves: { category: Category; label: string; number: string }[] = [
 ];
 
 const products: Product[] = [
-  { id: 1, name: 'Keune Style Refresh', category: 'Šampūnai', note: 'Sausas šampūnas · 200 ml', price: 24, shape: 'pump', tone: 'smoke', image: '/keune-style-refresh-dry-shampoo-cutout.png', variants: ['200 ml'] },
-  { id: 2, name: 'milk_shake Colour Care', category: 'Šampūnai', note: 'Spalvą tausojantis šampūnas · 300 ml', price: 23, shape: 'pump', tone: 'amber', image: '/milk-shake-colour-care-shampoo-cutout.png', variants: ['300 ml'] },
+  { id: 1, name: 'Keune Style Refresh', category: 'Šampūnai', note: 'Sausas šampūnas · 200 ml', price: 24, shape: 'pump', tone: 'smoke', image: '/keune-style-refresh-dry-shampoo-cutout.webp', variants: ['200 ml'] },
+  { id: 2, name: 'milk_shake Colour Care', category: 'Šampūnai', note: 'Spalvą tausojantis šampūnas · 300 ml', price: 23, shape: 'pump', tone: 'amber', image: '/milk-shake-colour-care-shampoo-cutout.webp', variants: ['300 ml'] },
   { id: 3, name: 'Smooth Veil', category: 'Kondicionieriai', note: 'Glotninantis kondicionierius · 200 ml', price: 28, shape: 'tube', tone: 'sand' },
   { id: 4, name: 'Repair Crème', category: 'Kondicionieriai', note: 'Atkuriamoji kaukė · 180 ml', price: 32, shape: 'jar', tone: 'bronze' },
   { id: 5, name: 'No. 03', category: 'Aliejukai', note: 'Lengvas plaukų aliejus · 50 ml', price: 34, shape: 'dropper', tone: 'amber' },
@@ -44,17 +44,17 @@ const products: Product[] = [
   { id: 8, name: 'Silk Loop', category: 'Priedai', note: 'Šilkinė plaukų gumytė', price: 12, shape: 'jar', tone: 'smoke' },
   { id: 9, name: 'Daily Ritual', category: 'Rinkiniai', note: 'Šampūnas, kondicionierius, aliejus', price: 68, shape: 'set', tone: 'bronze' },
   { id: 10, name: 'Restore Duo', category: 'Rinkiniai', note: 'Atkuriamasis šampūnas ir kaukė', price: 54, shape: 'set', tone: 'olive' },
-  { id: 11, name: 'milk_shake Integrity', category: 'Šampūnai', note: 'Maitinamasis šampūnas · 1000 ml', price: 39, shape: 'pump', tone: 'sand', image: '/milk-shake-integrity-shampoo-cutout.png', variants: ['1000 ml'] },
+  { id: 11, name: 'milk_shake Integrity', category: 'Šampūnai', note: 'Maitinamasis šampūnas · 1000 ml', price: 39, shape: 'pump', tone: 'sand', image: '/milk-shake-integrity-shampoo-cutout.webp', variants: ['1000 ml'] },
   { id: 12, name: 'Hydrate Melt', category: 'Kondicionieriai', note: 'Intensyviai drėkinantis · 200 ml', price: 30, shape: 'tube', tone: 'olive' },
   { id: 13, name: 'Satin Mist', category: 'Aliejukai', note: 'Lengva apsauginė dulksna · 50 ml', price: 33, shape: 'dropper', tone: 'smoke' },
   { id: 14, name: 'Wide Tooth', category: 'Priedai', note: 'Plačių dantukų ritualo šukos', price: 16, shape: 'brush', tone: 'bronze' },
   { id: 15, name: 'Night Repair', category: 'Rinkiniai', note: 'Naktinis atkuriamasis trejetas', price: 72, shape: 'set', tone: 'smoke' },
-  { id: 16, name: 'Kérastase Chronologiste', category: 'Šampūnai', note: 'Atgaivinantis šampūnas · 500 ml', price: 46, shape: 'pump', tone: 'smoke', image: '/kerastase-chronologiste-shampoo-cutout.png', variants: ['500 ml'] },
-  { id: 17, name: 'Kérastase Discipline', category: 'Šampūnai', note: 'Glotninantis šampūnas · 250 ml', price: 34, shape: 'tube', tone: 'bronze', image: '/kerastase-discipline-shampoo-cutout.png', variants: ['250 ml'] },
-  { id: 18, name: 'Schwarzkopf Fibre Clinix Fortify', category: 'Šampūnai', note: 'Pažeistiems plaukams · 300 ml', price: 29, shape: 'pump', tone: 'bronze', image: '/schwarzkopf-fibre-clinix-shampoo-cutout.png', variants: ['300 ml'] },
-  { id: 19, name: 'Olaplex No.4P Blonde Enhancer', category: 'Šampūnai', note: 'Tonuojantis šampūnas šviesiems plaukams · 250 ml', price: 32, shape: 'pump', tone: 'smoke', image: '/olaplex-no4p-shampoo-cutout.png', variants: ['250 ml'] },
-  { id: 20, name: 'Wella Ultimate Smooth', category: 'Šampūnai', note: 'Glotninantis ir maitinantis šampūnas · 250 ml', price: 28, shape: 'pump', tone: 'amber', image: '/wella-ultimate-smooth-shampoo-cutout.png', variants: ['250 ml'] },
-  { id: 21, name: 'Kevin.Murphy Plumping.Wash', category: 'Šampūnai', note: 'Tankinantis šampūnas ploniems plaukams · 250 ml', price: 35, shape: 'tube', tone: 'sand', image: '/kevin-murphy-plumping-wash-cutout.png', variants: ['250 ml'] },
+  { id: 16, name: 'Kérastase Chronologiste', category: 'Šampūnai', note: 'Atgaivinantis šampūnas · 500 ml', price: 46, shape: 'pump', tone: 'smoke', image: '/kerastase-chronologiste-shampoo-cutout.webp', variants: ['500 ml'] },
+  { id: 17, name: 'Kérastase Discipline', category: 'Šampūnai', note: 'Glotninantis šampūnas · 250 ml', price: 34, shape: 'tube', tone: 'bronze', image: '/kerastase-discipline-shampoo-cutout.webp', variants: ['250 ml'] },
+  { id: 18, name: 'Schwarzkopf Fibre Clinix Fortify', category: 'Šampūnai', note: 'Pažeistiems plaukams · 300 ml', price: 29, shape: 'pump', tone: 'bronze', image: '/schwarzkopf-fibre-clinix-shampoo-cutout.webp', variants: ['300 ml'] },
+  { id: 19, name: 'Olaplex No.4P Blonde Enhancer', category: 'Šampūnai', note: 'Tonuojantis šampūnas šviesiems plaukams · 250 ml', price: 32, shape: 'pump', tone: 'smoke', image: '/olaplex-no4p-shampoo-cutout.webp', variants: ['250 ml'] },
+  { id: 20, name: 'Wella Ultimate Smooth', category: 'Šampūnai', note: 'Glotninantis ir maitinantis šampūnas · 250 ml', price: 28, shape: 'pump', tone: 'amber', image: '/wella-ultimate-smooth-shampoo-cutout.webp', variants: ['250 ml'] },
+  { id: 21, name: 'Kevin.Murphy Plumping.Wash', category: 'Šampūnai', note: 'Tankinantis šampūnas ploniems plaukams · 250 ml', price: 35, shape: 'tube', tone: 'sand', image: '/kevin-murphy-plumping-wash-cutout.webp', variants: ['250 ml'] },
 ];
 
 const money = new Intl.NumberFormat('lt-LT', { style: 'currency', currency: 'EUR' });
@@ -78,12 +78,12 @@ function productStory(product: Product) {
   };
 }
 
-function ProductArt({ shape, tone, image }: { shape: Shape; tone: Product['tone']; image?: string }) {
+function ProductArt({ shape, tone, image, priority = false }: { shape: Shape; tone: Product['tone']; image?: string; priority?: boolean }) {
   return (
     <div className={`product-art shape-${shape} tone-${tone}${image ? ' has-photo' : ''}`} aria-hidden="true">
       {/* Transparent product cutouts must be served directly; the hosted image optimizer changes their layering. */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      {image ? <img src={image} alt="" draggable="false" /> : <><span className="product-shadow" /><span className="product-form"><i className="product-cap" /><b>S</b></span></>}
+      {image ? <img src={image} alt="" draggable="false" loading={priority ? 'eager' : 'lazy'} fetchPriority={priority ? 'high' : 'auto'} decoding="async" /> : <><span className="product-shadow" /><span className="product-form"><i className="product-cap" /><b>S</b></span></>}
     </div>
   );
 }
@@ -104,9 +104,8 @@ export default function Home() {
   const [rotation, setRotation] = useState(0);
   const [viewerCategory, setViewerCategory] = useState<Category | null>(null);
   const [viewerIndex, setViewerIndex] = useState(0);
-  const [viewerMotion, setViewerMotion] = useState<'idle' | 'moving' | 'settling'>('idle');
+  const [viewerMotion, setViewerMotion] = useState<'idle' | 'moving'>('idle');
   const [viewerDirection, setViewerDirection] = useState<1 | -1>(1);
-  const [viewerMotionKey, setViewerMotionKey] = useState(0);
   const [openingProductId, setOpeningProductId] = useState<number | null>(null);
   const [openingProductOffset, setOpeningProductOffset] = useState(0);
   const [viewerOpeningMode, setViewerOpeningMode] = useState<'phone' | 'desktop' | null>(null);
@@ -122,6 +121,7 @@ export default function Home() {
   const viewerProductTimerRef = useRef<number | null>(null);
   const viewerClickTimerRef = useRef<number | null>(null);
   const noticeTimerRef = useRef<number | null>(null);
+  const preloadedProductImagesRef = useRef<HTMLImageElement[]>([]);
 
   const clearViewerTimers = useCallback(() => {
     viewerMotionTimersRef.current.forEach((timer) => window.clearTimeout(timer));
@@ -147,6 +147,19 @@ export default function Home() {
   useEffect(() => {
     const frame = window.requestAnimationFrame(() => setPortalReady(true));
     return () => window.cancelAnimationFrame(frame);
+  }, []);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      preloadedProductImagesRef.current = products.flatMap((product) => {
+        if (!product.image) return [];
+        const image = new Image();
+        image.decoding = 'async';
+        image.src = product.image;
+        return [image];
+      });
+    }, 450);
+    return () => window.clearTimeout(timer);
   }, []);
 
   useEffect(() => {
@@ -239,6 +252,11 @@ export default function Home() {
 
   function openCategoryViewer(category: Category) {
     resetViewerMotion();
+    setSelectedProduct(null);
+    setSearchOpen(false);
+    setNavPanel(null);
+    setCartOpen(false);
+    setMenuOpen(false);
     setViewerIndex(0);
     setViewerCategory(category);
   }
@@ -254,18 +272,14 @@ export default function Home() {
 
     viewerMotionLockRef.current = true;
     setViewerDirection(normalizedDirection);
-    setViewerMotionKey((current) => current + 1);
     setViewerMotion('moving');
     const moveTimer = window.setTimeout(() => {
       setViewerIndex((current) => (current + normalizedDirection + viewerProducts.length) % viewerProducts.length);
-      setViewerMotion('settling');
-    }, 720);
-    const settleTimer = window.setTimeout(() => {
       setViewerMotion('idle');
       viewerMotionLockRef.current = false;
       viewerMotionTimersRef.current = [];
-    }, 980);
-    viewerMotionTimersRef.current = [moveTimer, settleTimer];
+    }, 520);
+    viewerMotionTimersRef.current = [moveTimer];
   }
 
   function openViewerProduct(product: Product, offset: number) {
@@ -364,12 +378,17 @@ export default function Home() {
           <p className="eyebrow"><span /> Atrinkta plaukų priežiūra</p>
           <h1>Grožio ritualas,<br /><em>sukurtas jums.</em></h1>
           <p className="hero-copy">Profesionalios priemonės plaukų stiprumui, žvilgesiui ir kasdieniam ritualui. Atrinkta tai, kas iš tiesų veikia.</p>
-          <div className="hero-ctas">
-            <button className="primary-cta" type="button" onClick={() => showPanel('collection')}>Atrasti kolekciją <span aria-hidden="true">↗</span></button>
-            <button className="text-cta" type="button" onClick={() => showPanel('contact')}>Konsultacija <span aria-hidden="true">→</span></button>
+          <div className="hero-collections" aria-label="Produktų kategorijos">
+            {categories.map((category) => (
+              <button type="button" key={category.name} onClick={() => openCategoryViewer(category.name)} aria-label={`Atidaryti kategoriją ${category.name}`}>
+                <span className="hero-category-number">{category.index}</span>
+                <i className="hero-category-art" data-shape={category.shape} aria-hidden="true" />
+                <strong>{category.name}</strong>
+                <span className="hero-category-arrow" aria-hidden="true">↗</span>
+              </button>
+            ))}
           </div>
         </div>
-        <div className="hero-meta" aria-hidden="true"><span>01</span><i /><span>Grožio ritualai</span></div>
       </section>
 
       {portalReady && viewerCategory && activeViewerProduct && createPortal(
@@ -404,7 +423,6 @@ export default function Home() {
           </div>
 
           <div
-            key={`viewer-wheel-${viewerMotionKey}`}
             className="category-wheel-stage"
             tabIndex={0}
             aria-label="Sukama produktų karuselė"
@@ -466,7 +484,7 @@ export default function Home() {
                     openViewerProduct(product, offset);
                   }}
                 >
-                  <ProductArt shape={product.shape} tone={product.tone} image={product.image} />
+                  <ProductArt shape={product.shape} tone={product.tone} image={product.image} priority={offset === 0} />
                 </button>
               );
             })}
