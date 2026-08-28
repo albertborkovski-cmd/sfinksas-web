@@ -64,6 +64,13 @@ const products: Product[] = [
   { id: 28, name: 'Davines MOMO Conditioner', category: 'Kondicionieriai', note: 'Drėkinantis kondicionierius su melionų ekstraktu · 1000 ml', price: 44, shape: 'tube', tone: 'olive', image: '/davines-momo-conditioner-cutout.webp', variants: ['1000 ml'] },
   { id: 29, name: 'Olaplex No.5P Blonde Enhancer', category: 'Kondicionieriai', note: 'Tonuojantis kondicionierius šviesiems plaukams · 250 ml', price: 32, shape: 'tube', tone: 'smoke', image: '/olaplex-no5p-conditioner-cutout.webp', variants: ['250 ml'] },
   { id: 30, name: 'K18 Damage Shield', category: 'Kondicionieriai', note: 'Apsauginis kondicionierius pažeistiems plaukams · 250 ml', price: 39, shape: 'tube', tone: 'smoke', image: '/k18-damage-shield-conditioner-cutout.webp', variants: ['250 ml'] },
+  { id: 31, name: 'Kevin.Murphy Young.Again', category: 'Aliejukai', note: 'Atnaujinantis plaukų aliejus · 100 ml', price: 42, shape: 'pump', tone: 'smoke', image: '/kevin-murphy-young-again-oil-cutout.webp', variants: ['100 ml'] },
+  { id: 32, name: 'Forever Nourishing Hair Oil', category: 'Aliejukai', note: 'Lengvas maitinamasis sausas aliejus · 30 ml', price: 29, shape: 'pump', tone: 'sand', image: '/forever-nourishing-hair-oil-cutout.webp', variants: ['30 ml'] },
+  { id: 33, name: 'K18 Molecular Repair Hair Oil', category: 'Aliejukai', note: 'Molekulinis atkuriamasis aliejus · 30 ml', price: 49, shape: 'tube', tone: 'sand', image: '/k18-molecular-repair-hair-oil-cutout.webp', variants: ['30 ml'] },
+  { id: 34, name: 'Kérastase Elixir Ultime', category: 'Aliejukai', note: 'Prabangus žvilgesio aliejus · 75 ml', price: 52, shape: 'pump', tone: 'amber', image: '/kerastase-elixir-ultime-oil-cutout.webp', variants: ['75 ml'] },
+  { id: 35, name: 'La’dor Osmanthus Hair Oil', category: 'Aliejukai', note: 'Kvapusis plaukų aliejus · 80 ml', price: 24, shape: 'dropper', tone: 'amber', image: '/lador-osmanthus-hair-oil-cutout.webp', variants: ['80 ml'] },
+  { id: 36, name: 'Khadi Strong Amla Hair Oil', category: 'Aliejukai', note: 'Ajurvedinis stiprinamasis aliejus · 50 ml', price: 22, shape: 'pump', tone: 'bronze', image: '/khadi-strong-amla-hair-oil-cutout.webp', variants: ['50 ml'] },
+  { id: 37, name: 'Olaplex No.7 Bonding Oil', category: 'Aliejukai', note: 'Jungtis stiprinantis aliejus · 30 ml', price: 32, shape: 'tube', tone: 'amber', image: '/olaplex-no7-bonding-oil-cutout.webp', variants: ['30 ml'] },
 ];
 
 const money = new Intl.NumberFormat('lt-LT', { style: 'currency', currency: 'EUR' });
@@ -87,6 +94,13 @@ const productStories: Record<number, { description: string; benefits: [string, s
   28: { description: 'Davines MOMO su melionų ekstraktu drėkina išsausėjusius plaukus, suteikia jiems minkštumo ir padeda lengviau iššukuoti.', benefits: ['Drėkina plaukus', 'Su melionų ekstraktu', 'Lengvina iššukavimą'] },
   29: { description: 'Violetinių pigmentų kondicionierius drėkina šviesius plaukus ir padeda neutralizuoti nepageidaujamus gelsvus atspalvius.', benefits: ['Neutralizuoja geltonumą', 'Drėkina šviesius plaukus', 'Palaiko šaltą toną'] },
   30: { description: 'Apsauginis kondicionierius padeda stiprinti pažeistus plaukus, išlaikyti glotnumą ir sukurti lengvą kasdienę apsaugą.', benefits: ['Saugo nuo pažeidimų', 'Stiprina plaukus', 'Glotnina neapsunkindamas'] },
+  31: { description: 'Atkuriamasis aliejus su nemirtingųjų gėlių ekstraktu maitina sausus plaukus, glotnina ir padeda išsaugoti elastingą, jaunatvišką išvaizdą.', benefits: ['Maitina sausus plaukus', 'Glotnina paviršių', 'Suteikia žvilgesio'] },
+  32: { description: 'Lengvas sausas aliejus su alavijų ir šešių augalinių aliejų deriniu minkština plaukus ir suteikia žvilgesio be sunkumo.', benefits: ['Lengva sausa tekstūra', 'Be silikonų', 'Maitina ir minkština'] },
+  33: { description: 'Koncentruotas molekulinis aliejus padeda atkurti pažeistus plaukus, sumažinti pūtimąsi ir sustiprinti natūralų žvilgesį.', benefits: ['Molekulinis atkūrimas', 'Mažina pūtimąsi', 'Apsaugo nuo karščio'] },
+  34: { description: 'Prabangus daugiafunkcis aliejus su laukinių kamelijų ekstraktu suteikia plaukams glotnumo, minkštumo ir veidrodinio žvilgesio.', benefits: ['Veidrodinis žvilgesys', 'Glotnina plaukus', 'Lengva prabangi tekstūra'] },
+  35: { description: 'Kvapusis osmantų aliejus apgaubia plaukus subtiliu aromatu, glotnina galiukus ir suteikia lengvo, natūralaus žvilgesio.', benefits: ['Subtilus aromatas', 'Glotnina galiukus', 'Suteikia žvilgesio'] },
+  36: { description: 'Ajurvedinis amlos aliejus skirtas silpniems plaukams: maitina šaknis, padeda stiprinti plaukus ir palaikyti natūralią apimtį.', benefits: ['100 % natūralus', 'Stiprina plaukus', 'Puoselėja šaknis'] },
+  37: { description: 'Itin lengvas jungtis stiprinantis aliejus suteikia žvilgesio, sumažina pūtimąsi ir padeda apsaugoti plaukus formuojant karščiu.', benefits: ['Stiprina jungtis', 'Apsaugo nuo karščio', 'Neapsunkina plaukų'] },
 };
 
 function productStory(product: Product) {
