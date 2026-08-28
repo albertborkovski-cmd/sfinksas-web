@@ -90,6 +90,7 @@ export default function Home() {
   const [previewMode, setPreviewMode] = useState<'desktop' | 'phone'>('desktop');
   const [activeCategory, setActiveCategory] = useState<Category | 'Visi'>('Visi');
   const [searchOpen, setSearchOpen] = useState(false);
+  const [navPanel, setNavPanel] = useState<'collection' | 'contact' | null>(null);
   const [cartOpen, setCartOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [query, setQuery] = useState('');
@@ -127,6 +128,7 @@ export default function Home() {
       if (event.key !== 'Escape') return;
       setSelectedProduct(null);
       setSearchOpen(false);
+      setNavPanel(null);
       setCartOpen(false);
       setMenuOpen(false);
       setViewerCategory(null);
@@ -297,10 +299,10 @@ export default function Home() {
         <header className="site-header">
           <a className="wordmark" href="#namai" aria-label="Sfinksas – pradžia">SFINKSAS</a>
           <nav className="desktop-nav" aria-label="Pagrindinis meniu">
-            <a className="active" href="#namai">Namai</a>
-            <button type="button" onClick={() => setSearchOpen(true)}>Paieška</button>
-            <a href="#kolekcija">Kolekcija</a>
-            <a href="#kontaktai">Kontaktai</a>
+            <button type="button" className={!searchOpen && !navPanel ? 'active' : ''} onClick={() => { setSearchOpen(false); setNavPanel(null); setCartOpen(false); setSelectedProduct(null); }}>Namai</button>
+            <button type="button" className={searchOpen ? 'active' : ''} onClick={() => { setNavPanel(null); setSearchOpen(true); }}>Paieška</button>
+            <button type="button" className={navPanel === 'collection' ? 'active' : ''} onClick={() => { setSearchOpen(false); setNavPanel('collection'); }}>Kolekcija</button>
+            <button type="button" className={navPanel === 'contact' ? 'active' : ''} onClick={() => { setSearchOpen(false); setNavPanel('contact'); }}>Kontaktai</button>
           </nav>
           <div className="header-actions">
             <button className="cart-button" type="button" onClick={() => setCartOpen(true)} aria-label={`Atverti krepšelį, prekių: ${cartCount}`}>
@@ -408,7 +410,7 @@ export default function Home() {
       <footer>
         <a className="wordmark footer-mark" href="#namai">SFINKSAS</a>
         <p>Profesionali plaukų priežiūra jūsų kasdieniam ritualui.</p>
-        <div><a href="#kolekcija">Kolekcija</a><a href="#kontaktai">Kontaktai</a><button type="button" onClick={() => setSearchOpen(true)}>Paieška</button></div>
+        <div><button type="button" onClick={() => setNavPanel('collection')}>Kolekcija</button><button type="button" onClick={() => setNavPanel('contact')}>Kontaktai</button><button type="button" onClick={() => setSearchOpen(true)}>Paieška</button></div>
         <span>© 2026 Sfinksas · Demonstracinė parduotuvė</span>
       </footer>
 
@@ -581,6 +583,43 @@ export default function Home() {
         </div>
       )}
 
+      {navPanel === 'collection' && (
+        <div className="nav-panel-overlay collection-menu-overlay" role="dialog" aria-modal="true" aria-label="Kolekcijos meniu">
+          <button className="nav-panel-close" type="button" onClick={() => setNavPanel(null)} aria-label="Uždaryti kolekcijos meniu">×</button>
+          <div className="collection-menu-panel">
+            <p className="section-kicker">Sfinksas · kolekcija</p>
+            <h2>Pasirinkite savo<br /><em>grožio ritualą.</em></h2>
+            <div className="collection-menu-list">
+              {categories.map((category) => (
+                <button key={category.name} type="button" onClick={() => { setNavPanel(null); openCategoryViewer(category.name); }}>
+                  <span>{category.index}</span><b>{category.name}</b><small>{category.note}</small><i>↗</i>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {navPanel === 'contact' && (
+        <div className="nav-panel-overlay contact-menu-overlay" role="dialog" aria-modal="true" aria-label="Kontaktų meniu">
+          <button className="nav-panel-close" type="button" onClick={() => setNavPanel(null)} aria-label="Uždaryti kontaktų meniu">×</button>
+          <div className="contact-menu-panel">
+            <div className="contact-menu-copy">
+              <p className="section-kicker">Sfinksas · kontaktai</p>
+              <h2>Padėsime atrasti<br /><em>jūsų ritualą.</em></h2>
+              <p>Parašykite, kokio rezultato ieškote. Padėsime pasirinkti priemones ir suderinti jų naudojimą.</p>
+              <a href="mailto:labas@sfinksas.lt">labas@sfinksas.lt <span>↗</span></a>
+            </div>
+            <form className="contact-menu-form" onSubmit={submitContact}>
+              <label>Jūsų vardas<input required name="menu-name" placeholder="Įrašykite vardą" /></label>
+              <label>El. paštas<input required type="email" name="menu-email" placeholder="vardas@pastas.lt" /></label>
+              <label>Žinutė<textarea required name="menu-message" rows={4} placeholder="Kuo galime padėti?" /></label>
+              <button type="submit">{messageSent ? 'Žinutė paruošta ✓' : 'Siųsti žinutę'} <span>↗</span></button>
+            </form>
+          </div>
+        </div>
+      )}
+
       {searchOpen && (
         <div className="overlay search-overlay" role="dialog" aria-modal="true" aria-label="Produktų paieška">
           <button className="overlay-close" type="button" onClick={() => { setSearchOpen(false); setQuery(''); }} aria-label="Uždaryti paiešką">×</button>
@@ -643,10 +682,10 @@ export default function Home() {
         <div className="mobile-menu" role="dialog" aria-modal="true" aria-label="Mobilus meniu">
           <div className="mobile-menu-top"><span className="wordmark">SFINKSAS</span><button type="button" onClick={() => setMenuOpen(false)} aria-label="Uždaryti meniu">×</button></div>
           <nav>
-            <a href="#namai" onClick={() => setMenuOpen(false)}><span>01</span>Namai</a>
-            <button type="button" onClick={() => { setMenuOpen(false); setSearchOpen(true); }}><span>02</span>Paieška</button>
-            <a href="#kolekcija" onClick={() => setMenuOpen(false)}><span>03</span>Kolekcija</a>
-            <a href="#kontaktai" onClick={() => setMenuOpen(false)}><span>04</span>Kontaktai</a>
+            <button type="button" onClick={() => { setMenuOpen(false); setSearchOpen(false); setNavPanel(null); }}><span>01</span>Namai</button>
+            <button type="button" onClick={() => { setMenuOpen(false); setNavPanel(null); setSearchOpen(true); }}><span>02</span>Paieška</button>
+            <button type="button" onClick={() => { setMenuOpen(false); setSearchOpen(false); setNavPanel('collection'); }}><span>03</span>Kolekcija</button>
+            <button type="button" onClick={() => { setMenuOpen(false); setSearchOpen(false); setNavPanel('contact'); }}><span>04</span>Kontaktai</button>
           </nav>
           <button className="mobile-cart" type="button" onClick={() => { setMenuOpen(false); setCartOpen(true); }}>Krepšelis ({cartCount}) <span>↗</span></button>
         </div>
