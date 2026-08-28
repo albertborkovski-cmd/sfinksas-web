@@ -1,6 +1,6 @@
 'use client';
 
-import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
+import { type CSSProperties, FormEvent, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
 type Category = 'Šampūnai' | 'Kondicionieriai' | 'Aliejukai' | 'Priedai' | 'Rinkiniai';
@@ -52,6 +52,25 @@ const products: Product[] = [
 
 const money = new Intl.NumberFormat('lt-LT', { style: 'currency', currency: 'EUR' });
 
+const productStories: Record<number, { description: string; benefits: [string, string, string] }> = {
+  1: { description: 'Lengva sauso šampūno dulksna sugeria riebalų perteklių, atgaivina šaknis ir suteikia plaukams natūralios apimties tarp plovimų.', benefits: ['Greitai atgaivina', 'Suteikia apimties', 'Nepalieka sunkumo'] },
+  2: { description: 'Švelni drėkinamoji formulė padeda apsaugoti dažytų plaukų spalvą, išlaikyti jos sodrumą ir sustiprinti natūralų žvilgesį.', benefits: ['Drėkinanti formulė', 'Saugo plaukų spalvą', 'Sustiprina žvilgesį'] },
+  11: { description: 'Maitinamasis šampūnas sukuria švelnią, sodrią putą ir padeda sausiems ar pažeistiems plaukams susigrąžinti minkštumą bei elastingumą.', benefits: ['Intensyviai maitina', 'Atkuria minkštumą', 'Tinka visų tipų plaukams'] },
+  16: { description: 'Prabangi atgaivinanti formulė valo galvos odą ir plaukus, suteikia glotnumo bei padeda išlaikyti gyvybingą, jaunatvišką išvaizdą.', benefits: ['Atgaivina plaukus', 'Suteikia glotnumo', 'Puoselėja galvos odą'] },
+  17: { description: 'Glotninantis šampūnas drausmina nepaklusnius plaukus, mažina pūtimąsi ir padeda išlaikyti lengvą, natūralų plaukų judėjimą.', benefits: ['Mažina pūtimąsi', 'Lengvina formavimą', 'Išlaiko plaukų judėjimą'] },
+  18: { description: 'Atkuriamoji formulė skirta pažeistiems plaukams: švelniai valo, padeda stiprinti plauko struktūrą ir saugo nuo lūžinėjimo.', benefits: ['Stiprina struktūrą', 'Mažina lūžinėjimą', 'Skirta pažeistiems plaukams'] },
+  19: { description: 'Violetinių pigmentų šampūnas neutralizuoja nepageidaujamus gelsvus tonus, drėkina ir padeda išlaikyti šviesių plaukų skaidrumą.', benefits: ['Neutralizuoja geltonumą', 'Drėkina šviesius plaukus', 'Palaiko šaltą atspalvį'] },
+  20: { description: 'Švelniai valanti formulė su skvalanu ir omega-9 maitina sausus, besipučiančius plaukus ir suteikia jiems glotnaus žvilgesio.', benefits: ['Glotnina plaukus', 'Maitina ir minkština', 'Suteikia žvilgesio'] },
+  21: { description: 'Tankinantis šampūnas švelniai valo plonus plaukus, suteikia jiems vizualaus pilnumo ir padeda išlaikyti lengvą apimtį.', benefits: ['Suteikia pilnumo', 'Pakelia nuo šaknų', 'Neapsunkina plaukų'] },
+};
+
+function productStory(product: Product) {
+  return productStories[product.id] ?? {
+    description: `Profesionali ${product.category.toLocaleLowerCase('lt')} formulė kasdieniam plaukų priežiūros ritualui. Padeda išlaikyti plaukus minkštus, žvilgančius ir lengvai valdomus.`,
+    benefits: ['Profesionaliai atrinkta', 'Patogu naudoti kasdien', 'Lengvas, neapsunkinantis rezultatas'] as [string, string, string],
+  };
+}
+
 function ProductArt({ shape, tone, image, small = false }: { shape: Shape; tone: Product['tone']; image?: string; small?: boolean }) {
   return (
     <div className={`product-art shape-${shape} tone-${tone}${image ? ' has-photo' : ''}${small ? ' product-art-small' : ''}`} aria-hidden="true">
@@ -78,6 +97,7 @@ export default function Home() {
   const [viewerIndex, setViewerIndex] = useState(0);
   const [viewerMotion, setViewerMotion] = useState<'idle' | 'moving' | 'settling'>('idle');
   const [openingProductId, setOpeningProductId] = useState<number | null>(null);
+  const [openingProductOffset, setOpeningProductOffset] = useState(0);
   const [viewerOpeningMode, setViewerOpeningMode] = useState<'phone' | 'desktop' | null>(null);
   const [productOpenedFromViewer, setProductOpenedFromViewer] = useState(false);
   const [productOpenedFromDesktopViewer, setProductOpenedFromDesktopViewer] = useState(false);
@@ -122,6 +142,7 @@ export default function Home() {
     if (viewerProductTimerRef.current) window.clearTimeout(viewerProductTimerRef.current);
     viewerProductTimerRef.current = null;
     setOpeningProductId(null);
+    setOpeningProductOffset(0);
     setViewerOpeningMode(null);
   }, [viewerCategory]);
 
@@ -195,6 +216,7 @@ export default function Home() {
     if (viewerProductTimerRef.current) window.clearTimeout(viewerProductTimerRef.current);
     viewerProductTimerRef.current = null;
     setOpeningProductId(null);
+    setOpeningProductOffset(0);
     setViewerOpeningMode(null);
     setActiveCategory(category);
     setViewerIndex(0);
@@ -228,11 +250,13 @@ export default function Home() {
     const phoneLayout = previewMode === 'phone' || window.matchMedia('(max-width: 760px)').matches;
     viewerMotionLockRef.current = true;
     setOpeningProductId(product.id);
+    setOpeningProductOffset(offset);
     setViewerOpeningMode(phoneLayout ? 'phone' : 'desktop');
     viewerProductTimerRef.current = window.setTimeout(() => {
       setViewerCategory(null);
       openProduct(product, phoneLayout, !phoneLayout);
       setOpeningProductId(null);
+      setOpeningProductOffset(0);
       setViewerOpeningMode(null);
       viewerProductTimerRef.current = null;
     }, phoneLayout ? 760 : 880);
@@ -391,7 +415,15 @@ export default function Home() {
           </div>
 
           {viewerOpeningMode === 'desktop' && openingProductId !== null && (
-            <div className="desktop-product-launch" aria-hidden="true">
+            <div
+              className="desktop-product-launch"
+              aria-hidden="true"
+              style={{
+                '--launch-start-x': `${Math.sign(openingProductOffset) * ([0, 18, 27, 35][Math.min(Math.abs(openingProductOffset), 3)] ?? 35)}vw`,
+                '--launch-start-scale': [1, .82, .67, .52][Math.min(Math.abs(openingProductOffset), 3)] ?? .52,
+                '--launch-start-opacity': [1, .7, .4, .2][Math.min(Math.abs(openingProductOffset), 3)] ?? .2,
+              } as CSSProperties}
+            >
               {(() => {
                 const product = viewerProducts.find((item) => item.id === openingProductId);
                 return product ? <ProductArt shape={product.shape} tone={product.tone} image={product.image} /> : null;
@@ -518,11 +550,9 @@ export default function Home() {
               <span className="preview-product-number">NO. {selectedProduct.id.toString().padStart(2, '0')}</span>
               <h2>{selectedProduct.name}</h2>
               <p className="preview-product-note">{selectedProduct.note}</p>
-              <p className="preview-product-description">Subalansuota profesionali formulė kasdieniam ritualui. Padeda išlaikyti plaukus minkštus, žvilgančius ir lengvai valdomus jų neapsunkindama.</p>
+              <p className="preview-product-description">{productStory(selectedProduct).description}</p>
               <ul>
-                <li><span>✓</span> Profesionaliai atrinkta formulė</li>
-                <li><span>✓</span> Tinka kasdieniam ritualui</li>
-                <li><span>✓</span> Be nereikalingo apsunkinimo</li>
+                {productStory(selectedProduct).benefits.map((benefit) => <li key={benefit}><span>✓</span>{benefit}</li>)}
               </ul>
               <fieldset className="variant-picker">
                 <legend>{selectedProduct.category === 'Rinkiniai' ? 'Pakuotė' : selectedProduct.category === 'Priedai' ? 'Kiekis' : 'Talpa'}</legend>
