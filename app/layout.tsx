@@ -42,6 +42,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="lt">
+      <head>
+        <link rel="preload" as="image" href="/sfinksas-luxury-interior.webp" fetchPriority="high" />
+        <link rel="preload" as="image" href="/home-category-products.webp" fetchPriority="high" />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >

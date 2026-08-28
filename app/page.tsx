@@ -18,12 +18,12 @@ type Product = {
   variants?: string[];
 };
 
-const categories: { name: Category; index: string; shape: Shape; note: string }[] = [
-  { name: 'Šampūnai', index: '01', shape: 'pump', note: 'Švelniam, tikslingam valymui' },
-  { name: 'Kondicionieriai', index: '02', shape: 'tube', note: 'Glotnumui ir elastingumui' },
-  { name: 'Aliejukai', index: '03', shape: 'dropper', note: 'Žvilgesiui be apsunkinimo' },
-  { name: 'Priedai', index: '04', shape: 'brush', note: 'Kasdienio ritualo detalės' },
-  { name: 'Rinkiniai', index: '05', shape: 'set', note: 'Suderinta priežiūra ir dovanos' },
+const categories: { name: Category; index: string; note: string }[] = [
+  { name: 'Šampūnai', index: '01', note: 'Švelniam, tikslingam valymui' },
+  { name: 'Kondicionieriai', index: '02', note: 'Glotnumui ir elastingumui' },
+  { name: 'Aliejukai', index: '03', note: 'Žvilgesiui be apsunkinimo' },
+  { name: 'Priedai', index: '04', note: 'Kasdienio ritualo detalės' },
+  { name: 'Rinkiniai', index: '05', note: 'Suderinta priežiūra ir dovanos' },
 ];
 
 const searchShelves: { category: Category; label: string; number: string }[] = [
@@ -36,17 +36,11 @@ const searchShelves: { category: Category; label: string; number: string }[] = [
 const products: Product[] = [
   { id: 1, name: 'Keune Style Refresh', category: 'Šampūnai', note: 'Sausas šampūnas · 200 ml', price: 24, shape: 'pump', tone: 'smoke', image: '/keune-style-refresh-dry-shampoo-cutout.webp', variants: ['200 ml'] },
   { id: 2, name: 'milk_shake Colour Care', category: 'Šampūnai', note: 'Spalvą tausojantis šampūnas · 300 ml', price: 23, shape: 'pump', tone: 'amber', image: '/milk-shake-colour-care-shampoo-cutout.webp', variants: ['300 ml'] },
-  { id: 3, name: 'Smooth Veil', category: 'Kondicionieriai', note: 'Glotninantis kondicionierius · 200 ml', price: 28, shape: 'tube', tone: 'sand' },
-  { id: 4, name: 'Repair Crème', category: 'Kondicionieriai', note: 'Atkuriamoji kaukė · 180 ml', price: 32, shape: 'jar', tone: 'bronze' },
-  { id: 5, name: 'No. 03', category: 'Aliejukai', note: 'Lengvas plaukų aliejus · 50 ml', price: 34, shape: 'dropper', tone: 'amber' },
-  { id: 6, name: 'Glow Drops', category: 'Aliejukai', note: 'Žvilgesio serumas · 30 ml', price: 31, shape: 'dropper', tone: 'olive' },
   { id: 7, name: 'Scalp Ritual', category: 'Priedai', note: 'Galvos odos masažuoklis', price: 18, shape: 'brush', tone: 'sand' },
   { id: 8, name: 'Silk Loop', category: 'Priedai', note: 'Šilkinė plaukų gumytė', price: 12, shape: 'jar', tone: 'smoke' },
   { id: 9, name: 'Daily Ritual', category: 'Rinkiniai', note: 'Šampūnas, kondicionierius, aliejus', price: 68, shape: 'set', tone: 'bronze' },
   { id: 10, name: 'Restore Duo', category: 'Rinkiniai', note: 'Atkuriamasis šampūnas ir kaukė', price: 54, shape: 'set', tone: 'olive' },
   { id: 11, name: 'milk_shake Integrity', category: 'Šampūnai', note: 'Maitinamasis šampūnas · 1000 ml', price: 39, shape: 'pump', tone: 'sand', image: '/milk-shake-integrity-shampoo-cutout.webp', variants: ['1000 ml'] },
-  { id: 12, name: 'Hydrate Melt', category: 'Kondicionieriai', note: 'Intensyviai drėkinantis · 200 ml', price: 30, shape: 'tube', tone: 'olive' },
-  { id: 13, name: 'Satin Mist', category: 'Aliejukai', note: 'Lengva apsauginė dulksna · 50 ml', price: 33, shape: 'dropper', tone: 'smoke' },
   { id: 14, name: 'Wide Tooth', category: 'Priedai', note: 'Plačių dantukų ritualo šukos', price: 16, shape: 'brush', tone: 'bronze' },
   { id: 15, name: 'Night Repair', category: 'Rinkiniai', note: 'Naktinis atkuriamasis trejetas', price: 72, shape: 'set', tone: 'smoke' },
   { id: 16, name: 'Kérastase Chronologiste', category: 'Šampūnai', note: 'Atgaivinantis šampūnas · 500 ml', price: 46, shape: 'pump', tone: 'smoke', image: '/kerastase-chronologiste-shampoo-cutout.webp', variants: ['500 ml'] },
@@ -141,21 +135,17 @@ export default function Home() {
   const [openingProductOffset, setOpeningProductOffset] = useState(0);
   const [viewerOpeningMode, setViewerOpeningMode] = useState<'desktop' | null>(null);
   const [productOpenedFromViewer, setProductOpenedFromViewer] = useState(false);
-  const [productOpenedFromDesktopViewer, setProductOpenedFromDesktopViewer] = useState(false);
   const [portalReady, setPortalReady] = useState(false);
   const viewerDragRef = useRef<{ pointerId: number; x: number; y: number; productId: number | null } | null>(null);
   const viewerWheelLockRef = useRef(0);
   const viewerMotionLockRef = useRef(false);
   const viewerMotionTimersRef = useRef<number[]>([]);
-  const viewerProductTimerRef = useRef<number | null>(null);
   const noticeTimerRef = useRef<number | null>(null);
   const preloadedProductImagesRef = useRef<HTMLImageElement[]>([]);
 
   const clearViewerTimers = useCallback(() => {
     viewerMotionTimersRef.current.forEach((timer) => window.clearTimeout(timer));
     viewerMotionTimersRef.current = [];
-    if (viewerProductTimerRef.current !== null) window.clearTimeout(viewerProductTimerRef.current);
-    viewerProductTimerRef.current = null;
   }, []);
 
   const resetViewerMotion = useCallback(() => {
@@ -178,16 +168,15 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    const timer = window.setTimeout(() => {
-      preloadedProductImagesRef.current = products.flatMap((product) => {
-        if (!product.image) return [];
-        const image = new Image();
-        image.decoding = 'async';
-        image.src = product.image;
-        return [image];
-      });
-    }, 450);
-    return () => window.clearTimeout(timer);
+    preloadedProductImagesRef.current = products.flatMap((product) => {
+      if (!product.image) return [];
+      const image = new Image();
+      image.decoding = 'async';
+      image.fetchPriority = 'low';
+      image.src = product.image;
+      return [image];
+    });
+    return () => { preloadedProductImagesRef.current = []; };
   }, []);
 
   useEffect(() => {
@@ -253,9 +242,8 @@ export default function Home() {
     }, 2200);
   }
 
-  function openProduct(product: Product, fromCategoryViewer = false, fromDesktopViewer = false) {
+  function openProduct(product: Product, fromCategoryViewer = false) {
     setProductOpenedFromViewer(fromCategoryViewer);
-    setProductOpenedFromDesktopViewer(fromDesktopViewer);
     setSelectedProduct(product);
     setPreviewQuantity(1);
     setPreviewVariant(0);
@@ -264,7 +252,7 @@ export default function Home() {
   function moveProduct(direction: number) {
     if (!selectedProduct) return;
     const currentIndex = products.findIndex((product) => product.id === selectedProduct.id);
-    openProduct(products[(currentIndex + direction + products.length) % products.length], productOpenedFromViewer, productOpenedFromDesktopViewer);
+    openProduct(products[(currentIndex + direction + products.length) % products.length], productOpenedFromViewer);
   }
 
   function changeQuantity(id: number, change: number) {
@@ -313,7 +301,7 @@ export default function Home() {
     const phoneLayout = previewMode === 'phone' || window.matchMedia('(max-width: 760px)').matches;
 
     if (phoneLayout) {
-      openProduct(product, true, false);
+      openProduct(product, true);
       closeCategoryViewer();
       return;
     }
@@ -322,7 +310,7 @@ export default function Home() {
     setOpeningProductId(product.id);
     setOpeningProductOffset(offset);
     setViewerOpeningMode('desktop');
-    openProduct(product, false, true);
+    openProduct(product);
   }
 
   function viewerOffset(index: number) {
@@ -459,7 +447,6 @@ export default function Home() {
                 type="button"
                 onClick={() => {
                   setSelectedProduct(null);
-                  setProductOpenedFromDesktopViewer(false);
                   resetViewerMotion();
                 }}
                 aria-label="Grįžti į produktų karuselę"
@@ -577,21 +564,11 @@ export default function Home() {
       )}
 
       {selectedProduct && !(viewerCategory && viewerOpeningMode === 'desktop') && (
-        <div className={`product-preview-backdrop${productOpenedFromViewer ? ' from-category-viewer' : ''}${productOpenedFromDesktopViewer ? ' from-desktop-viewer' : ''}`} role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setSelectedProduct(null); }}>
+        <div className={`product-preview-backdrop${productOpenedFromViewer ? ' from-category-viewer' : ''}`} role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setSelectedProduct(null); }}>
           <section className="product-preview-modal" role="dialog" aria-modal="true" aria-label={`${selectedProduct.name} produkto peržiūra`}>
             <button className="product-preview-close" type="button" onClick={() => setSelectedProduct(null)} aria-label="Uždaryti produkto peržiūrą">×</button>
             <button className="product-preview-previous" type="button" onClick={() => moveProduct(-1)} aria-label="Ankstesnis produktas">←</button>
             <button className="product-preview-next" type="button" onClick={() => moveProduct(1)} aria-label="Kitas produktas">→</button>
-
-            {productOpenedFromDesktopViewer && (
-              <div className="desktop-mini-carousel" aria-hidden="true">
-                {products.filter((product) => product.category === selectedProduct.category).slice(0, 7).map((product, index) => (
-                  <div key={product.id} data-mini-index={index}>
-                    <ProductArt shape={product.shape} tone={product.tone} image={product.image} />
-                  </div>
-                ))}
-              </div>
-            )}
 
             <div className={`product-preview-stage${selectedProduct.image ? ' has-product-photo' : ''}`}>
               <span className="preview-category">{selectedProduct.category}</span>
