@@ -414,7 +414,9 @@ export default function Home() {
               <span className="preview-category">{selectedProduct.category}</span>
               <span className="rotation-degree">{Math.round(rotation * 3.6)}°</span>
               <div className="preview-art-rotator" style={{ transform: `perspective(900px) rotateY(${rotation * 3.6}deg)` }}>
-                <ProductArt shape={selectedProduct.shape} tone={selectedProduct.tone} image={selectedProduct.image} />
+                <div className="preview-art-entry">
+                  <ProductArt shape={selectedProduct.shape} tone={selectedProduct.tone} image={selectedProduct.image} />
+                </div>
               </div>
               <div className="rotation-control">
                 <span><i>↔</i> Vilkite arba sukite</span>
