@@ -469,6 +469,15 @@ body.phone-preview-active { overflow: hidden; background: radial-gradient(circle
 .category-viewer.is-phone-viewer .category-viewer-hint { display: none; }
 .category-viewer.is-phone-viewer .category-viewer-footer > button { display: none; }
 
+.category-viewer.is-opening-product .category-viewer-topbar,
+.category-viewer.is-opening-product .category-viewer-copy,
+.category-viewer.is-opening-product .category-wheel-previous,
+.category-viewer.is-opening-product .category-wheel-next,
+.category-viewer.is-opening-product .category-viewer-footer { animation: phone-product-ui-out .3s ease both; pointer-events: none; }
+.category-viewer.is-opening-product .category-wheel-stage::after { animation: phone-product-ui-out .3s ease both; }
+.category-viewer.is-opening-product .category-wheel-item:not(.is-launching) { animation: phone-product-gallery-out .34s ease both !important; pointer-events: none; }
+.category-viewer.is-opening-product .category-wheel-item.is-launching { z-index: 20; will-change: transform, opacity; animation: phone-bottle-to-detail .76s cubic-bezier(.22,.61,.36,1) both !important; pointer-events: none; }
+
 @media (max-width: 900px) {
   .preview-switcher { display: none; }
 }
@@ -634,6 +643,16 @@ body.phone-preview-active { overflow: hidden; background: radial-gradient(circle
   0% { opacity: 0; transform: translate(-50%,calc(-50% - 390px)) translateZ(-250px) scale(.32); filter: brightness(.52) saturate(.25) contrast(.84); }
   100% { opacity: 1; transform: translate(-50%,calc(-50% - 285px)) translateZ(-170px) scale(.48); filter: brightness(.66) saturate(.45) contrast(.88); }
 }
+@keyframes phone-product-ui-out {
+  to { opacity: 0; transform: translateY(-8px); }
+}
+@keyframes phone-product-gallery-out {
+  to { opacity: 0; filter: blur(6px) brightness(.8); }
+}
+@keyframes phone-bottle-to-detail {
+  0% { opacity: 1; transform: translate(-50%,-50%) translateZ(105px) scale(.96); }
+  100% { opacity: 1; transform: translate(calc(-50% + 78px),calc(-50% + 172px)) translateZ(145px) scale(.72); }
+}
 
 /* Clean phone product detail: information above, purchase controls lower left, bottle lower right */
 .site-canvas.is-phone-preview .product-preview-backdrop { inset: 0; display: block; overflow: hidden; padding: 0; background: var(--paper); backdrop-filter: none; }
@@ -650,17 +669,19 @@ body.phone-preview-active { overflow: hidden; background: radial-gradient(circle
 .site-canvas.is-phone-preview .product-preview-previous,
 .site-canvas.is-phone-preview .product-preview-next { display: none; }
 .site-canvas.is-phone-preview .product-preview-close { position: fixed; right: 18px; top: 18px; }
-.site-canvas.is-phone-preview .preview-art-rotator { left: auto; right: -10px; top: auto; bottom: 48px; width: 188px; height: 316px; margin: 0; animation: phone-product-to-corner .92s cubic-bezier(.16,.78,.16,1) both; }
+.site-canvas.is-phone-preview .preview-art-rotator { left: auto; right: -18px; top: auto; bottom: -20px; width: 218px; height: 590px; margin: 0; animation: phone-product-to-corner .92s cubic-bezier(.16,.78,.16,1) both; }
 .site-canvas.is-phone-preview .preview-art-entry { animation: phone-bottle-open-3d .9s cubic-bezier(.16,.76,.16,1) both; transform-origin: 58% 50%; }
 .site-canvas.is-phone-preview .product-preview-details { position: absolute; z-index: 5; inset: 0; display: block; width: 100%; min-height: 0; margin: 0; padding: 78px 18px 18px; background: transparent; box-shadow: none; pointer-events: none; animation: phone-details-top-in .62s .2s cubic-bezier(.2,.75,.2,1) both; }
 .site-canvas.is-phone-preview .product-preview-details > * { pointer-events: auto; }
 .site-canvas.is-phone-preview .product-preview-details .section-kicker,
 .site-canvas.is-phone-preview .preview-product-number,
-.site-canvas.is-phone-preview .product-preview-details ul,
 .site-canvas.is-phone-preview .preview-delivery { display: none; }
-.site-canvas.is-phone-preview .product-preview-details h2 { max-width: calc(100% - 48px); padding: 0; font-size: 32px; line-height: 1.02; }
-.site-canvas.is-phone-preview .preview-product-note { max-width: calc(100% - 48px); margin-top: 9px; font-size: 8px; line-height: 1.35; }
-.site-canvas.is-phone-preview .preview-product-description { max-width: calc(100% - 24px); margin: 17px 0 0; color: #65574d; font-size: 13px; line-height: 1.48; }
+.site-canvas.is-phone-preview .product-preview-details h2 { max-width: 57%; padding: 0; font-size: 32px; line-height: 1.02; }
+.site-canvas.is-phone-preview .preview-product-note { max-width: 53%; margin-top: 9px; font-size: 8px; line-height: 1.35; }
+.site-canvas.is-phone-preview .preview-product-description { max-width: 52%; margin: 17px 0 0; color: #65574d; font-size: 12px; line-height: 1.48; }
+.site-canvas.is-phone-preview .product-preview-details ul { position: absolute; left: 18px; top: 315px; display: grid; gap: 15px; width: 172px; margin: 0; font-size: 9px; }
+.site-canvas.is-phone-preview .product-preview-details li { display: flex; align-items: center; gap: 9px; }
+.site-canvas.is-phone-preview .product-preview-details li span { display: grid; flex: 0 0 28px; place-items: center; width: 28px; height: 28px; margin: 0; border: 1px solid rgba(24,19,15,.24); border-radius: 50%; }
 .site-canvas.is-phone-preview .variant-picker { position: absolute; left: 18px; bottom: 180px; width: 176px; margin: 0; }
 .site-canvas.is-phone-preview .variant-picker div { flex-wrap: wrap; gap: 6px; }
 .site-canvas.is-phone-preview .variant-picker button { padding: 8px 11px; font-size: 9px; }
@@ -669,6 +690,10 @@ body.phone-preview-active { overflow: hidden; background: radial-gradient(circle
 .site-canvas.is-phone-preview .preview-quantity { gap: 8px; padding: 3px 5px; }
 .site-canvas.is-phone-preview .preview-quantity button { width: 24px; height: 24px; }
 .site-canvas.is-phone-preview .preview-add-button { position: absolute; left: 18px; bottom: 66px; width: 176px; padding: 15px 14px; }
+.site-canvas.is-phone-preview .product-preview-backdrop.from-category-viewer .product-preview-modal { animation: none; }
+.site-canvas.is-phone-preview .product-preview-backdrop.from-category-viewer .preview-art-rotator { animation: phone-product-detail-settle .48s cubic-bezier(.22,.61,.36,1) both; }
+.site-canvas.is-phone-preview .product-preview-backdrop.from-category-viewer .preview-art-entry { animation: none; }
+.site-canvas.is-phone-preview .product-preview-backdrop.from-category-viewer .product-preview-details { animation: phone-details-top-in .58s .08s cubic-bezier(.2,.75,.2,1) both; }
 
 @media (max-width: 760px) {
   .product-preview-backdrop { inset: 0; display: block; overflow: hidden; padding: 0; background: var(--paper); backdrop-filter: none; }
@@ -685,17 +710,19 @@ body.phone-preview-active { overflow: hidden; background: radial-gradient(circle
   .product-preview-previous,
   .product-preview-next { display: none; }
   .product-preview-close { position: fixed; right: 18px; top: 18px; }
-  .preview-art-rotator { left: auto; right: -8px; top: auto; bottom: 44px; width: min(49vw,205px); height: min(43svh,340px); margin: 0; animation: phone-product-to-corner .92s cubic-bezier(.16,.78,.16,1) both; }
+  .preview-art-rotator { left: auto; right: -20px; top: auto; bottom: -24px; width: min(58vw,238px); height: min(76svh,650px); margin: 0; animation: phone-product-to-corner .92s cubic-bezier(.16,.78,.16,1) both; }
   .preview-art-entry { animation: phone-bottle-open-3d .9s cubic-bezier(.16,.76,.16,1) both; transform-origin: 58% 50%; }
   .product-preview-details { position: absolute; z-index: 5; inset: 0; display: block; width: 100%; min-height: 0; margin: 0; padding: 82px 20px 20px; background: transparent; box-shadow: none; pointer-events: none; animation: phone-details-top-in .62s .2s cubic-bezier(.2,.75,.2,1) both; }
   .product-preview-details > * { pointer-events: auto; }
   .product-preview-details .section-kicker,
   .preview-product-number,
-  .product-preview-details ul,
   .preview-delivery { display: none; }
-  .product-preview-details h2 { max-width: calc(100% - 52px); padding: 0; font-size: clamp(29px,8vw,38px); line-height: 1.02; }
-  .preview-product-note { max-width: calc(100% - 52px); margin-top: 9px; font-size: 8px; line-height: 1.35; }
-  .preview-product-description { max-width: calc(100% - 30px); margin: 18px 0 0; color: #65574d; font-size: 13px; line-height: 1.5; }
+  .product-preview-details h2 { max-width: 58%; padding: 0; font-size: clamp(29px,8vw,38px); line-height: 1.02; }
+  .preview-product-note { max-width: 54%; margin-top: 9px; font-size: 8px; line-height: 1.35; }
+  .preview-product-description { max-width: 52%; margin: 18px 0 0; color: #65574d; font-size: 12px; line-height: 1.5; }
+  .product-preview-details ul { position: absolute; left: 20px; top: min(40svh,330px); display: grid; gap: 16px; width: 176px; margin: 0; font-size: 9px; }
+  .product-preview-details li { display: flex; align-items: center; gap: 9px; }
+  .product-preview-details li span { display: grid; flex: 0 0 30px; place-items: center; width: 30px; height: 30px; margin: 0; border: 1px solid rgba(24,19,15,.24); border-radius: 50%; }
   .variant-picker { position: absolute; left: 20px; bottom: 184px; width: 180px; margin: 0; }
   .variant-picker div { flex-wrap: wrap; gap: 6px; }
   .variant-picker button { padding: 8px 11px; font-size: 9px; }
@@ -704,6 +731,10 @@ body.phone-preview-active { overflow: hidden; background: radial-gradient(circle
   .preview-quantity { gap: 8px; padding: 3px 5px; }
   .preview-quantity button { width: 24px; height: 24px; }
   .preview-add-button { position: absolute; left: 20px; bottom: 66px; width: 180px; padding: 15px 14px; }
+  .product-preview-backdrop.from-category-viewer .product-preview-modal { animation: none; }
+  .product-preview-backdrop.from-category-viewer .preview-art-rotator { animation: phone-product-detail-settle .48s cubic-bezier(.22,.61,.36,1) both; }
+  .product-preview-backdrop.from-category-viewer .preview-art-entry { animation: none; }
+  .product-preview-backdrop.from-category-viewer .product-preview-details { animation: phone-details-top-in .58s .08s cubic-bezier(.2,.75,.2,1) both; }
 }
 
 @keyframes phone-product-to-corner {
@@ -714,6 +745,10 @@ body.phone-preview-active { overflow: hidden; background: radial-gradient(circle
 @keyframes phone-details-top-in {
   from { opacity: 0; transform: translateX(-28px); }
   to { opacity: 1; transform: translateX(0); }
+}
+@keyframes phone-product-detail-settle {
+  from { opacity: .94; transform: translate(10px,14px) scale(.97); }
+  to { opacity: 1; transform: translate(0,0) scale(1); }
 }
 
 @media (prefers-reduced-motion: reduce) {

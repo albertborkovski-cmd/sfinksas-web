@@ -77,12 +77,15 @@ export default function Home() {
   const [viewerCategory, setViewerCategory] = useState<Category | null>(null);
   const [viewerIndex, setViewerIndex] = useState(0);
   const [viewerMotion, setViewerMotion] = useState<'idle' | 'moving' | 'settling'>('idle');
+  const [openingProductId, setOpeningProductId] = useState<number | null>(null);
+  const [productOpenedFromViewer, setProductOpenedFromViewer] = useState(false);
   const [portalReady, setPortalReady] = useState(false);
   const dragRef = useRef<{ pointerId: number; x: number } | null>(null);
   const viewerDragRef = useRef<{ pointerId: number; x: number; y: number } | null>(null);
   const viewerWheelLockRef = useRef(0);
   const viewerMotionLockRef = useRef(false);
   const viewerMotionTimersRef = useRef<number[]>([]);
+  const viewerProductTimerRef = useRef<number | null>(null);
 
   useEffect(() => {
     setPortalReady(true);
@@ -105,6 +108,7 @@ export default function Home() {
 
   useEffect(() => () => {
     viewerMotionTimersRef.current.forEach((timer) => window.clearTimeout(timer));
+    if (viewerProductTimerRef.current) window.clearTimeout(viewerProductTimerRef.current);
   }, []);
 
   useEffect(() => {
@@ -113,6 +117,9 @@ export default function Home() {
     viewerMotionTimersRef.current = [];
     viewerMotionLockRef.current = false;
     setViewerMotion('idle');
+    if (viewerProductTimerRef.current) window.clearTimeout(viewerProductTimerRef.current);
+    viewerProductTimerRef.current = null;
+    setOpeningProductId(null);
   }, [viewerCategory]);
 
   const visibleProducts = useMemo(
@@ -153,7 +160,8 @@ export default function Home() {
     window.setTimeout(() => setNotice(''), 2200);
   }
 
-  function openProduct(product: Product) {
+  function openProduct(product: Product, fromCategoryViewer = false) {
+    setProductOpenedFromViewer(fromCategoryViewer);
     setSelectedProduct(product);
     setPreviewQuantity(1);
     setPreviewVariant(0);
@@ -180,6 +188,9 @@ export default function Home() {
     viewerMotionTimersRef.current = [];
     viewerMotionLockRef.current = false;
     setViewerMotion('idle');
+    if (viewerProductTimerRef.current) window.clearTimeout(viewerProductTimerRef.current);
+    viewerProductTimerRef.current = null;
+    setOpeningProductId(null);
     setActiveCategory(category);
     setViewerIndex(0);
     setViewerCategory(category);
@@ -205,6 +216,25 @@ export default function Home() {
       viewerMotionTimersRef.current = [];
     }, 1160);
     viewerMotionTimersRef.current = [moveTimer, settleTimer];
+  }
+
+  function openViewerProduct(product: Product, offset: number) {
+    if (viewerMotionLockRef.current || openingProductId !== null) return;
+    const phoneLayout = previewMode === 'phone' || window.matchMedia('(max-width: 760px)').matches;
+    if (!phoneLayout || offset !== 0) {
+      setViewerCategory(null);
+      openProduct(product);
+      return;
+    }
+
+    viewerMotionLockRef.current = true;
+    setOpeningProductId(product.id);
+    viewerProductTimerRef.current = window.setTimeout(() => {
+      setViewerCategory(null);
+      openProduct(product, true);
+      setOpeningProductId(null);
+      viewerProductTimerRef.current = null;
+    }, 760);
   }
 
   function viewerOffset(index: number) {
@@ -352,7 +382,7 @@ export default function Home() {
       </footer>
 
       {portalReady && viewerCategory && activeViewerProduct && createPortal(
-        <section className={`category-viewer${previewMode === 'phone' ? ' is-phone-viewer' : ''}${viewerProducts.some((product) => product.image) ? ' has-product-photos' : ''}${viewerMotion !== 'idle' ? ` is-phone-${viewerMotion}` : ''}`} role="dialog" aria-modal="true" aria-label={`${viewerCategory} prekių peržiūra`}>
+        <section className={`category-viewer${previewMode === 'phone' ? ' is-phone-viewer' : ''}${viewerProducts.some((product) => product.image) ? ' has-product-photos' : ''}${viewerMotion !== 'idle' ? ` is-phone-${viewerMotion}` : ''}${openingProductId !== null ? ' is-opening-product' : ''}`} role="dialog" aria-modal="true" aria-label={`${viewerCategory} prekių peržiūra`}>
           <div className="category-viewer-topbar">
             <span className="category-viewer-mark">SFINKSAS</span>
             <span>{viewerCategory}</span>
@@ -400,13 +430,13 @@ export default function Home() {
               return (
                 <button
                   key={product.id}
-                  className={`category-wheel-item${offset === 0 ? ' is-active' : offset < 0 ? ' is-before' : ' is-after'}`}
+                  className={`category-wheel-item${offset === 0 ? ' is-active' : offset < 0 ? ' is-before' : ' is-after'}${openingProductId === product.id ? ' is-launching' : ''}`}
                   data-offset={offset}
                   type="button"
                   aria-label={`Atidaryti ${product.name} informaciją`}
                   aria-current={offset === 0 ? 'true' : undefined}
                   onPointerDown={(event) => event.stopPropagation()}
-                  onClick={() => { setViewerCategory(null); openProduct(product); }}
+                  onClick={() => openViewerProduct(product, offset)}
                 >
                   <ProductArt shape={product.shape} tone={product.tone} image={product.image} />
                 </button>
@@ -420,14 +450,14 @@ export default function Home() {
           <div className="category-viewer-footer">
             <span className="category-viewer-count">{(viewerIndex + 1).toString().padStart(2, '0')} / {viewerProducts.length.toString().padStart(2, '0')}</span>
             <span className="category-viewer-hint"><i aria-hidden="true">↔</i> Braukite arba sukite</span>
-            <button type="button" onClick={() => { setViewerCategory(null); openProduct(activeViewerProduct); }}>Peržiūrėti produktą <span>↗</span></button>
+            <button type="button" onClick={() => openViewerProduct(activeViewerProduct, 0)}>Peržiūrėti produktą <span>↗</span></button>
           </div>
         </section>,
         document.body,
       )}
 
       {selectedProduct && (
-        <div className="product-preview-backdrop" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setSelectedProduct(null); }}>
+        <div className={`product-preview-backdrop${productOpenedFromViewer ? ' from-category-viewer' : ''}`} role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setSelectedProduct(null); }}>
           <section className="product-preview-modal" role="dialog" aria-modal="true" aria-label={`${selectedProduct.name} produkto peržiūra`}>
             <button className="product-preview-close" type="button" onClick={() => setSelectedProduct(null)} aria-label="Uždaryti produkto peržiūrą">×</button>
             <button className="product-preview-previous" type="button" onClick={() => moveProduct(-1)} aria-label="Ankstesnis produktas">←</button>
