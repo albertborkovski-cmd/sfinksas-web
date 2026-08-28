@@ -78,7 +78,9 @@ export default function Home() {
   const [viewerIndex, setViewerIndex] = useState(0);
   const [viewerMotion, setViewerMotion] = useState<'idle' | 'moving' | 'settling'>('idle');
   const [openingProductId, setOpeningProductId] = useState<number | null>(null);
+  const [viewerOpeningMode, setViewerOpeningMode] = useState<'phone' | 'desktop' | null>(null);
   const [productOpenedFromViewer, setProductOpenedFromViewer] = useState(false);
+  const [productOpenedFromDesktopViewer, setProductOpenedFromDesktopViewer] = useState(false);
   const [portalReady, setPortalReady] = useState(false);
   const dragRef = useRef<{ pointerId: number; x: number } | null>(null);
   const viewerDragRef = useRef<{ pointerId: number; x: number; y: number } | null>(null);
@@ -120,6 +122,7 @@ export default function Home() {
     if (viewerProductTimerRef.current) window.clearTimeout(viewerProductTimerRef.current);
     viewerProductTimerRef.current = null;
     setOpeningProductId(null);
+    setViewerOpeningMode(null);
   }, [viewerCategory]);
 
   const visibleProducts = useMemo(
@@ -160,8 +163,9 @@ export default function Home() {
     window.setTimeout(() => setNotice(''), 2200);
   }
 
-  function openProduct(product: Product, fromCategoryViewer = false) {
+  function openProduct(product: Product, fromCategoryViewer = false, fromDesktopViewer = false) {
     setProductOpenedFromViewer(fromCategoryViewer);
+    setProductOpenedFromDesktopViewer(fromDesktopViewer);
     setSelectedProduct(product);
     setPreviewQuantity(1);
     setPreviewVariant(0);
@@ -171,7 +175,7 @@ export default function Home() {
   function moveProduct(direction: number) {
     if (!selectedProduct) return;
     const currentIndex = products.findIndex((product) => product.id === selectedProduct.id);
-    openProduct(products[(currentIndex + direction + products.length) % products.length]);
+    openProduct(products[(currentIndex + direction + products.length) % products.length], productOpenedFromViewer, productOpenedFromDesktopViewer);
   }
 
   function changeQuantity(id: number, change: number) {
@@ -191,6 +195,7 @@ export default function Home() {
     if (viewerProductTimerRef.current) window.clearTimeout(viewerProductTimerRef.current);
     viewerProductTimerRef.current = null;
     setOpeningProductId(null);
+    setViewerOpeningMode(null);
     setActiveCategory(category);
     setViewerIndex(0);
     setViewerCategory(category);
@@ -221,20 +226,16 @@ export default function Home() {
   function openViewerProduct(product: Product, offset: number) {
     if (viewerMotionLockRef.current || openingProductId !== null) return;
     const phoneLayout = previewMode === 'phone' || window.matchMedia('(max-width: 760px)').matches;
-    if (!phoneLayout || offset !== 0) {
-      setViewerCategory(null);
-      openProduct(product);
-      return;
-    }
-
     viewerMotionLockRef.current = true;
     setOpeningProductId(product.id);
+    setViewerOpeningMode(phoneLayout ? 'phone' : 'desktop');
     viewerProductTimerRef.current = window.setTimeout(() => {
       setViewerCategory(null);
-      openProduct(product, true);
+      openProduct(product, phoneLayout, !phoneLayout);
       setOpeningProductId(null);
+      setViewerOpeningMode(null);
       viewerProductTimerRef.current = null;
-    }, 760);
+    }, phoneLayout ? 760 : 880);
   }
 
   function viewerOffset(index: number) {
@@ -382,12 +383,21 @@ export default function Home() {
       </footer>
 
       {portalReady && viewerCategory && activeViewerProduct && createPortal(
-        <section className={`category-viewer${previewMode === 'phone' ? ' is-phone-viewer' : ''}${viewerProducts.some((product) => product.image) ? ' has-product-photos' : ''}${viewerMotion !== 'idle' ? ` is-phone-${viewerMotion}` : ''}${openingProductId !== null ? ' is-opening-product' : ''}`} role="dialog" aria-modal="true" aria-label={`${viewerCategory} prekių peržiūra`}>
+        <section className={`category-viewer${previewMode === 'phone' ? ' is-phone-viewer' : ''}${viewerProducts.some((product) => product.image) ? ' has-product-photos' : ''}${viewerMotion !== 'idle' ? ` is-phone-${viewerMotion}` : ''}${openingProductId !== null ? ` is-opening-product is-opening-${viewerOpeningMode}` : ''}`} role="dialog" aria-modal="true" aria-label={`${viewerCategory} prekių peržiūra`}>
           <div className="category-viewer-topbar">
             <span className="category-viewer-mark">SFINKSAS</span>
             <span>{viewerCategory}</span>
             <button type="button" onClick={() => setViewerCategory(null)} aria-label="Uždaryti kategorijos peržiūrą">×</button>
           </div>
+
+          {viewerOpeningMode === 'desktop' && openingProductId !== null && (
+            <div className="desktop-product-launch" aria-hidden="true">
+              {(() => {
+                const product = viewerProducts.find((item) => item.id === openingProductId);
+                return product ? <ProductArt shape={product.shape} tone={product.tone} image={product.image} /> : null;
+              })()}
+            </div>
+          )}
 
           <div className="category-viewer-copy" aria-live="polite">
             <h2>{activeViewerProduct.name}</h2>
@@ -457,11 +467,21 @@ export default function Home() {
       )}
 
       {selectedProduct && (
-        <div className={`product-preview-backdrop${productOpenedFromViewer ? ' from-category-viewer' : ''}`} role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setSelectedProduct(null); }}>
+        <div className={`product-preview-backdrop${productOpenedFromViewer ? ' from-category-viewer' : ''}${productOpenedFromDesktopViewer ? ' from-desktop-viewer' : ''}`} role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setSelectedProduct(null); }}>
           <section className="product-preview-modal" role="dialog" aria-modal="true" aria-label={`${selectedProduct.name} produkto peržiūra`}>
             <button className="product-preview-close" type="button" onClick={() => setSelectedProduct(null)} aria-label="Uždaryti produkto peržiūrą">×</button>
             <button className="product-preview-previous" type="button" onClick={() => moveProduct(-1)} aria-label="Ankstesnis produktas">←</button>
             <button className="product-preview-next" type="button" onClick={() => moveProduct(1)} aria-label="Kitas produktas">→</button>
+
+            {productOpenedFromDesktopViewer && (
+              <div className="desktop-mini-carousel" aria-hidden="true">
+                {products.filter((product) => product.category === selectedProduct.category).slice(0, 7).map((product, index) => (
+                  <div key={product.id} data-mini-index={index}>
+                    <ProductArt shape={product.shape} tone={product.tone} image={product.image} />
+                  </div>
+                ))}
+              </div>
+            )}
 
             <div
               className={`product-preview-stage${selectedProduct.image ? ' has-product-photo' : ''}`}
