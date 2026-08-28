@@ -602,12 +602,15 @@ export default function Home() {
               <div className="search-cabinet-live">
                 {searchShelves.map((shelf) => {
                   const shelfProducts = products.filter((product) => product.category === shelf.category);
+                  const productSlots = new Map(
+                    shelfProducts.map((product, index) => [Math.round(((index + 1) * 19) / (shelfProducts.length + 1)), product]),
+                  );
                   return (
                     <section className="search-shelf" key={shelf.category} aria-label={shelf.label}>
                       <div className="search-shelf-scroll">
                         <div className="search-shelf-track">
                           {Array.from({ length: 20 }, (_, slot) => {
-                            const product = shelfProducts[slot];
+                            const product = productSlots.get(slot);
                             const matches = !!product && searchResults.some((result) => result.id === product.id);
                             return (
                               <div className={`search-shelf-slot${product ? ' has-product' : ''}${product && !matches ? ' is-filtered' : ''}`} key={`${shelf.category}-${slot}`}>
