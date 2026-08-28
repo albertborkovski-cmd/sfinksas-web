@@ -1,6 +1,5 @@
 'use client';
 
-import Image from 'next/image';
 import { type CSSProperties, FormEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
@@ -82,14 +81,15 @@ function productStory(product: Product) {
 function ProductArt({ shape, tone, image }: { shape: Shape; tone: Product['tone']; image?: string }) {
   return (
     <div className={`product-art shape-${shape} tone-${tone}${image ? ' has-photo' : ''}`} aria-hidden="true">
-      {image ? <Image src={image} alt="" fill sizes="(max-width: 760px) 74vw, 38vw" draggable={false} /> : <><span className="product-shadow" /><span className="product-form"><i className="product-cap" /><b>S</b></span></>}
+      {/* Transparent product cutouts must be served directly; the hosted image optimizer changes their layering. */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      {image ? <img src={image} alt="" draggable="false" /> : <><span className="product-shadow" /><span className="product-form"><i className="product-cap" /><b>S</b></span></>}
     </div>
   );
 }
 
 export default function Home() {
   const [previewMode, setPreviewMode] = useState<'desktop' | 'phone'>('desktop');
-  const [activeCategory, setActiveCategory] = useState<Category | 'Visi'>('Visi');
   const [searchOpen, setSearchOpen] = useState(false);
   const [navPanel, setNavPanel] = useState<'collection' | 'contact' | null>(null);
   const [cartOpen, setCartOpen] = useState(false);
@@ -174,11 +174,6 @@ export default function Home() {
     if (noticeTimerRef.current !== null) window.clearTimeout(noticeTimerRef.current);
   }, [clearViewerTimers]);
 
-  const visibleProducts = useMemo(
-    () => activeCategory === 'Visi' ? products.slice(0, 8) : products.filter((product) => product.category === activeCategory),
-    [activeCategory],
-  );
-
   const searchResults = useMemo(() => {
     const normalized = query.trim().toLocaleLowerCase('lt');
     return products.filter((product) => product.category !== 'Rinkiniai' && (!normalized || `${product.name} ${product.category} ${product.note}`.toLocaleLowerCase('lt').includes(normalized)));
@@ -244,7 +239,6 @@ export default function Home() {
 
   function openCategoryViewer(category: Category) {
     resetViewerMotion();
-    setActiveCategory(category);
     setViewerIndex(0);
     setViewerCategory(category);
   }
@@ -300,6 +294,42 @@ export default function Home() {
     setMessageSent(true);
   }
 
+  function showHome() {
+    closeCategoryViewer();
+    setSelectedProduct(null);
+    setSearchOpen(false);
+    setNavPanel(null);
+    setCartOpen(false);
+    setMenuOpen(false);
+  }
+
+  function showSearch() {
+    closeCategoryViewer();
+    setSelectedProduct(null);
+    setNavPanel(null);
+    setCartOpen(false);
+    setMenuOpen(false);
+    setSearchOpen(true);
+  }
+
+  function showPanel(panel: 'collection' | 'contact') {
+    closeCategoryViewer();
+    setSelectedProduct(null);
+    setSearchOpen(false);
+    setCartOpen(false);
+    setMenuOpen(false);
+    setNavPanel(panel);
+  }
+
+  function showCart() {
+    closeCategoryViewer();
+    setSelectedProduct(null);
+    setSearchOpen(false);
+    setNavPanel(null);
+    setMenuOpen(false);
+    setCartOpen(true);
+  }
+
   return (
     <>
       <div className="preview-switcher" role="group" aria-label="Svetainės peržiūros dydis">
@@ -314,18 +344,18 @@ export default function Home() {
       <main className={`site-canvas${previewMode === 'phone' ? ' is-phone-preview' : ''}`}>
       <section className="hero" id="namai">
         <header className="site-header">
-          <a className="wordmark" href="#namai" aria-label="Sfinksas – pradžia">SFINKSAS</a>
+          <button className="wordmark wordmark-button" type="button" onClick={showHome} aria-label="Sfinksas – pradžia">SFINKSAS</button>
           <nav className="desktop-nav" aria-label="Pagrindinis meniu">
-            <button type="button" onClick={() => { setSearchOpen(false); setNavPanel(null); setCartOpen(false); setSelectedProduct(null); }}>Namai</button>
-            <button type="button" className={searchOpen ? 'active' : ''} onClick={() => { setNavPanel(null); setSearchOpen(true); }}>Paieška</button>
-            <button type="button" className={navPanel === 'collection' ? 'active' : ''} onClick={() => { setSearchOpen(false); setNavPanel('collection'); }}>Kolekcija</button>
-            <button type="button" className={navPanel === 'contact' ? 'active' : ''} onClick={() => { setSearchOpen(false); setNavPanel('contact'); }}>Kontaktai</button>
+            <button type="button" onClick={showHome}>Namai</button>
+            <button type="button" className={searchOpen ? 'active' : ''} onClick={showSearch}>Paieška</button>
+            <button type="button" className={navPanel === 'collection' ? 'active' : ''} onClick={() => showPanel('collection')}>Kolekcija</button>
+            <button type="button" className={navPanel === 'contact' ? 'active' : ''} onClick={() => showPanel('contact')}>Kontaktai</button>
           </nav>
           <div className="header-actions">
-            <button className="cart-button" type="button" onClick={() => setCartOpen(true)} aria-label={`Atverti krepšelį, prekių: ${cartCount}`}>
+            <button className="cart-button" type="button" onClick={showCart} aria-label={`Atverti krepšelį, prekių: ${cartCount}`}>
               <span>Krepšelis</span><span className="cart-count">({cartCount})</span><span className="bag-icon" aria-hidden="true" />
             </button>
-            <button className="menu-button" type="button" onClick={() => setMenuOpen(true)} aria-label="Atverti meniu"><span /><span /></button>
+            <button className="menu-button" type="button" onClick={() => setMenuOpen((open) => !open)} aria-label={menuOpen ? 'Uždaryti meniu' : 'Atverti meniu'}><span /><span /></button>
           </div>
         </header>
 
@@ -335,101 +365,12 @@ export default function Home() {
           <h1>Grožio ritualas,<br /><em>sukurtas jums.</em></h1>
           <p className="hero-copy">Profesionalios priemonės plaukų stiprumui, žvilgesiui ir kasdieniam ritualui. Atrinkta tai, kas iš tiesų veikia.</p>
           <div className="hero-ctas">
-            <a className="primary-cta" href="#kolekcija">Atrasti kolekciją <span aria-hidden="true">↗</span></a>
-            <a className="text-cta" href="#apie">Mūsų požiūris <span aria-hidden="true">→</span></a>
+            <button className="primary-cta" type="button" onClick={() => showPanel('collection')}>Atrasti kolekciją <span aria-hidden="true">↗</span></button>
+            <button className="text-cta" type="button" onClick={() => showPanel('contact')}>Konsultacija <span aria-hidden="true">→</span></button>
           </div>
         </div>
         <div className="hero-meta" aria-hidden="true"><span>01</span><i /><span>Grožio ritualai</span></div>
-        <a className="scroll-cue" href="#kolekcija" aria-label="Slinkti į kolekciją"><span /></a>
       </section>
-
-      <section className="manifesto" id="apie">
-        <p className="section-kicker">Mūsų filosofija</p>
-        <div className="manifesto-copy">
-          <h2>Mažiau triukšmo.<br />Daugiau to, <em>kas veikia.</em></h2>
-          <div>
-            <p>„Sfinksas“ – tai kruopščiai atrinkta profesionali plaukų priežiūra: nuo kasdienio švelnaus valymo iki intensyvaus atkūrimo ir išbaigtų ritualų.</p>
-            <p className="small-copy">Kiekviena kategorija sukurta taip, kad lengvai rastumėte priemonę pagal savo ritualą.</p>
-          </div>
-        </div>
-        <div className="manifesto-rule"><span>01</span><i /><span>05</span></div>
-      </section>
-
-      <section className="collection" id="kolekcija">
-        <div className="collection-heading">
-          <div><p className="section-kicker light">Kolekcija</p><h2>Pasirinkite savo <em>ritualą</em></h2></div>
-          <p>Penkios kryptys, vienas tikslas – sveikai atrodantys, gyvybingi plaukai ir maloni kasdienė rutina.</p>
-        </div>
-
-        <div className="category-stage">
-          {categories.map((category) => (
-            <button key={category.name} className={`category-card${activeCategory === category.name ? ' selected' : ''}`} type="button" onClick={() => openCategoryViewer(category.name)}>
-              <span className="category-index">{category.index}</span>
-              <ProductArt shape={category.shape} tone={category.index === '02' ? 'sand' : category.index === '03' ? 'amber' : category.index === '04' ? 'olive' : 'smoke'} small />
-              <span className="category-name">{category.name}</span>
-              <span className="category-note">{category.note}</span>
-              <span className="category-arrow" aria-hidden="true">↗</span>
-            </button>
-          ))}
-        </div>
-
-        <div className="products-toolbar" id="produktai">
-          <div>
-            <span>Rodyti:</span>
-            <button className={activeCategory === 'Visi' ? 'current' : ''} type="button" onClick={() => setActiveCategory('Visi')}>Visi</button>
-            {categories.map((category) => <button key={category.name} className={activeCategory === category.name ? 'current' : ''} type="button" onClick={() => setActiveCategory(category.name)}>{category.name}</button>)}
-          </div>
-          <span>{visibleProducts.length.toString().padStart(2, '0')} produktai</span>
-        </div>
-
-        <div className="product-grid">
-          {visibleProducts.map((product) => (
-            <article className="product-card" key={product.id}>
-              <div className={`product-image${product.image ? ' has-product-photo' : ''}`}>
-                <span className="product-category">{product.category}</span>
-                <ProductArt shape={product.shape} tone={product.tone} image={product.image} />
-                <button className="product-preview-trigger" type="button" onClick={() => openProduct(product)} aria-label={`Peržiūrėti ${product.name}`}><span className="sr-only">Peržiūrėti produktą</span></button>
-                <button className="quick-add" type="button" onClick={() => addToCart(product)} aria-label={`Pridėti ${product.name} į krepšelį`}>+</button>
-              </div>
-              <div className="product-info"><div><button className="product-name-button" type="button" onClick={() => openProduct(product)}><h3>{product.name}</h3></button><p>{product.note}</p></div><strong>{money.format(product.price)}</strong></div>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      <section className="editorial">
-        <div className="editorial-image" role="img" aria-label="Sfinksas plaukų priežiūros priemonės ant akmens pakylos" />
-        <div className="editorial-copy">
-          <p className="section-kicker">Ritualas nuo pradžios iki pabaigos</p>
-          <h2>Priežiūra, kuri<br /><em>jaučiasi kitaip.</em></h2>
-          <p>Suderinkite valymą, drėkinimą ir apsaugą. Atrinkti rinkiniai leidžia pradėti paprastai, o kiekvieną žingsnį – suprasti.</p>
-          <a className="dark-cta" href="#kolekcija">Rinktis rinkinį <span>↗</span></a>
-          <dl><div><dt>5</dt><dd>aiškios kategorijos</dd></div><div><dt>1</dt><dd>vientisas ritualas</dd></div></dl>
-        </div>
-      </section>
-
-      <section className="contacts" id="kontaktai">
-        <div className="contact-intro">
-          <p className="section-kicker light">Kontaktai</p>
-          <h2>Turite klausimą?<br /><em>Pasikalbėkime.</em></h2>
-          <p>Padėsime išsirinkti produktą ar suderinti kasdienį plaukų priežiūros ritualą.</p>
-          <a href="mailto:labas@sfinksas.lt">labas@sfinksas.lt <span>↗</span></a>
-        </div>
-        <form className="contact-form" onSubmit={submitContact}>
-          <label>Jūsų vardas<input required name="name" placeholder="Įrašykite vardą" /></label>
-          <label>El. paštas<input required type="email" name="email" placeholder="vardas@pastas.lt" /></label>
-          <label>Žinutė<textarea required name="message" rows={3} placeholder="Kuo galime padėti?" /></label>
-          <button type="submit">{messageSent ? 'Žinutė paruošta ✓' : 'Siųsti žinutę'} <span>↗</span></button>
-          <small>Demonstracinėje versijoje žinutė nėra išsiunčiama.</small>
-        </form>
-      </section>
-
-      <footer>
-        <a className="wordmark footer-mark" href="#namai">SFINKSAS</a>
-        <p>Profesionali plaukų priežiūra jūsų kasdieniam ritualui.</p>
-        <div><button type="button" onClick={() => setNavPanel('collection')}>Kolekcija</button><button type="button" onClick={() => setNavPanel('contact')}>Kontaktai</button><button type="button" onClick={() => setSearchOpen(true)}>Paieška</button></div>
-        <span>© 2026 Sfinksas · Demonstracinė parduotuvė</span>
-      </footer>
 
       {portalReady && viewerCategory && activeViewerProduct && createPortal(
         <section className={`category-viewer${previewMode === 'phone' ? ' is-phone-viewer' : ''}${viewerProducts.some((product) => product.image) ? ' has-product-photos' : ''}${viewerMotion !== 'idle' ? ` is-phone-${viewerMotion} is-direction-${viewerDirection > 0 ? 'next' : 'previous'}` : ''}${openingProductId !== null ? ` is-opening-product is-opening-${viewerOpeningMode}` : ''}`} role="dialog" aria-modal="true" aria-label={`${viewerCategory} prekių peržiūra`}>
@@ -668,7 +609,7 @@ export default function Home() {
         <div className="overlay search-overlay" role="dialog" aria-modal="true" aria-label="Produktų paieška">
           <button className="overlay-close" type="button" onClick={() => { setSearchOpen(false); setQuery(''); }} aria-label="Uždaryti paiešką">×</button>
           <div className="search-panel">
-            <div className="search-heading"><span className="wordmark">SFINKSAS</span><p className="section-kicker">Produktų galerija · paieška kolekcijoje</p></div>
+            <div className="search-heading"><p className="section-kicker">Produktų galerija · paieška kolekcijoje</p></div>
             <label><span className="sr-only">Ieškoti produkto</span><input autoFocus value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Ko ieškote?" /><i>⌕</i></label>
             <p className="search-status">{query ? `Atitinka paiešką: ${searchResults.length}` : 'Visi produktai savo vietose'}</p>
             <div className="search-shelves">
@@ -686,7 +627,7 @@ export default function Home() {
                             <div className={`search-shelf-slot${product ? ' has-product' : ''}${product && !matches ? ' is-filtered' : ''}`} key={`${shelf.category}-${slot}`}>
                               {product && (
                                 <button type="button" tabIndex={matches ? 0 : -1} onClick={() => { setSearchOpen(false); setQuery(''); openProduct(product); }} aria-label={`Peržiūrėti ${product.name}`}>
-                                  <ProductArt shape={product.shape} tone={product.tone} image={product.image} small />
+                                  <ProductArt shape={product.shape} tone={product.tone} image={product.image} />
                                   <span className="shelf-product-card"><b>{product.name}</b><small>{money.format(product.price)}</small></span>
                                 </button>
                               )}
@@ -708,10 +649,10 @@ export default function Home() {
           <aside className="cart-drawer" role="dialog" aria-modal="true" aria-label="Krepšelis">
             <div className="drawer-header"><div><p className="section-kicker">Jūsų pasirinkimai</p><h2>Krepšelis <span>({cartCount})</span></h2></div><button type="button" onClick={() => setCartOpen(false)} aria-label="Uždaryti krepšelį">×</button></div>
             <div className="cart-items">
-              {!cartItems.length && <div className="empty-cart"><span>○</span><h3>Krepšelis dar tuščias</h3><p>Atraskite ritualą, kuris tinka jūsų plaukams.</p><button type="button" onClick={() => setCartOpen(false)}>Grįžti į kolekciją</button></div>}
+              {!cartItems.length && <div className="empty-cart"><span>○</span><h3>Krepšelis dar tuščias</h3><p>Atraskite ritualą, kuris tinka jūsų plaukams.</p><button type="button" onClick={() => showPanel('collection')}>Atverti kolekciją</button></div>}
               {cartItems.map((product) => (
                 <div className="cart-row" key={product.id}>
-                  <div className={`cart-art${product.image ? ' has-product-photo' : ''}`}><ProductArt shape={product.shape} tone={product.tone} image={product.image} small /></div>
+                  <div className={`cart-art${product.image ? ' has-product-photo' : ''}`}><ProductArt shape={product.shape} tone={product.tone} image={product.image} /></div>
                   <div className="cart-row-copy"><b>{product.name}</b><small>{product.note}</small><div><button type="button" onClick={() => changeQuantity(product.id, -1)} aria-label="Mažinti kiekį">−</button><span>{cart[product.id]}</span><button type="button" onClick={() => changeQuantity(product.id, 1)} aria-label="Didinti kiekį">+</button></div></div>
                   <strong>{money.format(product.price * cart[product.id])}</strong>
                 </div>
@@ -726,12 +667,12 @@ export default function Home() {
         <div className="mobile-menu" role="dialog" aria-modal="true" aria-label="Mobilus meniu">
           <div className="mobile-menu-top"><span className="wordmark">SFINKSAS</span><button type="button" onClick={() => setMenuOpen(false)} aria-label="Uždaryti meniu">×</button></div>
           <nav>
-            <button type="button" onClick={() => { setMenuOpen(false); setSearchOpen(false); setNavPanel(null); }}><span>01</span>Namai</button>
-            <button type="button" onClick={() => { setMenuOpen(false); setNavPanel(null); setSearchOpen(true); }}><span>02</span>Paieška</button>
-            <button type="button" onClick={() => { setMenuOpen(false); setSearchOpen(false); setNavPanel('collection'); }}><span>03</span>Kolekcija</button>
-            <button type="button" onClick={() => { setMenuOpen(false); setSearchOpen(false); setNavPanel('contact'); }}><span>04</span>Kontaktai</button>
+            <button type="button" onClick={showHome}><span>01</span>Namai</button>
+            <button type="button" onClick={showSearch}><span>02</span>Paieška</button>
+            <button type="button" onClick={() => showPanel('collection')}><span>03</span>Kolekcija</button>
+            <button type="button" onClick={() => showPanel('contact')}><span>04</span>Kontaktai</button>
           </nav>
-          <button className="mobile-cart" type="button" onClick={() => { setMenuOpen(false); setCartOpen(true); }}>Krepšelis ({cartCount}) <span>↗</span></button>
+          <button className="mobile-cart" type="button" onClick={showCart}>Krepšelis ({cartCount}) <span>↗</span></button>
         </div>
       )}
 
