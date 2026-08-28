@@ -107,7 +107,7 @@ export default function Home() {
   const [viewerDirection, setViewerDirection] = useState<1 | -1>(1);
   const [openingProductId, setOpeningProductId] = useState<number | null>(null);
   const [openingProductOffset, setOpeningProductOffset] = useState(0);
-  const [viewerOpeningMode, setViewerOpeningMode] = useState<'phone' | 'desktop' | null>(null);
+  const [viewerOpeningMode, setViewerOpeningMode] = useState<'desktop' | null>(null);
   const [productOpenedFromViewer, setProductOpenedFromViewer] = useState(false);
   const [productOpenedFromDesktopViewer, setProductOpenedFromDesktopViewer] = useState(false);
   const [portalReady, setPortalReady] = useState(false);
@@ -279,14 +279,21 @@ export default function Home() {
   function openViewerProduct(product: Product, offset: number) {
     if (viewerMotionLockRef.current || openingProductId !== null) return;
     const phoneLayout = previewMode === 'phone' || window.matchMedia('(max-width: 760px)').matches;
+
+    if (phoneLayout) {
+      openProduct(product, true, false);
+      closeCategoryViewer();
+      return;
+    }
+
     viewerMotionLockRef.current = true;
     setOpeningProductId(product.id);
     setOpeningProductOffset(offset);
-    setViewerOpeningMode(phoneLayout ? 'phone' : 'desktop');
-    openProduct(product, phoneLayout, !phoneLayout);
+    setViewerOpeningMode('desktop');
+    openProduct(product, false, true);
     viewerProductTimerRef.current = window.setTimeout(() => {
       closeCategoryViewer();
-    }, phoneLayout ? 480 : 680);
+    }, 680);
   }
 
   function viewerOffset(index: number) {

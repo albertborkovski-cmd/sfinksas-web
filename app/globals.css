@@ -485,8 +485,6 @@ body.phone-preview-active { overflow: hidden; background: radial-gradient(circle
 .category-viewer.is-opening-product .category-wheel-next,
 .category-viewer.is-opening-product .category-viewer-footer { animation: phone-product-ui-out .3s ease both; pointer-events: none; }
 .category-viewer.is-opening-product .category-wheel-stage::after { animation: phone-product-ui-out .3s ease both; }
-.category-viewer.is-opening-phone .category-wheel-item:not(.is-launching) { animation: phone-product-gallery-out .34s ease both !important; pointer-events: none; }
-.category-viewer.is-opening-phone .category-wheel-item.is-launching { z-index: 20; will-change: transform, opacity; animation: phone-bottle-to-detail .48s cubic-bezier(.22,.61,.36,1) both !important; pointer-events: none; }
 .category-viewer.is-opening-desktop .category-wheel-stage { overflow: visible; border: 0; background: transparent; box-shadow: none; transform-origin: left top; animation: desktop-carousel-to-corner .68s cubic-bezier(.2,.72,.25,1) both; pointer-events: none; }
 .category-viewer.is-opening-desktop .category-wheel-stage::after { display: none; }
 .category-viewer.is-opening-desktop .desktop-product-launch { position: absolute; z-index: 30; left: 50%; top: 53%; width: min(300px,24vw); height: min(500px,62vh); pointer-events: none; will-change: transform; animation: desktop-bottle-to-corner .68s cubic-bezier(.2,.72,.25,1) both; }
@@ -638,13 +636,6 @@ body.phone-preview-active { overflow: hidden; background: radial-gradient(circle
 @keyframes phone-product-ui-out {
   to { opacity: 0; transform: translateY(-8px); }
 }
-@keyframes phone-product-gallery-out {
-  to { opacity: 0; filter: blur(6px) brightness(.8); }
-}
-@keyframes phone-bottle-to-detail {
-  0% { opacity: 1; transform: translate(-50%,-50%) translateZ(105px) scale(.96); }
-  100% { opacity: 1; transform: translate(calc(-50% + 78px),calc(-50% + 172px)) translateZ(145px) scale(.72); }
-}
 @keyframes desktop-carousel-to-corner {
   0% { opacity: 1; transform: translate(0,0) scale(1); filter: none; }
   100% { opacity: .34; transform: translate(-48px,-92px) scale(.3); filter: saturate(.52) brightness(.9); }
@@ -689,9 +680,9 @@ body.phone-preview-active { overflow: hidden; background: radial-gradient(circle
 .site-canvas.is-phone-preview .preview-quantity button { width: 24px; height: 24px; }
 .site-canvas.is-phone-preview .preview-add-button { position: absolute; left: 18px; bottom: 66px; width: 176px; border-radius: 9px; padding: 15px 14px; box-shadow: 0 12px 28px rgba(31,23,18,.18); }
 .site-canvas.is-phone-preview .product-preview-backdrop.from-category-viewer .product-preview-modal { animation: none; }
-.site-canvas.is-phone-preview .product-preview-backdrop.from-category-viewer .preview-art-rotator { animation: phone-product-detail-settle .48s cubic-bezier(.22,.61,.36,1) both; }
+.site-canvas.is-phone-preview .product-preview-backdrop.from-category-viewer .preview-art-rotator { animation: phone-product-from-gallery .58s cubic-bezier(.2,.78,.2,1) both; }
 .site-canvas.is-phone-preview .product-preview-backdrop.from-category-viewer .preview-art-entry { animation: none; }
-.site-canvas.is-phone-preview .product-preview-backdrop.from-category-viewer .product-preview-details { animation: phone-details-top-in .58s .08s cubic-bezier(.2,.75,.2,1) both; }
+.site-canvas.is-phone-preview .product-preview-backdrop.from-category-viewer .product-preview-details { animation: phone-details-top-in .44s .04s cubic-bezier(.2,.75,.2,1) both; }
 
 @media (max-width: 760px) {
   .product-preview-backdrop { inset: 0; display: block; overflow: hidden; padding: 0; background: var(--paper); backdrop-filter: none; }
@@ -728,9 +719,9 @@ body.phone-preview-active { overflow: hidden; background: radial-gradient(circle
   .preview-quantity button { width: 24px; height: 24px; }
   .preview-add-button { position: absolute; left: 20px; bottom: 66px; width: 180px; border-radius: 9px; padding: 15px 14px; box-shadow: 0 12px 28px rgba(31,23,18,.18); }
   .product-preview-backdrop.from-category-viewer .product-preview-modal { animation: none; }
-  .product-preview-backdrop.from-category-viewer .preview-art-rotator { animation: phone-product-detail-settle .48s cubic-bezier(.22,.61,.36,1) both; }
+  .product-preview-backdrop.from-category-viewer .preview-art-rotator { animation: phone-product-from-gallery .58s cubic-bezier(.2,.78,.2,1) both; }
   .product-preview-backdrop.from-category-viewer .preview-art-entry { animation: none; }
-  .product-preview-backdrop.from-category-viewer .product-preview-details { animation: phone-details-top-in .58s .08s cubic-bezier(.2,.75,.2,1) both; }
+  .product-preview-backdrop.from-category-viewer .product-preview-details { animation: phone-details-top-in .44s .04s cubic-bezier(.2,.75,.2,1) both; }
 }
 
 @keyframes phone-product-to-corner {
@@ -742,8 +733,8 @@ body.phone-preview-active { overflow: hidden; background: radial-gradient(circle
   from { opacity: 0; transform: translateX(-28px); }
   to { opacity: 1; transform: translateX(0); }
 }
-@keyframes phone-product-detail-settle {
-  from { opacity: .94; translate: 10px 14px; scale: .97; }
+@keyframes phone-product-from-gallery {
+  from { opacity: 1; translate: -112px -168px; scale: 1.28; }
   to { opacity: 1; translate: 0 0; scale: 1; }
 }
 
