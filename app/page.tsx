@@ -309,9 +309,6 @@ export default function Home() {
     setOpeningProductOffset(offset);
     setViewerOpeningMode('desktop');
     openProduct(product, false, true);
-    viewerProductTimerRef.current = window.setTimeout(() => {
-      closeCategoryViewer();
-    }, 680);
   }
 
   function viewerOffset(index: number) {
@@ -435,6 +432,45 @@ export default function Home() {
             </div>
           )}
 
+          {viewerOpeningMode === 'desktop' && selectedProduct && (
+            <div className="desktop-viewer-detail">
+              <button
+                className="desktop-viewer-detail-close"
+                type="button"
+                onClick={() => {
+                  setSelectedProduct(null);
+                  setProductOpenedFromDesktopViewer(false);
+                  resetViewerMotion();
+                }}
+                aria-label="Grįžti į produktų karuselę"
+              >←</button>
+              <div className="desktop-viewer-detail-copy">
+                <p className="section-kicker">Produkto peržiūra</p>
+                <h2>{selectedProduct.name}</h2>
+                <p className="preview-product-note">{selectedProduct.note}</p>
+                <p className="preview-product-description">{productStory(selectedProduct).description}</p>
+                <ul>
+                  {productStory(selectedProduct).benefits.map((benefit) => <li key={benefit}><span>✓</span>{benefit}</li>)}
+                </ul>
+                <fieldset className="variant-picker">
+                  <legend>{selectedProduct.category === 'Rinkiniai' ? 'Pakuotė' : selectedProduct.category === 'Priedai' ? 'Kiekis' : 'Talpa'}</legend>
+                  <div>{previewVariants.map((variant, index) => <button key={variant} type="button" className={previewVariant === index ? 'selected' : ''} onClick={() => setPreviewVariant(index)}>{variant}</button>)}</div>
+                </fieldset>
+                <div className="preview-purchase-row">
+                  <div className="preview-quantity" aria-label="Kiekis">
+                    <button type="button" onClick={() => setPreviewQuantity((quantity) => Math.max(1, quantity - 1))} aria-label="Mažinti kiekį">−</button>
+                    <span>{previewQuantity}</span>
+                    <button type="button" onClick={() => setPreviewQuantity((quantity) => quantity + 1)} aria-label="Didinti kiekį">+</button>
+                  </div>
+                  <strong>{money.format(previewPrice * previewQuantity)}</strong>
+                </div>
+                <button className="preview-add-button" type="button" onClick={() => { addToCart(selectedProduct, previewQuantity); setSelectedProduct(null); closeCategoryViewer(); }}>
+                  Pridėti į krepšelį <span>↗</span>
+                </button>
+              </div>
+            </div>
+          )}
+
           <div className="category-viewer-copy" aria-live="polite">
             <h2>{activeViewerProduct.name}</h2>
             <strong>{money.format(activeViewerProduct.price)}</strong>
@@ -520,7 +556,7 @@ export default function Home() {
         document.body,
       )}
 
-      {selectedProduct && (
+      {selectedProduct && !(viewerCategory && viewerOpeningMode === 'desktop') && (
         <div className={`product-preview-backdrop${productOpenedFromViewer ? ' from-category-viewer' : ''}${productOpenedFromDesktopViewer ? ' from-desktop-viewer' : ''}`} role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setSelectedProduct(null); }}>
           <section className="product-preview-modal" role="dialog" aria-modal="true" aria-label={`${selectedProduct.name} produkto peržiūra`}>
             <button className="product-preview-close" type="button" onClick={() => setSelectedProduct(null)} aria-label="Uždaryti produkto peržiūrą">×</button>
