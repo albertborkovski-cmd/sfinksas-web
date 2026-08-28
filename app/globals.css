@@ -434,14 +434,15 @@ body.phone-preview-active { overflow: hidden; background: radial-gradient(circle
 .category-viewer.is-phone-viewer .category-wheel-stage { inset: 144px 0 74px; background: radial-gradient(ellipse at 50% 75%,rgba(255,255,255,.3),transparent 46%); perspective: 950px; perspective-origin: 50% 58%; }
 .category-viewer.is-phone-viewer .category-wheel-stage::after { bottom: 12%; width: 220px; height: 38px; }
 .category-viewer.is-phone-viewer .category-wheel-item { top: 67%; width: 270px; height: 400px; transform-style: preserve-3d; transition-duration: .72s; transition-timing-function: cubic-bezier(.16,.78,.18,1); }
-.category-viewer.is-phone-viewer .category-wheel-item.is-active { z-index: 8; opacity: 1; transform: translate(-50%,-50%) translateZ(105px) scale(.96); filter: none; animation: phone-bottle-arrive-from-top .78s cubic-bezier(.16,.8,.18,1) both; }
+.category-viewer.is-phone-viewer .category-wheel-item.is-active { z-index: 8; opacity: 1; transform: translate(-50%,-50%) translateZ(105px) scale(.96); filter: none; animation: phone-bottle-front-down .9s cubic-bezier(.16,.8,.18,1) both; }
 .category-viewer.is-phone-viewer .category-wheel-item.is-before,
 .category-viewer.is-phone-viewer .category-wheel-item[data-offset="3"],
 .category-viewer.is-phone-viewer .category-wheel-item[data-offset="-3"],
 .category-viewer.is-phone-viewer .category-wheel-item[data-offset="4"],
 .category-viewer.is-phone-viewer .category-wheel-item[data-offset="-4"] { display: none; }
 .category-viewer.is-phone-viewer .category-wheel-item.is-after { z-index: 7; opacity: .7; pointer-events: none; transform: translate(-50%,calc(-50% - 175px)) translateZ(-85px) scale(.68); filter: saturate(.74) contrast(.97) brightness(.98); }
-.category-viewer.is-phone-viewer .category-wheel-item[data-offset="2"] { z-index: 6; opacity: .4; transform: translate(-50%,calc(-50% - 285px)) translateZ(-170px) scale(.48); filter: saturate(.48) contrast(.95) brightness(.94); }
+.category-viewer.is-phone-viewer .category-wheel-item[data-offset="1"] { animation: phone-bottle-middle-down .9s .04s cubic-bezier(.16,.8,.18,1) both; }
+.category-viewer.is-phone-viewer .category-wheel-item[data-offset="2"] { z-index: 6; opacity: .4; transform: translate(-50%,calc(-50% - 285px)) translateZ(-170px) scale(.48); filter: saturate(.48) contrast(.95) brightness(.94); animation: phone-bottle-back-in .9s .08s cubic-bezier(.16,.8,.18,1) both; }
 .category-viewer.is-phone-viewer .category-wheel-item[data-offset="1"] .product-art.has-photo,
 .category-viewer.is-phone-viewer .category-wheel-item[data-offset="2"] .product-art.has-photo { clip-path: none; }
 .category-viewer.is-phone-viewer .category-wheel-item.is-active .product-art.has-photo img { filter: drop-shadow(0 30px 20px rgba(37,22,13,.36)) drop-shadow(-8px 0 12px rgba(255,255,255,.12)); }
@@ -479,14 +480,15 @@ body.phone-preview-active { overflow: hidden; background: radial-gradient(circle
   .category-wheel-stage { inset: 144px 0 74px; background: radial-gradient(ellipse at 50% 75%,rgba(255,255,255,.3),transparent 46%); perspective: 950px; perspective-origin: 50% 58%; }
   .category-wheel-stage::after { bottom: 12%; width: 220px; height: 38px; }
   .category-wheel-item { top: 67%; width: 270px; height: 400px; transform-style: preserve-3d; transition-duration: .72s; transition-timing-function: cubic-bezier(.16,.78,.18,1); }
-  .category-wheel-item.is-active { z-index: 8; opacity: 1; transform: translate(-50%,-50%) translateZ(105px) scale(.96); filter: none; animation: phone-bottle-arrive-from-top .78s cubic-bezier(.16,.8,.18,1) both; }
+  .category-wheel-item.is-active { z-index: 8; opacity: 1; transform: translate(-50%,-50%) translateZ(105px) scale(.96); filter: none; animation: phone-bottle-front-down .9s cubic-bezier(.16,.8,.18,1) both; }
   .category-wheel-item.is-before,
   .category-wheel-item[data-offset="3"],
   .category-wheel-item[data-offset="-3"],
   .category-wheel-item[data-offset="4"],
   .category-wheel-item[data-offset="-4"] { display: none; }
   .category-wheel-item.is-after { z-index: 7; opacity: .7; pointer-events: none; transform: translate(-50%,calc(-50% - 175px)) translateZ(-85px) scale(.68); filter: saturate(.74) contrast(.97) brightness(.98); }
-  .category-wheel-item[data-offset="2"] { z-index: 6; opacity: .4; transform: translate(-50%,calc(-50% - 285px)) translateZ(-170px) scale(.48); filter: saturate(.48) contrast(.95) brightness(.94); }
+  .category-wheel-item[data-offset="1"] { animation: phone-bottle-middle-down .9s .04s cubic-bezier(.16,.8,.18,1) both; }
+  .category-wheel-item[data-offset="2"] { z-index: 6; opacity: .4; transform: translate(-50%,calc(-50% - 285px)) translateZ(-170px) scale(.48); filter: saturate(.48) contrast(.95) brightness(.94); animation: phone-bottle-back-in .9s .08s cubic-bezier(.16,.8,.18,1) both; }
   .category-wheel-item[data-offset="1"] .product-art.has-photo,
   .category-wheel-item[data-offset="2"] .product-art.has-photo { clip-path: none; }
   .category-wheel-item.is-active .product-art.has-photo img { filter: drop-shadow(0 30px 20px rgba(37,22,13,.36)) drop-shadow(-8px 0 12px rgba(255,255,255,.12)); }
@@ -599,10 +601,18 @@ body.phone-preview-active { overflow: hidden; background: radial-gradient(circle
   .toast { width: calc(100% - 36px); justify-content: space-between; }
 }
 
-@keyframes phone-bottle-arrive-from-top {
-  0% { opacity: 0; transform: translate(-50%,calc(-50% - 265px)) translateZ(-190px) rotateX(-12deg) scale(.5); }
-  68% { opacity: 1; transform: translate(-50%,calc(-50% + 9px)) translateZ(118px) rotateX(2deg) scale(.98); }
-  100% { opacity: 1; transform: translate(-50%,-50%) translateZ(105px) rotateX(0) scale(.96); }
+@keyframes phone-bottle-front-down {
+  0% { opacity: .7; transform: translate(-50%,calc(-50% - 175px)) translateZ(-85px) scale(.68); }
+  72% { opacity: 1; transform: translate(-50%,calc(-50% + 10px)) translateZ(120px) scale(.99); }
+  100% { opacity: 1; transform: translate(-50%,-50%) translateZ(105px) scale(.96); }
+}
+@keyframes phone-bottle-middle-down {
+  0% { opacity: .4; transform: translate(-50%,calc(-50% - 285px)) translateZ(-170px) scale(.48); }
+  100% { opacity: .7; transform: translate(-50%,calc(-50% - 175px)) translateZ(-85px) scale(.68); }
+}
+@keyframes phone-bottle-back-in {
+  0% { opacity: 0; transform: translate(-50%,calc(-50% - 390px)) translateZ(-250px) scale(.32); }
+  100% { opacity: .4; transform: translate(-50%,calc(-50% - 285px)) translateZ(-170px) scale(.48); }
 }
 
 /* Clean phone product detail: information above, purchase controls lower left, bottle lower right */
