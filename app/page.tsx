@@ -658,14 +658,15 @@ export default function Home() {
               <div className="search-cabinet-live">
                 {searchShelves.map((shelf) => {
                   const shelfProducts = products.filter((product) => product.category === shelf.category);
+                  const shelfSlotCount = Math.max(10, shelfProducts.length + 2);
                   const productSlots = new Map(
-                    shelfProducts.map((product, index) => [Math.round(((index + 1) * 19) / (shelfProducts.length + 1)), product]),
+                    shelfProducts.map((product, index) => [Math.round(((index + 1) * (shelfSlotCount - 1)) / (shelfProducts.length + 1)), product]),
                   );
                   return (
                     <section className="search-shelf" key={shelf.category} aria-label={shelf.label}>
                       <div className="search-shelf-scroll">
-                        <div className="search-shelf-track">
-                          {Array.from({ length: 20 }, (_, slot) => {
+                        <div className="search-shelf-track" style={{ '--shelf-columns': shelfSlotCount } as CSSProperties}>
+                          {Array.from({ length: shelfSlotCount }, (_, slot) => {
                             const product = productSlots.get(slot);
                             const matches = !!product && searchResults.some((result) => result.id === product.id);
                             return (
