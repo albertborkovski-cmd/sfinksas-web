@@ -114,8 +114,9 @@ function ProductArt({ shape, tone, image, priority = false }: { shape: Shape; to
   );
 }
 
-function ConditionerUpsell({ products: recommendations, onPrevious, onNext, onAdd, onFinish }: {
+function ConditionerUpsell({ products: recommendations, outgoingProduct, onPrevious, onNext, onAdd, onFinish }: {
   products: Product[];
+  outgoingProduct: Product | null;
   onPrevious: () => void;
   onNext: () => void;
   onAdd: (product: Product) => void;
@@ -133,11 +134,12 @@ function ConditionerUpsell({ products: recommendations, onPrevious, onNext, onAd
         </div>
         <div className="upsell-track">
           {recommendations.map((product, index) => (
-            <button className="upsell-product" data-position={index} type="button" key={`${product.id}-${index}`} onClick={() => onAdd(product)} aria-label={`Pridėti ${product.name} į krepšelį`}>
+            <button className="upsell-product" data-position={index} type="button" key={product.id} onClick={() => onAdd(product)} aria-label={`Pridėti ${product.name} į krepšelį`}>
               <ProductArt shape={product.shape} tone={product.tone} image={product.image} />
               <span><b>{product.name}</b><small>{money.format(product.price)}</small></span>
             </button>
           ))}
+          {outgoingProduct && <div className="upsell-product upsell-product-outgoing" aria-hidden="true"><ProductArt shape={outgoingProduct.shape} tone={outgoingProduct.tone} image={outgoingProduct.image} /></div>}
         </div>
       </div>
       <button className="upsell-finish" type="button" onClick={onFinish}>Tęsti be kondicionieriaus <span>↗</span></button>
@@ -168,6 +170,7 @@ export default function Home() {
   const [productOpenedFromViewer, setProductOpenedFromViewer] = useState(false);
   const [conditionerUpsellOpen, setConditionerUpsellOpen] = useState(false);
   const [conditionerUpsellIndex, setConditionerUpsellIndex] = useState(0);
+  const [conditionerUpsellOutgoing, setConditionerUpsellOutgoing] = useState<Product | null>(null);
   const [portalReady, setPortalReady] = useState(false);
   const viewerDragRef = useRef<{ pointerId: number; x: number; y: number; productId: number | null } | null>(null);
   const viewerWheelLockRef = useRef(0);
@@ -246,19 +249,24 @@ export default function Home() {
     () => viewerCategory ? products.filter((product) => product.category === viewerCategory) : [],
     [viewerCategory],
   );
-  const conditionerProducts = products.filter((product) => product.category === 'Kondicionieriai' && product.id !== selectedProduct?.id);
+  const conditionerProducts = useMemo(
+    () => products.filter((product) => product.category === 'Kondicionieriai' && product.id !== selectedProduct?.id),
+    [selectedProduct],
+  );
   const visibleConditioners = Array.from(
     { length: Math.min(4, conditionerProducts.length) },
     (_, offset) => conditionerProducts[(conditionerUpsellIndex + offset) % conditionerProducts.length],
   );
 
   useEffect(() => {
-    if (!conditionerUpsellOpen || conditionerProducts.length <= 4 || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    const timer = window.setInterval(() => {
+    if (!conditionerUpsellOpen || conditionerUpsellOutgoing || conditionerProducts.length <= 4 || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const timer = window.setTimeout(() => {
+      setConditionerUpsellOutgoing(conditionerProducts[conditionerUpsellIndex % conditionerProducts.length]);
       setConditionerUpsellIndex((current) => (current + 1) % conditionerProducts.length);
+      window.setTimeout(() => setConditionerUpsellOutgoing(null), 680);
     }, 4200);
-    return () => window.clearInterval(timer);
-  }, [conditionerUpsellOpen, conditionerProducts.length]);
+    return () => window.clearTimeout(timer);
+  }, [conditionerUpsellOpen, conditionerUpsellOutgoing, conditionerUpsellIndex, conditionerProducts]);
   const activeViewerProduct = viewerProducts[viewerIndex] || null;
 
   const cartItems = products.filter((product) => cart[product.id]);
@@ -293,6 +301,7 @@ export default function Home() {
 
   function openProduct(product: Product, fromCategoryViewer = false) {
     setConditionerUpsellOpen(false);
+    setConditionerUpsellOutgoing(null);
     setProductOpenedFromViewer(fromCategoryViewer);
     setSelectedProduct(product);
     setPreviewQuantity(1);
@@ -302,17 +311,23 @@ export default function Home() {
   function showConditionerUpsell(product: Product) {
     addToCart(product, previewQuantity);
     setConditionerUpsellIndex(0);
+    setConditionerUpsellOutgoing(null);
     setConditionerUpsellOpen(true);
   }
 
   function finishConditionerUpsell() {
     setConditionerUpsellOpen(false);
+    setConditionerUpsellOutgoing(null);
     setSelectedProduct(null);
     if (viewerCategory) closeCategoryViewer();
   }
 
   function rotateConditionerUpsell(direction: number) {
-    if (!conditionerProducts.length) return;
+    if (!conditionerProducts.length || conditionerUpsellOutgoing) return;
+    if (direction > 0) {
+      setConditionerUpsellOutgoing(visibleConditioners[0]);
+      window.setTimeout(() => setConditionerUpsellOutgoing(null), 680);
+    }
     setConditionerUpsellIndex((current) => (current + direction + conditionerProducts.length) % conditionerProducts.length);
   }
 
@@ -543,7 +558,7 @@ export default function Home() {
                   Pridėti į krepšelį <span>↗</span>
                 </button>
               </div>}
-              {conditionerUpsellOpen && <ConditionerUpsell products={visibleConditioners} onPrevious={() => rotateConditionerUpsell(-1)} onNext={() => rotateConditionerUpsell(1)} onAdd={(product) => addToCart(product)} onFinish={finishConditionerUpsell} />}
+              {conditionerUpsellOpen && <ConditionerUpsell products={visibleConditioners} outgoingProduct={conditionerUpsellOutgoing} onPrevious={() => rotateConditionerUpsell(-1)} onNext={() => rotateConditionerUpsell(1)} onAdd={(product) => addToCart(product)} onFinish={finishConditionerUpsell} />}
             </div>
           )}
 
@@ -680,7 +695,7 @@ export default function Home() {
               </button>
               <small className="preview-delivery">Nemokamas pristatymas užsakymams nuo 60 €</small>
             </div>}
-            {conditionerUpsellOpen && <ConditionerUpsell products={visibleConditioners} onPrevious={() => rotateConditionerUpsell(-1)} onNext={() => rotateConditionerUpsell(1)} onAdd={(product) => addToCart(product)} onFinish={finishConditionerUpsell} />}
+            {conditionerUpsellOpen && <ConditionerUpsell products={visibleConditioners} outgoingProduct={conditionerUpsellOutgoing} onPrevious={() => rotateConditionerUpsell(-1)} onNext={() => rotateConditionerUpsell(1)} onAdd={(product) => addToCart(product)} onFinish={finishConditionerUpsell} />}
           </section>
         </div>
       )}
