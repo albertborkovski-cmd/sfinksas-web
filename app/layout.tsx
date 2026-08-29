@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import './globals.css';
 
+const publicBasePath = process.env.NEXT_PUBLIC_BASE_PATH ?? '';
+
 export const metadata: Metadata = {
   metadataBase: new URL('https://sfinksas.albertborkovski.chatgpt.site'),
   title: 'Sfinksas — profesionali plaukų priežiūra',
@@ -32,10 +34,13 @@ export default function RootLayout({
   return (
     <html lang="lt">
       <head>
-        <link rel="preload" as="image" href="/sfinksas-luxury-interior.webp" fetchPriority="high" />
-        <link rel="preload" as="image" href="/home-category-products.webp" fetchPriority="high" />
+        <link rel="preload" as="image" href={`${publicBasePath}/sfinksas-luxury-interior.webp`} fetchPriority="high" />
+        <link rel="preload" as="image" href={`${publicBasePath}/home-category-products.webp`} fetchPriority="high" />
       </head>
-      <body>{children}</body>
+      <body style={{
+        '--hero-background-image': `url("${publicBasePath}/sfinksas-luxury-interior.webp")`,
+        '--search-background-image': `url("${publicBasePath}/sfinksas-search-cabinet-empty.webp")`,
+      } as React.CSSProperties}>{children}</body>
     </html>
   );
 }

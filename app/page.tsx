@@ -70,6 +70,11 @@ const products: Product[] = [
 ];
 
 const money = new Intl.NumberFormat('lt-LT', { style: 'currency', currency: 'EUR' });
+const publicBasePath = process.env.NEXT_PUBLIC_BASE_PATH ?? '';
+
+function publicAsset(path?: string) {
+  return path ? `${publicBasePath}${path}` : undefined;
+}
 
 const productStories: Record<number, { description: string; benefits: [string, string, string] }> = {
   1: { description: 'Lengva sauso šampūno dulksna sugeria riebalų perteklių, atgaivina šaknis ir suteikia plaukams natūralios apimties tarp plovimų.', benefits: ['Greitai atgaivina', 'Suteikia apimties', 'Nepalieka sunkumo'] },
@@ -107,11 +112,11 @@ function productStory(product: Product) {
 }
 
 function fastProductImage(image?: string) {
-  return image?.replace(/\.webp$/, '-fast.webp');
+  return publicAsset(image?.replace(/\.webp$/, '-fast.webp'));
 }
 
 function ProductArt({ shape, tone, image, priority = false, fullQuality = false }: { shape: Shape; tone: Product['tone']; image?: string; priority?: boolean; fullQuality?: boolean }) {
-  const imageSource = fullQuality ? image : fastProductImage(image);
+  const imageSource = fullQuality ? publicAsset(image) : fastProductImage(image);
   return (
     <div className={`product-art shape-${shape} tone-${tone}${image ? ' has-photo' : ''}`} aria-hidden="true">
       {/* Transparent product cutouts must be served directly; the hosted image optimizer changes their layering. */}
@@ -242,7 +247,7 @@ export default function Home() {
 
   useEffect(() => {
     const fastImages = products.flatMap((product) => fastProductImage(product.image) ?? []);
-    const fullImages = products.flatMap((product) => product.image ?? []);
+    const fullImages = products.flatMap((product) => publicAsset(product.image) ?? []);
     preloadedProductImagesRef.current = fastImages.map((source) => {
       const image = new Image();
       image.decoding = 'async';
@@ -557,7 +562,7 @@ export default function Home() {
         <div className="hero-product-nav" aria-label="Produktų kategorijos">
           {/* Transparent category composition supplied by the user. */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/home-category-products.webp" alt="Profesionalių plaukų priežiūros produktų kolekcija" draggable="false" loading="eager" fetchPriority="high" decoding="async" />
+          <img src={publicAsset('/home-category-products.webp')} alt="Profesionalių plaukų priežiūros produktų kolekcija" draggable="false" loading="eager" fetchPriority="high" decoding="async" />
           {categories.map((category, index) => (
             <button
               type="button"
