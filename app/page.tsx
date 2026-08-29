@@ -114,12 +114,13 @@ function ProductArt({ shape, tone, image, priority = false }: { shape: Shape; to
   );
 }
 
-function ConditionerUpsell({ products: recommendations, outgoingProduct, onPrevious, onNext, onAdd }: {
+function ConditionerUpsell({ products: recommendations, outgoingProduct, onPrevious, onNext, onAdd, onFinish }: {
   products: Product[];
   outgoingProduct: Product | null;
   onPrevious: () => void;
   onNext: () => void;
   onAdd: (product: Product) => void;
+  onFinish: () => void;
 }) {
   return (
     <section className="conditioner-upsell" aria-label="Kondicionierių pasiūlymai">
@@ -141,6 +142,7 @@ function ConditionerUpsell({ products: recommendations, outgoingProduct, onPrevi
         ))}
         {outgoingProduct && <div className="upsell-product upsell-product-outgoing" aria-hidden="true"><ProductArt shape={outgoingProduct.shape} tone={outgoingProduct.tone} image={outgoingProduct.image} /></div>}
       </div>
+      <button className="upsell-finish" type="button" onClick={onFinish}>Tęsti be kondicionieriaus</button>
     </section>
   );
 }
@@ -311,6 +313,13 @@ export default function Home() {
     setConditionerUpsellIndex(0);
     setConditionerUpsellOutgoing(null);
     setConditionerUpsellOpen(true);
+  }
+
+  function finishConditionerUpsell() {
+    setConditionerUpsellOpen(false);
+    setConditionerUpsellOutgoing(null);
+    setSelectedProduct(null);
+    if (viewerCategory) closeCategoryViewer();
   }
 
   function rotateConditionerUpsell(direction: number) {
@@ -549,7 +558,7 @@ export default function Home() {
                   Pridėti į krepšelį <span>↗</span>
                 </button>
               </div>}
-              {conditionerUpsellOpen && <ConditionerUpsell products={visibleConditioners} outgoingProduct={conditionerUpsellOutgoing} onPrevious={() => rotateConditionerUpsell(-1)} onNext={() => rotateConditionerUpsell(1)} onAdd={(product) => addToCart(product)} />}
+              {conditionerUpsellOpen && <ConditionerUpsell products={visibleConditioners} outgoingProduct={conditionerUpsellOutgoing} onPrevious={() => rotateConditionerUpsell(-1)} onNext={() => rotateConditionerUpsell(1)} onAdd={(product) => addToCart(product)} onFinish={finishConditionerUpsell} />}
             </div>
           )}
 
@@ -641,7 +650,7 @@ export default function Home() {
       {selectedProduct && !(viewerCategory && viewerOpeningMode === 'desktop') && (
         <div className={`product-preview-backdrop${productOpenedFromViewer ? ' from-category-viewer' : ''}`} role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setSelectedProduct(null); }}>
           <section className={`product-preview-modal${conditionerUpsellOpen ? ' is-upsell' : ''}`} role="dialog" aria-modal="true" aria-label={`${selectedProduct.name} produkto peržiūra`}>
-            <button className="product-preview-close" type="button" onClick={() => { setConditionerUpsellOpen(false); setSelectedProduct(null); }} aria-label="Uždaryti produkto peržiūrą">×</button>
+            <button className="product-preview-close" type="button" onClick={() => { setConditionerUpsellOpen(false); setSelectedProduct(null); }} aria-label="Uždaryti produkto peržiūrą">{conditionerUpsellOpen ? '←' : '×'}</button>
             <button className="product-preview-previous" type="button" onClick={() => moveProduct(-1)} aria-label="Ankstesnis produktas">←</button>
             <button className="product-preview-next" type="button" onClick={() => moveProduct(1)} aria-label="Kitas produktas">→</button>
 
@@ -686,7 +695,7 @@ export default function Home() {
               </button>
               <small className="preview-delivery">Nemokamas pristatymas užsakymams nuo 60 €</small>
             </div>}
-            {conditionerUpsellOpen && <ConditionerUpsell products={visibleConditioners} outgoingProduct={conditionerUpsellOutgoing} onPrevious={() => rotateConditionerUpsell(-1)} onNext={() => rotateConditionerUpsell(1)} onAdd={(product) => addToCart(product)} />}
+            {conditionerUpsellOpen && <ConditionerUpsell products={visibleConditioners} outgoingProduct={conditionerUpsellOutgoing} onPrevious={() => rotateConditionerUpsell(-1)} onNext={() => rotateConditionerUpsell(1)} onAdd={(product) => addToCart(product)} onFinish={finishConditionerUpsell} />}
           </section>
         </div>
       )}
