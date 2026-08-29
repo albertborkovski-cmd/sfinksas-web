@@ -144,7 +144,7 @@ function ConditionerUpsell({ products: recommendations, outgoingProduct, onPrevi
         ))}
         {outgoingProduct && <div className="upsell-product upsell-product-outgoing" aria-hidden="true"><ProductArt shape={outgoingProduct.shape} tone={outgoingProduct.tone} image={outgoingProduct.image} /></div>}
       </div>
-      <button className="upsell-finish" type="button" onClick={onFinish}>Tęsti be kondicionieriaus</button>
+      <button className="upsell-finish" type="button" onClick={onFinish}>Kitą kartą</button>
     </section>
   );
 }
