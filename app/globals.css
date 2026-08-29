@@ -449,8 +449,8 @@ body.phone-preview-active { overflow: hidden; background: radial-gradient(circle
 .site-canvas.is-phone-preview .search-panel input { border: 0; padding: 0 28px 2px 0; font-size: 15px; }
 .site-canvas.is-phone-preview .search-panel label > i { top: -2px; font-size: 18px; }
 .site-canvas.is-phone-preview .search-status { margin-top: 3px; font-size: 5.5px; }
-.site-canvas.is-phone-preview .search-shelf-slot::after { bottom: -1px; width: 62%; height: 4px; background: radial-gradient(ellipse,rgba(55,34,22,.42),rgba(55,34,22,.12) 54%,transparent 75%); filter: blur(1.2px); }
-.site-canvas.is-phone-preview .search-shelf-slot .product-art { inset: 4px 7px -1px; transform: none; }
+.site-canvas.is-phone-preview .search-shelf-slot::after { bottom: -35px; width: 62%; height: 4px; background: radial-gradient(ellipse,rgba(55,34,22,.42),rgba(55,34,22,.12) 54%,transparent 75%); filter: blur(1.2px); }
+.site-canvas.is-phone-preview .search-shelf-slot .product-art { inset: 4px 7px -1px; translate: 0 34px; transform: none; }
 .site-canvas.is-phone-preview .search-shelf-slot .product-art.has-photo img { object-position: center bottom; filter: drop-shadow(0 4px 2px rgba(58,36,23,.22)); }
 .site-canvas.is-phone-preview .shelf-product-card { display: none; }
 .site-canvas.is-phone-preview .cart-drawer { padding: 25px 18px; }
@@ -661,8 +661,8 @@ body.phone-preview-active { overflow: hidden; background: radial-gradient(circle
   .search-panel input { border: 0; padding: 0 28px 2px 0; font-size: 15px; }
   .search-panel label > i { top: -2px; font-size: 18px; }
   .search-status { margin-top: 3px; font-size: 5.5px; }
-  .search-shelf-slot::after { bottom: -1px; width: 62%; height: 4px; background: radial-gradient(ellipse,rgba(55,34,22,.42),rgba(55,34,22,.12) 54%,transparent 75%); filter: blur(1.2px); }
-  .search-shelf-slot .product-art { inset: 4px 7px -1px; transform: none; }
+  .search-shelf-slot::after { bottom: -35px; width: 62%; height: 4px; background: radial-gradient(ellipse,rgba(55,34,22,.42),rgba(55,34,22,.12) 54%,transparent 75%); filter: blur(1.2px); }
+  .search-shelf-slot .product-art { inset: 4px 7px -1px; translate: 0 34px; transform: none; }
   .search-shelf-slot .product-art.has-photo img { object-position: center bottom; filter: drop-shadow(0 4px 2px rgba(58,36,23,.22)); }
   .shelf-product-card { display: none; }
   .cart-drawer { padding: 25px 18px; }
