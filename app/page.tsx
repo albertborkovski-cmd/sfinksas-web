@@ -217,20 +217,22 @@ export default function Home() {
   const cartItems = products.filter((product) => cart[product.id]);
   const cartCount = Object.values(cart).reduce((sum, quantity) => sum + quantity, 0);
   const cartTotal = cartItems.reduce((sum, product) => sum + product.price * cart[product.id], 0);
-  const previewVariants = selectedProduct?.category === 'Šampūnai'
+  const previewVariants = selectedProduct?.category === 'Šampūnai' || selectedProduct?.category === 'Kondicionieriai'
     ? ['250 ml', '500 ml', '1000 ml']
-    : selectedProduct?.variants ?? (selectedProduct?.category === 'Priedai'
-      ? ['1 vnt.']
-      : selectedProduct?.category === 'Rinkiniai'
-        ? ['Standartinis', 'Dovaninis']
-        : ['250 ml', '500 ml']);
-  const shampooSizePremiums = [0, 18, 42];
+    : selectedProduct?.category === 'Aliejukai'
+      ? ['30 ml', '75 ml', '100 ml']
+      : selectedProduct?.category === 'Priedai'
+        ? ['1 vnt.']
+        : selectedProduct?.category === 'Rinkiniai'
+          ? ['Standartinis', 'Dovaninis']
+          : selectedProduct?.variants ?? ['Standartinis'];
+  const sizePremiums = selectedProduct?.category === 'Aliejukai' ? [0, 10, 18] : [0, 18, 42];
   const previewPrice = selectedProduct
-    ? selectedProduct.price + (selectedProduct.category === 'Šampūnai' ? shampooSizePremiums[previewVariant] ?? 0 : previewVariant > 0 ? 18 : 0)
+    ? selectedProduct.price + (selectedProduct.category === 'Rinkiniai' ? (previewVariant > 0 ? 18 : 0) : sizePremiums[previewVariant] ?? 0)
     : 0;
-  const previewBottleScale = selectedProduct?.category === 'Šampūnai'
-    ? [0.82, 1, 1.18][previewVariant] ?? 1
-    : [0.9, 1.07][previewVariant] ?? 1;
+  const previewBottleScale = selectedProduct?.category === 'Priedai' || selectedProduct?.category === 'Rinkiniai'
+    ? [0.94, 1.08][previewVariant] ?? 1
+    : [0.82, 1, 1.18][previewVariant] ?? 1;
 
   function addToCart(product: Product, quantity = 1) {
     setCart((current) => ({ ...current, [product.id]: (current[product.id] || 0) + quantity }));
@@ -431,10 +433,12 @@ export default function Home() {
                 '--launch-start-opacity': [1, .7, .4, .2][Math.min(Math.abs(openingProductOffset), 3)] ?? .2,
               } as CSSProperties}
             >
-              {(() => {
-                const product = viewerProducts.find((item) => item.id === openingProductId);
-                return product ? <ProductArt shape={product.shape} tone={product.tone} image={product.image} /> : null;
-              })()}
+              <div className="desktop-product-pose" style={{ '--bottle-scale': previewBottleScale } as CSSProperties}>
+                {(() => {
+                  const product = viewerProducts.find((item) => item.id === openingProductId);
+                  return product ? <ProductArt shape={product.shape} tone={product.tone} image={product.image} /> : null;
+                })()}
+              </div>
             </div>
           )}
 

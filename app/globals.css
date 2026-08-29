@@ -156,7 +156,7 @@ h2 em { font-weight: 400; color: #c79876; }
 .product-preview-stage.has-product-photo::after { display: block; background: rgba(44,26,15,.26); }
 .product-preview-stage.has-product-photo .product-art.has-photo img { transform: translateZ(28px); filter: drop-shadow(0 46px 30px rgba(29,17,10,.4)) drop-shadow(-16px -3px 20px rgba(255,255,255,.17)) drop-shadow(13px 5px 13px rgba(74,42,25,.16)); }
 .preview-category { position: absolute; z-index: 4; left: 28px; top: 26px; font-size: 9px; letter-spacing: .16em; text-transform: uppercase; }
-.preview-art-rotator { position: absolute; z-index: 3; left: auto; right: -9%; top: auto; bottom: -12%; width: min(62%,410px); height: 88%; margin: 0; transform: perspective(1050px) rotateY(-9deg) rotateZ(2.5deg) scale(var(--bottle-scale,1)); transform-origin: 60% 82%; transform-style: preserve-3d; transition: transform .62s cubic-bezier(.2,.75,.2,1); }
+.preview-art-rotator { position: absolute; z-index: 3; left: auto; right: -9%; top: auto; bottom: -12%; width: min(62%,410px); height: 88%; margin: 0; transform: perspective(1050px) rotateY(-11deg) rotateZ(6deg) scale(var(--bottle-scale,1)); transform-origin: 60% 82%; transform-style: preserve-3d; transition: transform .62s cubic-bezier(.2,.75,.2,1); }
 .preview-art-entry { position: absolute; inset: 0; transform-style: preserve-3d; }
 .preview-art-rotator .product-art { inset: 0; }
 .preview-art-rotator .product-form { width: 50%; }
@@ -429,6 +429,7 @@ body.phone-preview-active { overflow: hidden; background: radial-gradient(circle
 .category-viewer.is-opening-desktop .category-wheel-stage { overflow: visible; border: 0; background: transparent; box-shadow: none; transform-origin: left top; animation: desktop-carousel-to-corner .68s cubic-bezier(.2,.72,.25,1) both; pointer-events: none; }
 .category-viewer.is-opening-desktop .category-wheel-stage::after { display: none; }
 .category-viewer.is-opening-desktop .desktop-product-launch { position: absolute; z-index: 30; left: 50%; top: 53%; width: min(300px,24vw); height: min(500px,62vh); pointer-events: none; will-change: transform; animation: desktop-bottle-to-corner .68s cubic-bezier(.2,.72,.25,1) both; }
+.category-viewer.is-opening-desktop .desktop-product-pose { position: absolute; inset: 0; transform: perspective(1100px) rotateY(-11deg) rotateZ(6deg) scale(var(--bottle-scale,1)); transform-origin: 58% 82%; transform-style: preserve-3d; transition: transform .62s cubic-bezier(.2,.75,.2,1); }
 .category-viewer.is-opening-desktop .desktop-product-launch .product-art { inset: 0; }
 .category-viewer.is-opening-desktop .desktop-product-launch .product-art.has-photo img { filter: drop-shadow(0 38px 25px rgba(37,22,13,.32)); }
 .desktop-viewer-detail { position: absolute; z-index: 32; inset: 0; pointer-events: none; }
