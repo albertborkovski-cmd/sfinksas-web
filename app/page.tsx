@@ -147,6 +147,34 @@ function ConditionerUpsell({ products: recommendations, outgoingProduct, onPrevi
   );
 }
 
+function AcceptedRitual({ primary, companion, total, onPay }: {
+  primary: Product;
+  companion: Product;
+  total: number;
+  onPay: () => void;
+}) {
+  return (
+    <section className="accepted-ritual" aria-label="Pasirinktas produktų rinkinys">
+      <div className="accepted-ritual-heading">
+        <p>Jūsų ritualas paruoštas</p>
+        <h2>Puikus duetas.</h2>
+      </div>
+      <div className="accepted-ritual-products">
+        {[primary, companion].map((product, index) => (
+          <article className="accepted-ritual-product" data-side={index === 0 ? 'left' : 'right'} key={product.id}>
+            <ProductArt shape={product.shape} tone={product.tone} image={product.image} priority />
+            <span>{product.name}</span>
+          </article>
+        ))}
+      </div>
+      <div className="accepted-ritual-checkout">
+        <div><span>Bendra suma</span><strong>{money.format(total)}</strong></div>
+        <button type="button" onClick={onPay}>Apmokėti <span>↗</span></button>
+      </div>
+    </section>
+  );
+}
+
 export default function Home() {
   const [previewMode, setPreviewMode] = useState<'desktop' | 'phone'>('desktop');
   const [searchOpen, setSearchOpen] = useState(false);
@@ -171,6 +199,7 @@ export default function Home() {
   const [conditionerUpsellOpen, setConditionerUpsellOpen] = useState(false);
   const [conditionerUpsellIndex, setConditionerUpsellIndex] = useState(0);
   const [conditionerUpsellOutgoing, setConditionerUpsellOutgoing] = useState<Product | null>(null);
+  const [acceptedUpsellProduct, setAcceptedUpsellProduct] = useState<Product | null>(null);
   const [portalReady, setPortalReady] = useState(false);
   const viewerDragRef = useRef<{ pointerId: number; x: number; y: number; productId: number | null } | null>(null);
   const viewerWheelLockRef = useRef(0);
@@ -196,6 +225,7 @@ export default function Home() {
   const closeCategoryViewer = useCallback(() => {
     resetViewerMotion();
     setConditionerUpsellOpen(false);
+    setAcceptedUpsellProduct(null);
     setViewerCategory(null);
   }, [resetViewerMotion]);
 
@@ -259,14 +289,14 @@ export default function Home() {
   );
 
   useEffect(() => {
-    if (!conditionerUpsellOpen || conditionerUpsellOutgoing || conditionerProducts.length <= 4 || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    if (!conditionerUpsellOpen || acceptedUpsellProduct || conditionerUpsellOutgoing || conditionerProducts.length <= 4 || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     const timer = window.setTimeout(() => {
       setConditionerUpsellOutgoing(conditionerProducts[conditionerUpsellIndex % conditionerProducts.length]);
       setConditionerUpsellIndex((current) => (current + 1) % conditionerProducts.length);
       window.setTimeout(() => setConditionerUpsellOutgoing(null), 680);
     }, 4200);
     return () => window.clearTimeout(timer);
-  }, [conditionerUpsellOpen, conditionerUpsellOutgoing, conditionerUpsellIndex, conditionerProducts]);
+  }, [conditionerUpsellOpen, acceptedUpsellProduct, conditionerUpsellOutgoing, conditionerUpsellIndex, conditionerProducts]);
   const activeViewerProduct = viewerProducts[viewerIndex] || null;
 
   const cartItems = products.filter((product) => cart[product.id]);
@@ -302,6 +332,7 @@ export default function Home() {
   function openProduct(product: Product, fromCategoryViewer = false) {
     setConditionerUpsellOpen(false);
     setConditionerUpsellOutgoing(null);
+    setAcceptedUpsellProduct(null);
     setProductOpenedFromViewer(fromCategoryViewer);
     setSelectedProduct(product);
     setPreviewQuantity(1);
@@ -312,12 +343,28 @@ export default function Home() {
     addToCart(product, previewQuantity);
     setConditionerUpsellIndex(0);
     setConditionerUpsellOutgoing(null);
+    setAcceptedUpsellProduct(null);
     setConditionerUpsellOpen(true);
+  }
+
+  function acceptConditionerUpsell(product: Product) {
+    addToCart(product);
+    setConditionerUpsellOutgoing(null);
+    setAcceptedUpsellProduct(product);
+  }
+
+  function proceedToCheckout() {
+    setAcceptedUpsellProduct(null);
+    setConditionerUpsellOpen(false);
+    setSelectedProduct(null);
+    if (viewerCategory) closeCategoryViewer();
+    setCartOpen(true);
   }
 
   function finishConditionerUpsell() {
     setConditionerUpsellOpen(false);
     setConditionerUpsellOutgoing(null);
+    setAcceptedUpsellProduct(null);
     setSelectedProduct(null);
     if (viewerCategory) closeCategoryViewer();
   }
@@ -496,7 +543,7 @@ export default function Home() {
       </section>
 
       {portalReady && viewerCategory && activeViewerProduct && createPortal(
-        <section className={`category-viewer${previewMode === 'phone' ? ' is-phone-viewer' : ''}${viewerProducts.some((product) => product.image) ? ' has-product-photos' : ''}${viewerMotion !== 'idle' ? ` is-phone-${viewerMotion} is-direction-${viewerDirection > 0 ? 'next' : 'previous'}` : ''}${openingProductId !== null ? ` is-opening-product is-opening-${viewerOpeningMode}` : ''}${conditionerUpsellOpen ? ' is-upsell' : ''}`} role="dialog" aria-modal="true" aria-label={`${viewerCategory} prekių peržiūra`}>
+        <section className={`category-viewer${previewMode === 'phone' ? ' is-phone-viewer' : ''}${viewerProducts.some((product) => product.image) ? ' has-product-photos' : ''}${viewerMotion !== 'idle' ? ` is-phone-${viewerMotion} is-direction-${viewerDirection > 0 ? 'next' : 'previous'}` : ''}${openingProductId !== null ? ` is-opening-product is-opening-${viewerOpeningMode}` : ''}${conditionerUpsellOpen ? ' is-upsell' : ''}${acceptedUpsellProduct ? ' is-upsell-accepted' : ''}`} role="dialog" aria-modal="true" aria-label={`${viewerCategory} prekių peržiūra`}>
           <div className="category-viewer-topbar">
             <span className="category-viewer-mark">SFINKSAS</span>
             <span>{viewerCategory}</span>
@@ -529,6 +576,7 @@ export default function Home() {
                 type="button"
                 onClick={() => {
                   setConditionerUpsellOpen(false);
+                  setAcceptedUpsellProduct(null);
                   setSelectedProduct(null);
                   resetViewerMotion();
                 }}
@@ -558,7 +606,8 @@ export default function Home() {
                   Pridėti į krepšelį <span>↗</span>
                 </button>
               </div>}
-              {conditionerUpsellOpen && <ConditionerUpsell products={visibleConditioners} outgoingProduct={conditionerUpsellOutgoing} onPrevious={() => rotateConditionerUpsell(-1)} onNext={() => rotateConditionerUpsell(1)} onAdd={(product) => addToCart(product)} onFinish={finishConditionerUpsell} />}
+              {conditionerUpsellOpen && !acceptedUpsellProduct && <ConditionerUpsell products={visibleConditioners} outgoingProduct={conditionerUpsellOutgoing} onPrevious={() => rotateConditionerUpsell(-1)} onNext={() => rotateConditionerUpsell(1)} onAdd={acceptConditionerUpsell} onFinish={finishConditionerUpsell} />}
+              {acceptedUpsellProduct && <AcceptedRitual primary={selectedProduct} companion={acceptedUpsellProduct} total={previewPrice * previewQuantity + acceptedUpsellProduct.price} onPay={proceedToCheckout} />}
             </div>
           )}
 
@@ -649,8 +698,8 @@ export default function Home() {
 
       {selectedProduct && !(viewerCategory && viewerOpeningMode === 'desktop') && (
         <div className={`product-preview-backdrop${productOpenedFromViewer ? ' from-category-viewer' : ''}`} role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setSelectedProduct(null); }}>
-          <section className={`product-preview-modal${conditionerUpsellOpen ? ' is-upsell' : ''}`} role="dialog" aria-modal="true" aria-label={`${selectedProduct.name} produkto peržiūra`}>
-            <button className="product-preview-close" type="button" onClick={() => { setConditionerUpsellOpen(false); setSelectedProduct(null); }} aria-label="Uždaryti produkto peržiūrą">{conditionerUpsellOpen ? '←' : '×'}</button>
+          <section className={`product-preview-modal${conditionerUpsellOpen ? ' is-upsell' : ''}${acceptedUpsellProduct ? ' is-upsell-accepted' : ''}`} role="dialog" aria-modal="true" aria-label={`${selectedProduct.name} produkto peržiūra`}>
+            <button className="product-preview-close" type="button" onClick={() => { setConditionerUpsellOpen(false); setAcceptedUpsellProduct(null); setSelectedProduct(null); }} aria-label="Uždaryti produkto peržiūrą">{conditionerUpsellOpen ? '←' : '×'}</button>
             <button className="product-preview-previous" type="button" onClick={() => moveProduct(-1)} aria-label="Ankstesnis produktas">←</button>
             <button className="product-preview-next" type="button" onClick={() => moveProduct(1)} aria-label="Kitas produktas">→</button>
 
@@ -695,7 +744,8 @@ export default function Home() {
               </button>
               <small className="preview-delivery">Nemokamas pristatymas užsakymams nuo 60 €</small>
             </div>}
-            {conditionerUpsellOpen && <ConditionerUpsell products={visibleConditioners} outgoingProduct={conditionerUpsellOutgoing} onPrevious={() => rotateConditionerUpsell(-1)} onNext={() => rotateConditionerUpsell(1)} onAdd={(product) => addToCart(product)} onFinish={finishConditionerUpsell} />}
+            {conditionerUpsellOpen && !acceptedUpsellProduct && <ConditionerUpsell products={visibleConditioners} outgoingProduct={conditionerUpsellOutgoing} onPrevious={() => rotateConditionerUpsell(-1)} onNext={() => rotateConditionerUpsell(1)} onAdd={acceptConditionerUpsell} onFinish={finishConditionerUpsell} />}
+            {acceptedUpsellProduct && <AcceptedRitual primary={selectedProduct} companion={acceptedUpsellProduct} total={previewPrice * previewQuantity + acceptedUpsellProduct.price} onPay={proceedToCheckout} />}
           </section>
         </div>
       )}
