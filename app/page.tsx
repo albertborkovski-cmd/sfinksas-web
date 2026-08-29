@@ -583,7 +583,7 @@ export default function Home() {
                 aria-label="Grįžti į produktų karuselę"
               >←</button>
               {!conditionerUpsellOpen && <div className="desktop-viewer-detail-copy">
-                <p className="section-kicker">Produkto peržiūra</p>
+                <p className="section-kicker">Atrinkta jūsų plaukų ritualui</p>
                 <h2>{selectedProduct.name}</h2>
                 <p className="preview-product-note">{selectedProduct.note}</p>
                 <p className="preview-product-description">{productStory(selectedProduct).description}</p>
