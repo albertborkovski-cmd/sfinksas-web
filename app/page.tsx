@@ -808,11 +808,11 @@ export default function Home() {
                   : searchShelves.map((shelf) => ({ ...shelf, row: -1 }))).map((shelf) => {
                   const categoryProducts = products.filter((product) => product.category === shelf.category);
                   const shelfProducts = previewMode === 'phone'
-                    ? categoryProducts.filter((_, index) => index % 4 === shelf.row)
+                    ? categoryProducts.slice(shelf.row * 4, shelf.row * 4 + 4)
                     : categoryProducts;
-                  const shelfSlotCount = previewMode === 'phone' ? Math.max(4, shelfProducts.length + 1) : Math.max(10, shelfProducts.length + 2);
+                  const shelfSlotCount = previewMode === 'phone' ? 4 : Math.max(10, shelfProducts.length + 2);
                   const productSlots = new Map(
-                    shelfProducts.map((product, index) => [Math.round(((index + 1) * (shelfSlotCount - 1)) / (shelfProducts.length + 1)), product]),
+                    shelfProducts.map((product, index) => [previewMode === 'phone' ? index : Math.round(((index + 1) * (shelfSlotCount - 1)) / (shelfProducts.length + 1)), product]),
                   );
                   return (
                     <section className="search-shelf" key={`${shelf.category}-${shelf.number}`} aria-label={shelf.label}>
