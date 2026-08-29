@@ -125,9 +125,9 @@ function ConditionerUpsell({ products: recommendations, outgoingProduct, onPrevi
   return (
     <section className="conditioner-upsell" aria-label="Kondicionierių pasiūlymai">
       <div className="upsell-heading">
-        <p className="upsell-kicker">Užbaikite savo ritualą</p>
+        <p className="upsell-kicker">Suderintas ritualas</p>
         <h2>Gal norėtumėte pridėti ir kondicionierių?</h2>
-        <p className="upsell-copy">Keturi atrinkti pasiūlymai, kurie papildo pasirinktą plaukų priežiūros priemonę.</p>
+        <p className="upsell-copy">Atrinkome keturias priemones, kurios papildo jūsų pasirinkimą ir padeda išlaikyti plaukus glotnius, minkštus bei žvilgančius.</p>
         <div className="upsell-carousel-top">
           <span>Kondicionieriai</span>
           <div><button type="button" onClick={onPrevious} aria-label="Ankstesni kondicionieriai">←</button><button type="button" onClick={onNext} aria-label="Kiti kondicionieriai">→</button></div>
@@ -583,7 +583,7 @@ export default function Home() {
                 aria-label="Grįžti į produktų karuselę"
               >←</button>
               {!conditionerUpsellOpen && <div className="desktop-viewer-detail-copy">
-                <p className="section-kicker">Atrinkta jūsų plaukų ritualui</p>
+                <p className="section-kicker">Produkto peržiūra</p>
                 <h2>{selectedProduct.name}</h2>
                 <p className="preview-product-note">{selectedProduct.note}</p>
                 <p className="preview-product-description">{productStory(selectedProduct).description}</p>
