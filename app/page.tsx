@@ -393,9 +393,7 @@ export default function Home() {
 
         <div className="hero-shade" />
         <div className="hero-content">
-          <p className="eyebrow"><span /> Atrinkta plaukų priežiūra</p>
-          <h1>Grožio ritualas,<br /><em>sukurtas jums.</em></h1>
-          <p className="hero-copy">Profesionalios priemonės plaukų stiprumui, žvilgesiui ir kasdieniam ritualui. Atrinkta tai, kas iš tiesų veikia.</p>
+          <p className="hero-tagline">Profesionali plaukų priežiūra jūsų kasdieniam grožio ritualui.</p>
         </div>
         <div className="hero-product-nav" aria-label="Produktų kategorijos">
           {/* Transparent category composition supplied by the user. */}
@@ -409,7 +407,7 @@ export default function Home() {
               onClick={() => openCategoryViewer(category.name)}
               aria-label={`Atidaryti kategoriją ${category.name}`}
             >
-              <span>{category.name}</span>
+              <span className="sr-only">{category.name}</span>
             </button>
           ))}
         </div>
