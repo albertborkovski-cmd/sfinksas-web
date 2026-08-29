@@ -223,7 +223,7 @@ h2 em { font-weight: 400; color: #c79876; }
 .upsell-product:focus-visible .product-art.has-photo::before { opacity: 1; transform: scale(1.08); }
 .upsell-product:focus-visible { outline: 0; }
 .upsell-product > span { position: absolute; left: 2px; right: 2px; bottom: 5px; display: grid; gap: 4px; text-align: center; }
-.upsell-product:not([data-position='0']) > span { opacity: 0; }
+.upsell-product:not([data-position='1']) > span { opacity: 0; }
 .upsell-product b { overflow: hidden; font-family: Georgia,serif; font-size: 9px; font-weight: 400; line-height: 1.15; text-overflow: ellipsis; white-space: nowrap; }
 .upsell-product small { color: #9a6c50; font-size: 8px; }
 .upsell-finish { position: absolute; z-index: 6; left: 0; bottom: 4.5vh; border: 0; border-radius: 999px; padding: 12px 18px; background: rgba(255,255,255,.45); box-shadow: 0 10px 28px rgba(68,43,27,.08); color: #6f5e51; text-align: left; font-size: 9px; letter-spacing: .12em; text-transform: uppercase; cursor: pointer; }
@@ -236,10 +236,10 @@ h2 em { font-weight: 400; color: #c79876; }
 .accepted-ritual-heading { position: relative; z-index: 3; justify-self: center; text-align: center; }
 .accepted-ritual-heading p { margin: 0 0 8px; color: #946448; font-size: 9px; font-weight: 600; letter-spacing: .19em; text-transform: uppercase; }
 .accepted-ritual-heading h2 { margin: 0; font-family: Georgia,serif; font-size: clamp(42px,4.6vw,70px); font-weight: 400; letter-spacing: -.045em; line-height: 1; }
-.accepted-ritual-products { position: relative; z-index: 2; display: flex; align-items: end; justify-content: center; gap: clamp(8px,2vw,34px); min-height: 0; padding: 1vh 0 10vh; perspective: 1200px; }
-.accepted-ritual-product { position: relative; width: min(25vw,330px); height: min(60vh,590px); transform-style: preserve-3d; }
+.accepted-ritual-products { position: relative; z-index: 2; display: flex; align-items: end; justify-content: center; gap: 0; min-height: 0; padding: 1vh 0 10vh; perspective: 1200px; }
+.accepted-ritual-product { position: relative; width: min(25vw,330px); height: min(60vh,590px); transform-style: preserve-3d; transform-origin: center bottom; }
 .accepted-ritual-product[data-side='left'] { animation: accepted-product-left .82s cubic-bezier(.16,.78,.16,1) both; }
-.accepted-ritual-product[data-side='right'] { animation: accepted-product-right .82s .06s cubic-bezier(.16,.78,.16,1) both; }
+.accepted-ritual-product[data-side='right'] { margin-left: clamp(-92px,-5vw,-34px); animation: accepted-product-right .86s .05s cubic-bezier(.16,.78,.16,1) both; }
 .accepted-ritual-product::after { content: ''; position: absolute; z-index: 0; left: 15%; right: 15%; bottom: 4%; height: 8%; border-radius: 50%; background: radial-gradient(ellipse,rgba(54,32,19,.34),transparent 72%); filter: blur(10px); }
 .accepted-ritual-product .product-art { z-index: 2; inset: 0 0 44px; }
 .accepted-ritual-product .product-art.has-photo img { transform: translateZ(42px); object-position: center bottom; filter: drop-shadow(0 38px 25px rgba(43,25,14,.34)) drop-shadow(-12px -4px 18px rgba(255,255,255,.3)) drop-shadow(10px 6px 13px rgba(111,69,41,.18)) saturate(1.04) contrast(1.025); }
@@ -252,8 +252,8 @@ h2 em { font-weight: 400; color: #c79876; }
 .product-preview-modal.is-upsell-accepted .product-preview-close,
 .category-viewer.is-upsell-accepted .desktop-viewer-detail-close { z-index: 60; }
 @keyframes accepted-ritual-in { from { opacity: 0; } to { opacity: 1; } }
-@keyframes accepted-product-left { from { opacity: 0; transform: translate3d(-28vw,4vh,-140px) rotateY(18deg) scale(.72); } to { opacity: 1; transform: translate3d(0,0,0) rotateY(-4deg) scale(1); } }
-@keyframes accepted-product-right { from { opacity: 0; transform: translate3d(30vw,-4vh,-140px) rotateY(-18deg) scale(.72); } to { opacity: 1; transform: translate3d(0,0,0) rotateY(4deg) scale(.96); } }
+@keyframes accepted-product-left { from { opacity: 0; transform: translate3d(-30vw,5vh,-160px) rotateY(18deg) rotateZ(-5deg) scale(.68); } 72% { opacity: 1; } to { opacity: 1; transform: translate3d(7%,0,0) rotateY(-4deg) rotateZ(-1.2deg) scale(1); } }
+@keyframes accepted-product-right { from { opacity: 0; transform: translate3d(32vw,-5vh,-160px) rotateY(-18deg) rotateZ(6deg) scale(.68); } 72% { opacity: 1; } to { opacity: 1; transform: translate3d(-7%,1.5%,18px) rotateY(4deg) rotateZ(1.6deg) scale(.95); } }
 @keyframes accepted-checkout-in { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
 
 @keyframes desktop-product-info-in {
@@ -748,7 +748,8 @@ body.phone-preview-active { overflow: hidden; background: radial-gradient(circle
 .site-canvas.is-phone-preview .accepted-ritual { padding: 68px 16px 16px; }
 .site-canvas.is-phone-preview .accepted-ritual-heading h2 { font-size: 34px; }
 .site-canvas.is-phone-preview .accepted-ritual-products { gap: 0; padding: 0 0 82px; }
-.site-canvas.is-phone-preview .accepted-ritual-product { width: 45%; height: 55%; }
+.site-canvas.is-phone-preview .accepted-ritual-product { width: 52%; height: 58%; }
+.site-canvas.is-phone-preview .accepted-ritual-product[data-side='right'] { margin-left: -19%; }
 .site-canvas.is-phone-preview .accepted-ritual-product > span { font-size: 8px; }
 .site-canvas.is-phone-preview .accepted-ritual-checkout { width: 100%; gap: 8px; padding: 7px 7px 7px 15px; }
 .site-canvas.is-phone-preview .accepted-ritual-checkout > div { min-width: 86px; }
@@ -811,7 +812,8 @@ body.phone-preview-active { overflow: hidden; background: radial-gradient(circle
   .accepted-ritual { padding: 68px 16px 16px; }
   .accepted-ritual-heading h2 { font-size: 34px; }
   .accepted-ritual-products { gap: 0; padding: 0 0 82px; }
-  .accepted-ritual-product { width: 45%; height: 55%; }
+  .accepted-ritual-product { width: 52%; height: 58%; }
+  .accepted-ritual-product[data-side='right'] { margin-left: -19%; }
   .accepted-ritual-product > span { font-size: 8px; }
   .accepted-ritual-checkout { width: 100%; gap: 8px; padding: 7px 7px 7px 15px; }
   .accepted-ritual-checkout > div { min-width: 86px; }
