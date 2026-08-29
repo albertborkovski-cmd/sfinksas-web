@@ -191,7 +191,6 @@ export default function Home() {
   const [query, setQuery] = useState('');
   const [phoneSearchCategoryIndex, setPhoneSearchCategoryIndex] = useState(1);
   const [cart, setCart] = useState<Record<number, number>>({});
-  const [notice, setNotice] = useState('');
   const [messageSent, setMessageSent] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [previewQuantity, setPreviewQuantity] = useState(1);
@@ -244,14 +243,37 @@ export default function Home() {
   useEffect(() => {
     const fastImages = products.flatMap((product) => fastProductImage(product.image) ?? []);
     const fullImages = products.flatMap((product) => product.image ?? []);
-    preloadedProductImagesRef.current = [...fastImages, ...fullImages].map((source, index) => {
+    preloadedProductImagesRef.current = fastImages.map((source) => {
       const image = new Image();
       image.decoding = 'async';
-      image.fetchPriority = index < fastImages.length ? 'auto' : 'low';
+      image.fetchPriority = 'auto';
       image.src = source;
       return image;
     });
-    return () => { preloadedProductImagesRef.current = []; };
+
+    const loadFullImages = () => {
+      const detailedImages = fullImages.map((source) => {
+        const image = new Image();
+        image.decoding = 'async';
+        image.fetchPriority = 'low';
+        image.src = source;
+        return image;
+      });
+      preloadedProductImagesRef.current.push(...detailedImages);
+    };
+
+    const idleWindow = window as Window & {
+      requestIdleCallback?: (callback: IdleRequestCallback, options?: IdleRequestOptions) => number;
+      cancelIdleCallback?: (handle: number) => void;
+    };
+    const idleHandle = idleWindow.requestIdleCallback?.(loadFullImages, { timeout: 2500 });
+    const fallbackHandle = idleHandle === undefined ? window.setTimeout(loadFullImages, 1400) : undefined;
+
+    return () => {
+      if (idleHandle !== undefined) idleWindow.cancelIdleCallback?.(idleHandle);
+      if (fallbackHandle !== undefined) window.clearTimeout(fallbackHandle);
+      preloadedProductImagesRef.current = [];
+    };
   }, []);
 
   useEffect(() => {
@@ -871,7 +893,7 @@ export default function Home() {
                 </div>
               ))}
             </div>
-            {!!cartItems.length && <div className="cart-summary"><div><span>Suma</span><strong>{money.format(cartTotal)}</strong></div><button type="button" onClick={() => setNotice('Apmokėjimas šioje demonstracijoje išjungtas')}>Tęsti apmokėjimą <span>↗</span></button><small>Pristatymas apskaičiuojamas kitame žingsnyje.</small></div>}
+            {!!cartItems.length && <div className="cart-summary"><div><span>Suma</span><strong>{money.format(cartTotal)}</strong></div><button type="button" disabled aria-disabled="true">Apmokėjimas ruošiamas <span>↗</span></button><small>Pristatymas apskaičiuojamas kitame žingsnyje.</small></div>}
           </aside>
         </div>
       )}
@@ -889,7 +911,6 @@ export default function Home() {
         </div>
       )}
 
-      {notice && <div className="toast" role="status">{notice}<span>✓</span></div>}
       </main>
     </>
   );
