@@ -770,8 +770,8 @@ body.phone-preview-active { overflow: hidden; background: radial-gradient(circle
 .site-canvas.is-phone-preview .upsell-product .product-art { inset: 0 -2px 42px; }
 .site-canvas.is-phone-preview .upsell-product b { font-size: 6px; }
 .site-canvas.is-phone-preview .upsell-product small { font-size: 6px; }
-.site-canvas.is-phone-preview .upsell-product[data-position='1'] > span { left: -82%; right: auto; bottom: 10%; width: 92%; justify-items: end; text-align: right; }
-.site-canvas.is-phone-preview .upsell-product[data-position='1'] > span b { display: none; }
+.site-canvas.is-phone-preview .upsell-product[data-position='1'] > span { left: -92%; right: auto; bottom: 7%; width: 104%; justify-items: end; text-align: right; }
+.site-canvas.is-phone-preview .upsell-product[data-position='1'] > span b { display: block; max-width: 100%; font-size: 8px; line-height: 1.2; white-space: normal; }
 .site-canvas.is-phone-preview .upsell-product[data-position='1'] > span small { font-size: 9px; }
 .site-canvas.is-phone-preview .upsell-finish { left: 50%; right: auto; bottom: 10px; padding: 12px 24px; white-space: nowrap; transform: translateX(-50%); }
 .site-canvas.is-phone-preview .accepted-ritual { padding: 68px 16px 16px; }
@@ -839,8 +839,8 @@ body.phone-preview-active { overflow: hidden; background: radial-gradient(circle
   .upsell-product-outgoing { left: 66%; bottom: 0; }
   .upsell-product .product-art { inset: 0 -2px 42px; }
   .upsell-product b, .upsell-product small { font-size: 6px; }
-  .upsell-product[data-position='1'] > span { left: -82%; right: auto; bottom: 10%; width: 92%; justify-items: end; text-align: right; }
-  .upsell-product[data-position='1'] > span b { display: none; }
+  .upsell-product[data-position='1'] > span { left: -92%; right: auto; bottom: 7%; width: 104%; justify-items: end; text-align: right; }
+  .upsell-product[data-position='1'] > span b { display: block; max-width: 100%; font-size: 8px; line-height: 1.2; white-space: normal; }
   .upsell-product[data-position='1'] > span small { font-size: 9px; }
   .upsell-finish { left: 50%; right: auto; bottom: 10px; padding: 12px 24px; white-space: nowrap; transform: translateX(-50%); }
   .accepted-ritual { padding: 68px 16px 16px; }

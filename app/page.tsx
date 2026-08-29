@@ -213,7 +213,6 @@ export default function Home() {
   const viewerWheelLockRef = useRef(0);
   const viewerMotionLockRef = useRef(false);
   const viewerMotionTimersRef = useRef<number[]>([]);
-  const noticeTimerRef = useRef<number | null>(null);
   const preloadedProductImagesRef = useRef<HTMLImageElement[]>([]);
 
   const clearViewerTimers = useCallback(() => {
@@ -276,7 +275,6 @@ export default function Home() {
 
   useEffect(() => () => {
     clearViewerTimers();
-    if (noticeTimerRef.current !== null) window.clearTimeout(noticeTimerRef.current);
   }, [clearViewerTimers]);
 
   const searchResults = useMemo(() => {
@@ -332,12 +330,6 @@ export default function Home() {
 
   function addToCart(product: Product, quantity = 1) {
     setCart((current) => ({ ...current, [product.id]: (current[product.id] || 0) + quantity }));
-    setNotice(`${product.name} pridėta į krepšelį`);
-    if (noticeTimerRef.current !== null) window.clearTimeout(noticeTimerRef.current);
-    noticeTimerRef.current = window.setTimeout(() => {
-      setNotice('');
-      noticeTimerRef.current = null;
-    }, 2200);
   }
 
   function cyclePhoneSearchCategory(direction: number) {
