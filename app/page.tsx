@@ -106,12 +106,17 @@ function productStory(product: Product) {
   };
 }
 
-function ProductArt({ shape, tone, image, priority = false }: { shape: Shape; tone: Product['tone']; image?: string; priority?: boolean }) {
+function fastProductImage(image?: string) {
+  return image?.replace(/\.webp$/, '-fast.webp');
+}
+
+function ProductArt({ shape, tone, image, priority = false, fullQuality = false }: { shape: Shape; tone: Product['tone']; image?: string; priority?: boolean; fullQuality?: boolean }) {
+  const imageSource = fullQuality ? image : fastProductImage(image);
   return (
     <div className={`product-art shape-${shape} tone-${tone}${image ? ' has-photo' : ''}`} aria-hidden="true">
       {/* Transparent product cutouts must be served directly; the hosted image optimizer changes their layering. */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      {image ? <img src={image} alt="" draggable="false" loading={priority ? 'eager' : 'lazy'} fetchPriority={priority ? 'high' : 'auto'} decoding="async" /> : <><span className="product-shadow" /><span className="product-form"><i className="product-cap" /><b>S</b></span></>}
+      {imageSource ? <img src={imageSource} alt="" draggable="false" loading="eager" fetchPriority={priority ? 'high' : 'auto'} decoding="async" /> : <><span className="product-shadow" /><span className="product-form"><i className="product-cap" /><b>S</b></span></>}
     </div>
   );
 }
@@ -138,11 +143,11 @@ function ConditionerUpsell({ products: recommendations, outgoingProduct, onPrevi
       <div className="upsell-track">
         {recommendations.map((product, index) => (
           <button className="upsell-product" data-position={index} type="button" key={product.id} onClick={() => onAdd(product)} aria-label={`Pridėti ${product.name} į krepšelį`}>
-            <ProductArt shape={product.shape} tone={product.tone} image={product.image} />
+            <ProductArt shape={product.shape} tone={product.tone} image={product.image} priority />
             <span><b>{product.name}</b><small>{money.format(product.price)}</small></span>
           </button>
         ))}
-        {outgoingProduct && <div className="upsell-product upsell-product-outgoing" aria-hidden="true"><ProductArt shape={outgoingProduct.shape} tone={outgoingProduct.tone} image={outgoingProduct.image} /></div>}
+        {outgoingProduct && <div className="upsell-product upsell-product-outgoing" aria-hidden="true"><ProductArt shape={outgoingProduct.shape} tone={outgoingProduct.tone} image={outgoingProduct.image} priority /></div>}
       </div>
       <button className="upsell-finish" type="button" onClick={onFinish}>Kitą kartą</button>
     </section>
@@ -164,7 +169,7 @@ function AcceptedRitual({ primary, companion, total, onPay }: {
       <div className="accepted-ritual-products">
         {[primary, companion].map((product, index) => (
           <article className="accepted-ritual-product" data-side={index === 0 ? 'left' : 'right'} key={product.id}>
-            <ProductArt shape={product.shape} tone={product.tone} image={product.image} priority />
+            <ProductArt shape={product.shape} tone={product.tone} image={product.image} priority fullQuality />
             <span>{product.name}</span>
           </article>
         ))}
@@ -238,13 +243,14 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    preloadedProductImagesRef.current = products.flatMap((product) => {
-      if (!product.image) return [];
+    const fastImages = products.flatMap((product) => fastProductImage(product.image) ?? []);
+    const fullImages = products.flatMap((product) => product.image ?? []);
+    preloadedProductImagesRef.current = [...fastImages, ...fullImages].map((source, index) => {
       const image = new Image();
       image.decoding = 'async';
-      image.fetchPriority = 'low';
-      image.src = product.image;
-      return [image];
+      image.fetchPriority = index < fastImages.length ? 'auto' : 'low';
+      image.src = source;
+      return image;
     });
     return () => { preloadedProductImagesRef.current = []; };
   }, []);
@@ -298,7 +304,7 @@ export default function Home() {
     const timer = window.setTimeout(() => {
       setConditionerUpsellOutgoing(conditionerProducts[conditionerUpsellIndex % conditionerProducts.length]);
       setConditionerUpsellIndex((current) => (current + 1) % conditionerProducts.length);
-      window.setTimeout(() => setConditionerUpsellOutgoing(null), 680);
+      window.setTimeout(() => setConditionerUpsellOutgoing(null), 480);
     }, 4200);
     return () => window.clearTimeout(timer);
   }, [conditionerUpsellOpen, acceptedUpsellProduct, conditionerUpsellOutgoing, conditionerUpsellIndex, conditionerProducts]);
@@ -383,7 +389,7 @@ export default function Home() {
     if (!conditionerProducts.length || conditionerUpsellOutgoing) return;
     if (direction > 0) {
       setConditionerUpsellOutgoing(visibleConditioners[0]);
-      window.setTimeout(() => setConditionerUpsellOutgoing(null), 680);
+      window.setTimeout(() => setConditionerUpsellOutgoing(null), 480);
     }
     setConditionerUpsellIndex((current) => (current + direction + conditionerProducts.length) % conditionerProducts.length);
   }
@@ -431,7 +437,7 @@ export default function Home() {
       setViewerMotion('idle');
       viewerMotionLockRef.current = false;
       viewerMotionTimersRef.current = [];
-    }, 520);
+    }, 380);
     viewerMotionTimersRef.current = [moveTimer];
   }
 
@@ -537,7 +543,7 @@ export default function Home() {
         <div className="hero-product-nav" aria-label="Produktų kategorijos">
           {/* Transparent category composition supplied by the user. */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/home-category-products.webp" alt="Profesionalių plaukų priežiūros produktų kolekcija" draggable="false" />
+          <img src="/home-category-products.webp" alt="Profesionalių plaukų priežiūros produktų kolekcija" draggable="false" loading="eager" fetchPriority="high" decoding="async" />
           {categories.map((category, index) => (
             <button
               type="button"
@@ -573,7 +579,7 @@ export default function Home() {
               <div className="desktop-product-pose" style={{ '--bottle-scale': previewBottleScale } as CSSProperties}>
                 {(() => {
                   const product = viewerProducts.find((item) => item.id === openingProductId);
-                  return product ? <ProductArt shape={product.shape} tone={product.tone} image={product.image} /> : null;
+                  return product ? <ProductArt shape={product.shape} tone={product.tone} image={product.image} priority fullQuality /> : null;
                 })()}
               </div>
             </div>
@@ -689,7 +695,7 @@ export default function Home() {
                   aria-current={offset === 0 ? 'true' : undefined}
                   onClick={(event) => { if (event.detail === 0) openViewerProduct(product, offset); }}
                 >
-                  <ProductArt shape={product.shape} tone={product.tone} image={product.image} priority={offset === 0} />
+                  <ProductArt shape={product.shape} tone={product.tone} image={product.image} priority={Math.abs(offset) <= (previewMode === 'phone' ? 2 : 3)} />
                 </button>
               );
             })}
@@ -723,7 +729,7 @@ export default function Home() {
                 } as CSSProperties}
               >
                 <div className="preview-art-entry">
-                  <ProductArt shape={selectedProduct.shape} tone={selectedProduct.tone} image={selectedProduct.image} />
+                  <ProductArt shape={selectedProduct.shape} tone={selectedProduct.tone} image={selectedProduct.image} priority fullQuality />
                 </div>
               </div>
             </div>
@@ -825,7 +831,7 @@ export default function Home() {
                               <div className={`search-shelf-slot${product ? ' has-product' : ''}${product && !matches ? ' is-filtered' : ''}`} key={`${shelf.category}-${slot}`}>
                                 {product && (
                                   <button type="button" tabIndex={matches ? 0 : -1} aria-hidden={!matches} onClick={() => { setSearchOpen(false); setQuery(''); openProduct(product); }} aria-label={`Peržiūrėti ${product.name}`}>
-                                    <ProductArt shape={product.shape} tone={product.tone} image={product.image} />
+                                    <ProductArt shape={product.shape} tone={product.tone} image={product.image} priority />
                                     <span className="shelf-product-card"><b>{product.name}</b><small>{money.format(product.price)}</small></span>
                                   </button>
                                 )}
