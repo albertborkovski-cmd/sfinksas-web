@@ -114,35 +114,33 @@ function ProductArt({ shape, tone, image, priority = false }: { shape: Shape; to
   );
 }
 
-function ConditionerUpsell({ products: recommendations, outgoingProduct, onPrevious, onNext, onAdd, onFinish }: {
+function ConditionerUpsell({ products: recommendations, outgoingProduct, onPrevious, onNext, onAdd }: {
   products: Product[];
   outgoingProduct: Product | null;
   onPrevious: () => void;
   onNext: () => void;
   onAdd: (product: Product) => void;
-  onFinish: () => void;
 }) {
   return (
     <section className="conditioner-upsell" aria-label="Kondicionierių pasiūlymai">
-      <p className="upsell-kicker">Užbaikite savo ritualą</p>
-      <h2>Gal norėtumėte pridėti ir kondicionierių?</h2>
-      <p className="upsell-copy">Keturi atrinkti pasiūlymai, kurie papildo pasirinktą plaukų priežiūros priemonę.</p>
-      <div className="upsell-carousel">
+      <div className="upsell-heading">
+        <p className="upsell-kicker">Užbaikite savo ritualą</p>
+        <h2>Gal norėtumėte pridėti ir kondicionierių?</h2>
+        <p className="upsell-copy">Keturi atrinkti pasiūlymai, kurie papildo pasirinktą plaukų priežiūros priemonę.</p>
         <div className="upsell-carousel-top">
           <span>Kondicionieriai</span>
           <div><button type="button" onClick={onPrevious} aria-label="Ankstesni kondicionieriai">←</button><button type="button" onClick={onNext} aria-label="Kiti kondicionieriai">→</button></div>
         </div>
-        <div className="upsell-track">
-          {recommendations.map((product, index) => (
-            <button className="upsell-product" data-position={index} type="button" key={product.id} onClick={() => onAdd(product)} aria-label={`Pridėti ${product.name} į krepšelį`}>
-              <ProductArt shape={product.shape} tone={product.tone} image={product.image} />
-              <span><b>{product.name}</b><small>{money.format(product.price)}</small></span>
-            </button>
-          ))}
-          {outgoingProduct && <div className="upsell-product upsell-product-outgoing" aria-hidden="true"><ProductArt shape={outgoingProduct.shape} tone={outgoingProduct.tone} image={outgoingProduct.image} /></div>}
-        </div>
       </div>
-      <button className="upsell-finish" type="button" onClick={onFinish}>Tęsti be kondicionieriaus <span>↗</span></button>
+      <div className="upsell-track">
+        {recommendations.map((product, index) => (
+          <button className="upsell-product" data-position={index} type="button" key={product.id} onClick={() => onAdd(product)} aria-label={`Pridėti ${product.name} į krepšelį`}>
+            <ProductArt shape={product.shape} tone={product.tone} image={product.image} />
+            <span><b>{product.name}</b><small>{money.format(product.price)}</small></span>
+          </button>
+        ))}
+        {outgoingProduct && <div className="upsell-product upsell-product-outgoing" aria-hidden="true"><ProductArt shape={outgoingProduct.shape} tone={outgoingProduct.tone} image={outgoingProduct.image} /></div>}
+      </div>
     </section>
   );
 }
@@ -313,13 +311,6 @@ export default function Home() {
     setConditionerUpsellIndex(0);
     setConditionerUpsellOutgoing(null);
     setConditionerUpsellOpen(true);
-  }
-
-  function finishConditionerUpsell() {
-    setConditionerUpsellOpen(false);
-    setConditionerUpsellOutgoing(null);
-    setSelectedProduct(null);
-    if (viewerCategory) closeCategoryViewer();
   }
 
   function rotateConditionerUpsell(direction: number) {
@@ -558,7 +549,7 @@ export default function Home() {
                   Pridėti į krepšelį <span>↗</span>
                 </button>
               </div>}
-              {conditionerUpsellOpen && <ConditionerUpsell products={visibleConditioners} outgoingProduct={conditionerUpsellOutgoing} onPrevious={() => rotateConditionerUpsell(-1)} onNext={() => rotateConditionerUpsell(1)} onAdd={(product) => addToCart(product)} onFinish={finishConditionerUpsell} />}
+              {conditionerUpsellOpen && <ConditionerUpsell products={visibleConditioners} outgoingProduct={conditionerUpsellOutgoing} onPrevious={() => rotateConditionerUpsell(-1)} onNext={() => rotateConditionerUpsell(1)} onAdd={(product) => addToCart(product)} />}
             </div>
           )}
 
@@ -695,7 +686,7 @@ export default function Home() {
               </button>
               <small className="preview-delivery">Nemokamas pristatymas užsakymams nuo 60 €</small>
             </div>}
-            {conditionerUpsellOpen && <ConditionerUpsell products={visibleConditioners} outgoingProduct={conditionerUpsellOutgoing} onPrevious={() => rotateConditionerUpsell(-1)} onNext={() => rotateConditionerUpsell(1)} onAdd={(product) => addToCart(product)} onFinish={finishConditionerUpsell} />}
+            {conditionerUpsellOpen && <ConditionerUpsell products={visibleConditioners} outgoingProduct={conditionerUpsellOutgoing} onPrevious={() => rotateConditionerUpsell(-1)} onNext={() => rotateConditionerUpsell(1)} onAdd={(product) => addToCart(product)} />}
           </section>
         </div>
       )}
