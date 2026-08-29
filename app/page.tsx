@@ -114,6 +114,37 @@ function ProductArt({ shape, tone, image, priority = false }: { shape: Shape; to
   );
 }
 
+function ConditionerUpsell({ products: recommendations, onPrevious, onNext, onAdd, onFinish }: {
+  products: Product[];
+  onPrevious: () => void;
+  onNext: () => void;
+  onAdd: (product: Product) => void;
+  onFinish: () => void;
+}) {
+  return (
+    <section className="conditioner-upsell" aria-label="Kondicionierių pasiūlymai">
+      <p className="upsell-kicker">Užbaikite savo ritualą</p>
+      <h2>Gal norėtumėte pridėti ir kondicionierių?</h2>
+      <p className="upsell-copy">Keturi atrinkti pasiūlymai, kurie papildo pasirinktą plaukų priežiūros priemonę.</p>
+      <div className="upsell-carousel">
+        <div className="upsell-carousel-top">
+          <span>Kondicionieriai</span>
+          <div><button type="button" onClick={onPrevious} aria-label="Ankstesni kondicionieriai">←</button><button type="button" onClick={onNext} aria-label="Kiti kondicionieriai">→</button></div>
+        </div>
+        <div className="upsell-track">
+          {recommendations.map((product, index) => (
+            <button className="upsell-product" data-position={index} type="button" key={`${product.id}-${index}`} onClick={() => onAdd(product)} aria-label={`Pridėti ${product.name} į krepšelį`}>
+              <ProductArt shape={product.shape} tone={product.tone} image={product.image} />
+              <span><b>{product.name}</b><small>{money.format(product.price)}</small></span>
+            </button>
+          ))}
+        </div>
+      </div>
+      <button className="upsell-finish" type="button" onClick={onFinish}>Tęsti be kondicionieriaus <span>↗</span></button>
+    </section>
+  );
+}
+
 export default function Home() {
   const [previewMode, setPreviewMode] = useState<'desktop' | 'phone'>('desktop');
   const [searchOpen, setSearchOpen] = useState(false);
@@ -135,6 +166,8 @@ export default function Home() {
   const [openingProductOffset, setOpeningProductOffset] = useState(0);
   const [viewerOpeningMode, setViewerOpeningMode] = useState<'desktop' | null>(null);
   const [productOpenedFromViewer, setProductOpenedFromViewer] = useState(false);
+  const [conditionerUpsellOpen, setConditionerUpsellOpen] = useState(false);
+  const [conditionerUpsellIndex, setConditionerUpsellIndex] = useState(0);
   const [portalReady, setPortalReady] = useState(false);
   const viewerDragRef = useRef<{ pointerId: number; x: number; y: number; productId: number | null } | null>(null);
   const viewerWheelLockRef = useRef(0);
@@ -159,6 +192,7 @@ export default function Home() {
 
   const closeCategoryViewer = useCallback(() => {
     resetViewerMotion();
+    setConditionerUpsellOpen(false);
     setViewerCategory(null);
   }, [resetViewerMotion]);
 
@@ -212,6 +246,19 @@ export default function Home() {
     () => viewerCategory ? products.filter((product) => product.category === viewerCategory) : [],
     [viewerCategory],
   );
+  const conditionerProducts = products.filter((product) => product.category === 'Kondicionieriai' && product.id !== selectedProduct?.id);
+  const visibleConditioners = Array.from(
+    { length: Math.min(4, conditionerProducts.length) },
+    (_, offset) => conditionerProducts[(conditionerUpsellIndex + offset) % conditionerProducts.length],
+  );
+
+  useEffect(() => {
+    if (!conditionerUpsellOpen || conditionerProducts.length <= 4 || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const timer = window.setInterval(() => {
+      setConditionerUpsellIndex((current) => (current + 1) % conditionerProducts.length);
+    }, 4200);
+    return () => window.clearInterval(timer);
+  }, [conditionerUpsellOpen, conditionerProducts.length]);
   const activeViewerProduct = viewerProducts[viewerIndex] || null;
 
   const cartItems = products.filter((product) => cart[product.id]);
@@ -245,10 +292,28 @@ export default function Home() {
   }
 
   function openProduct(product: Product, fromCategoryViewer = false) {
+    setConditionerUpsellOpen(false);
     setProductOpenedFromViewer(fromCategoryViewer);
     setSelectedProduct(product);
     setPreviewQuantity(1);
     setPreviewVariant(0);
+  }
+
+  function showConditionerUpsell(product: Product) {
+    addToCart(product, previewQuantity);
+    setConditionerUpsellIndex(0);
+    setConditionerUpsellOpen(true);
+  }
+
+  function finishConditionerUpsell() {
+    setConditionerUpsellOpen(false);
+    setSelectedProduct(null);
+    if (viewerCategory) closeCategoryViewer();
+  }
+
+  function rotateConditionerUpsell(direction: number) {
+    if (!conditionerProducts.length) return;
+    setConditionerUpsellIndex((current) => (current + direction + conditionerProducts.length) % conditionerProducts.length);
   }
 
   function moveProduct(direction: number) {
@@ -416,11 +481,11 @@ export default function Home() {
       </section>
 
       {portalReady && viewerCategory && activeViewerProduct && createPortal(
-        <section className={`category-viewer${previewMode === 'phone' ? ' is-phone-viewer' : ''}${viewerProducts.some((product) => product.image) ? ' has-product-photos' : ''}${viewerMotion !== 'idle' ? ` is-phone-${viewerMotion} is-direction-${viewerDirection > 0 ? 'next' : 'previous'}` : ''}${openingProductId !== null ? ` is-opening-product is-opening-${viewerOpeningMode}` : ''}`} role="dialog" aria-modal="true" aria-label={`${viewerCategory} prekių peržiūra`}>
+        <section className={`category-viewer${previewMode === 'phone' ? ' is-phone-viewer' : ''}${viewerProducts.some((product) => product.image) ? ' has-product-photos' : ''}${viewerMotion !== 'idle' ? ` is-phone-${viewerMotion} is-direction-${viewerDirection > 0 ? 'next' : 'previous'}` : ''}${openingProductId !== null ? ` is-opening-product is-opening-${viewerOpeningMode}` : ''}${conditionerUpsellOpen ? ' is-upsell' : ''}`} role="dialog" aria-modal="true" aria-label={`${viewerCategory} prekių peržiūra`}>
           <div className="category-viewer-topbar">
             <span className="category-viewer-mark">SFINKSAS</span>
             <span>{viewerCategory}</span>
-            <button type="button" onClick={closeCategoryViewer} aria-label="Uždaryti kategorijos peržiūrą">×</button>
+            <button type="button" onClick={() => { setSelectedProduct(null); closeCategoryViewer(); }} aria-label="Uždaryti kategorijos peržiūrą">×</button>
           </div>
 
           {viewerOpeningMode === 'desktop' && openingProductId !== null && (
@@ -448,12 +513,13 @@ export default function Home() {
                 className="desktop-viewer-detail-close"
                 type="button"
                 onClick={() => {
+                  setConditionerUpsellOpen(false);
                   setSelectedProduct(null);
                   resetViewerMotion();
                 }}
                 aria-label="Grįžti į produktų karuselę"
               >←</button>
-              <div className="desktop-viewer-detail-copy">
+              {!conditionerUpsellOpen && <div className="desktop-viewer-detail-copy">
                 <p className="section-kicker">Produkto peržiūra</p>
                 <h2>{selectedProduct.name}</h2>
                 <p className="preview-product-note">{selectedProduct.note}</p>
@@ -473,10 +539,11 @@ export default function Home() {
                   </div>
                   <strong>{money.format(previewPrice * previewQuantity)}</strong>
                 </div>
-                <button className="preview-add-button" type="button" onClick={() => { addToCart(selectedProduct, previewQuantity); setSelectedProduct(null); closeCategoryViewer(); }}>
+                <button className="preview-add-button" type="button" onClick={() => showConditionerUpsell(selectedProduct)}>
                   Pridėti į krepšelį <span>↗</span>
                 </button>
-              </div>
+              </div>}
+              {conditionerUpsellOpen && <ConditionerUpsell products={visibleConditioners} onPrevious={() => rotateConditionerUpsell(-1)} onNext={() => rotateConditionerUpsell(1)} onAdd={(product) => addToCart(product)} onFinish={finishConditionerUpsell} />}
             </div>
           )}
 
@@ -567,8 +634,8 @@ export default function Home() {
 
       {selectedProduct && !(viewerCategory && viewerOpeningMode === 'desktop') && (
         <div className={`product-preview-backdrop${productOpenedFromViewer ? ' from-category-viewer' : ''}`} role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setSelectedProduct(null); }}>
-          <section className="product-preview-modal" role="dialog" aria-modal="true" aria-label={`${selectedProduct.name} produkto peržiūra`}>
-            <button className="product-preview-close" type="button" onClick={() => setSelectedProduct(null)} aria-label="Uždaryti produkto peržiūrą">×</button>
+          <section className={`product-preview-modal${conditionerUpsellOpen ? ' is-upsell' : ''}`} role="dialog" aria-modal="true" aria-label={`${selectedProduct.name} produkto peržiūra`}>
+            <button className="product-preview-close" type="button" onClick={() => { setConditionerUpsellOpen(false); setSelectedProduct(null); }} aria-label="Uždaryti produkto peržiūrą">×</button>
             <button className="product-preview-previous" type="button" onClick={() => moveProduct(-1)} aria-label="Ankstesnis produktas">←</button>
             <button className="product-preview-next" type="button" onClick={() => moveProduct(1)} aria-label="Kitas produktas">→</button>
 
@@ -587,7 +654,7 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="product-preview-details">
+            {!conditionerUpsellOpen && <div className="product-preview-details">
               <p className="section-kicker">Produkto peržiūra</p>
               <span className="preview-product-number">NO. {selectedProduct.id.toString().padStart(2, '0')}</span>
               <h2>{selectedProduct.name}</h2>
@@ -608,11 +675,12 @@ export default function Home() {
                 </div>
                 <strong>{money.format(previewPrice * previewQuantity)}</strong>
               </div>
-              <button className="preview-add-button" type="button" onClick={() => { addToCart(selectedProduct, previewQuantity); setSelectedProduct(null); }}>
+              <button className="preview-add-button" type="button" onClick={() => showConditionerUpsell(selectedProduct)}>
                 Pridėti į krepšelį <span>↗</span>
               </button>
               <small className="preview-delivery">Nemokamas pristatymas užsakymams nuo 60 €</small>
-            </div>
+            </div>}
+            {conditionerUpsellOpen && <ConditionerUpsell products={visibleConditioners} onPrevious={() => rotateConditionerUpsell(-1)} onNext={() => rotateConditionerUpsell(1)} onAdd={(product) => addToCart(product)} onFinish={finishConditionerUpsell} />}
           </section>
         </div>
       )}
