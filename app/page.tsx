@@ -33,6 +33,8 @@ const searchShelves: { category: Category; label: string; number: string }[] = [
   { category: 'Priedai', label: 'Priedai', number: '04' },
 ];
 
+const phoneSearchCategories: Category[] = ['Aliejukai', 'Šampūnai', 'Kondicionieriai'];
+
 const products: Product[] = [
   { id: 1, name: 'Keune Style Refresh', category: 'Šampūnai', note: 'Sausas šampūnas · 200 ml', price: 24, shape: 'pump', tone: 'smoke', image: '/keune-style-refresh-dry-shampoo-cutout.webp', variants: ['200 ml'] },
   { id: 2, name: 'milk_shake Colour Care', category: 'Šampūnai', note: 'Spalvą tausojantis šampūnas · 300 ml', price: 23, shape: 'pump', tone: 'amber', image: '/milk-shake-colour-care-shampoo-cutout.webp', variants: ['300 ml'] },
@@ -182,6 +184,7 @@ export default function Home() {
   const [cartOpen, setCartOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [query, setQuery] = useState('');
+  const [phoneSearchCategoryIndex, setPhoneSearchCategoryIndex] = useState(1);
   const [cart, setCart] = useState<Record<number, number>>({});
   const [notice, setNotice] = useState('');
   const [messageSent, setMessageSent] = useState(false);
@@ -274,6 +277,8 @@ export default function Home() {
     const normalized = query.trim().toLocaleLowerCase('lt');
     return products.filter((product) => product.category !== 'Rinkiniai' && (!normalized || `${product.name} ${product.category} ${product.note}`.toLocaleLowerCase('lt').includes(normalized)));
   }, [query]);
+  const activePhoneSearchCategory = phoneSearchCategories[phoneSearchCategoryIndex];
+  const phoneSearchResults = searchResults.filter((product) => product.category === activePhoneSearchCategory);
 
   const viewerProducts = useMemo(
     () => viewerCategory ? products.filter((product) => product.category === viewerCategory) : [],
@@ -327,6 +332,11 @@ export default function Home() {
       setNotice('');
       noticeTimerRef.current = null;
     }, 2200);
+  }
+
+  function cyclePhoneSearchCategory(direction: number) {
+    setPhoneSearchCategoryIndex((current) => (current + direction + phoneSearchCategories.length) % phoneSearchCategories.length);
+    setQuery('');
   }
 
   function openProduct(product: Product, fromCategoryViewer = false) {
@@ -793,14 +803,19 @@ export default function Home() {
           <div className="search-panel">
             <div className="search-architecture" aria-label="SFINKSAS produktų lentynos">
               <div className="search-cabinet-live">
-                {searchShelves.map((shelf) => {
-                  const shelfProducts = products.filter((product) => product.category === shelf.category);
-                  const shelfSlotCount = Math.max(10, shelfProducts.length + 2);
+                {(previewMode === 'phone'
+                  ? Array.from({ length: 4 }, (_, index) => ({ category: activePhoneSearchCategory, label: activePhoneSearchCategory, number: (index + 1).toString().padStart(2, '0'), row: index }))
+                  : searchShelves.map((shelf) => ({ ...shelf, row: -1 }))).map((shelf) => {
+                  const categoryProducts = products.filter((product) => product.category === shelf.category);
+                  const shelfProducts = previewMode === 'phone'
+                    ? categoryProducts.filter((_, index) => index % 4 === shelf.row)
+                    : categoryProducts;
+                  const shelfSlotCount = previewMode === 'phone' ? Math.max(4, shelfProducts.length + 1) : Math.max(10, shelfProducts.length + 2);
                   const productSlots = new Map(
                     shelfProducts.map((product, index) => [Math.round(((index + 1) * (shelfSlotCount - 1)) / (shelfProducts.length + 1)), product]),
                   );
                   return (
-                    <section className="search-shelf" key={shelf.category} aria-label={shelf.label}>
+                    <section className="search-shelf" key={`${shelf.category}-${shelf.number}`} aria-label={shelf.label}>
                       <div className="search-shelf-scroll">
                         <div className="search-shelf-track" style={{ '--shelf-columns': shelfSlotCount } as CSSProperties}>
                           {Array.from({ length: shelfSlotCount }, (_, slot) => {
@@ -819,7 +834,7 @@ export default function Home() {
                           })}
                         </div>
                       </div>
-                      <header><span>{shelf.number}</span><h2>{shelf.label}</h2><small>{shelfProducts.length} / 20</small></header>
+                      <header><span>{shelf.number}</span><h2>{shelf.label}</h2><small>{categoryProducts.length}</small></header>
                     </section>
                   );
                 })}
@@ -827,9 +842,14 @@ export default function Home() {
             </div>
             <aside className="search-console">
               <div className="search-heading"><p className="section-kicker">Produktų galerija · paieška kolekcijoje</p></div>
+              <div className="mobile-search-category-nav" aria-label="Paieškos kategorija">
+                <button type="button" onClick={() => cyclePhoneSearchCategory(-1)} aria-label="Ankstesnė kategorija">←</button>
+                <strong>{activePhoneSearchCategory}</strong>
+                <button type="button" onClick={() => cyclePhoneSearchCategory(1)} aria-label="Kita kategorija">→</button>
+              </div>
               <h2>Raskite savo <em>ritualą.</em></h2>
               <label><span className="sr-only">Ieškoti produkto</span><input autoFocus value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Ko ieškote?" /><i>⌕</i></label>
-              <p className="search-status">{query ? `Atitinka paiešką: ${searchResults.length}` : 'Visi produktai savo vietose'}</p>
+              <p className="search-status">{query ? `Atitinka paiešką: ${previewMode === 'phone' ? phoneSearchResults.length : searchResults.length}` : previewMode === 'phone' ? `${activePhoneSearchCategory}: ${phoneSearchResults.length}` : 'Visi produktai savo vietose'}</p>
               <p className="search-guide">Rašykite produkto pavadinimą, kategoriją arba paskirtį. Netinkantys produktai švelniai išnyks, o jų vieta lentynoje liks tuščia.</p>
               <div className="search-category-key" aria-hidden="true">
                 {searchShelves.map((shelf) => <span key={shelf.category}><i>{shelf.number}</i>{shelf.label}</span>)}
