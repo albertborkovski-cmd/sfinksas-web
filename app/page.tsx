@@ -129,7 +129,7 @@ function ConditionerUpsell({ products: recommendations, outgoingProduct, onPrevi
       <div className="upsell-heading">
         <p className="upsell-kicker">Suderintas ritualas</p>
         <h2>Gal norėtumėte pridėti ir kondicionierių?</h2>
-        <p className="upsell-copy">Atrinkome keturias priemones, kurios papildo jūsų pasirinkimą ir padeda išlaikyti plaukus glotnius, minkštus bei žvilgančius.</p>
+        <p className="upsell-copy">Atrinkome {recommendations.length === 3 ? 'tris' : 'keturias'} priemones, kurios papildo jūsų pasirinkimą ir padeda išlaikyti plaukus glotnius, minkštus bei žvilgančius.</p>
         <div className="upsell-carousel-top">
           <span>Kondicionieriai</span>
           <div><button type="button" onClick={onPrevious} aria-label="Ankstesni kondicionieriai">←</button><button type="button" onClick={onNext} aria-label="Kiti kondicionieriai">→</button></div>
@@ -616,7 +616,7 @@ export default function Home() {
                   Pridėti į krepšelį <span>↗</span>
                 </button>
               </div>}
-              {conditionerUpsellOpen && !acceptedUpsellProduct && <ConditionerUpsell products={visibleConditioners} outgoingProduct={conditionerUpsellOutgoing} onPrevious={() => rotateConditionerUpsell(-1)} onNext={() => rotateConditionerUpsell(1)} onAdd={acceptConditionerUpsell} onFinish={finishConditionerUpsell} />}
+              {conditionerUpsellOpen && !acceptedUpsellProduct && <ConditionerUpsell products={previewMode === 'phone' ? visibleConditioners.slice(0, 3) : visibleConditioners} outgoingProduct={conditionerUpsellOutgoing} onPrevious={() => rotateConditionerUpsell(-1)} onNext={() => rotateConditionerUpsell(1)} onAdd={acceptConditionerUpsell} onFinish={finishConditionerUpsell} />}
               {acceptedUpsellProduct && <AcceptedRitual primary={selectedProduct} companion={acceptedUpsellProduct} total={previewPrice * previewQuantity + acceptedUpsellProduct.price} onPay={proceedToCheckout} />}
             </div>
           )}
@@ -754,7 +754,7 @@ export default function Home() {
               </button>
               <small className="preview-delivery">Nemokamas pristatymas užsakymams nuo 60 €</small>
             </div>}
-            {conditionerUpsellOpen && !acceptedUpsellProduct && <ConditionerUpsell products={visibleConditioners} outgoingProduct={conditionerUpsellOutgoing} onPrevious={() => rotateConditionerUpsell(-1)} onNext={() => rotateConditionerUpsell(1)} onAdd={acceptConditionerUpsell} onFinish={finishConditionerUpsell} />}
+            {conditionerUpsellOpen && !acceptedUpsellProduct && <ConditionerUpsell products={previewMode === 'phone' ? visibleConditioners.slice(0, 3) : visibleConditioners} outgoingProduct={conditionerUpsellOutgoing} onPrevious={() => rotateConditionerUpsell(-1)} onNext={() => rotateConditionerUpsell(1)} onAdd={acceptConditionerUpsell} onFinish={finishConditionerUpsell} />}
             {acceptedUpsellProduct && <AcceptedRitual primary={selectedProduct} companion={acceptedUpsellProduct} total={previewPrice * previewQuantity + acceptedUpsellProduct.price} onPay={proceedToCheckout} />}
           </section>
         </div>
