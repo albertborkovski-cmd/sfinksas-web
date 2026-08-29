@@ -722,7 +722,7 @@ body.phone-preview-active { overflow: hidden; background: radial-gradient(circle
 .site-canvas.is-phone-preview .product-preview-backdrop.from-category-viewer .preview-art-rotator { animation: phone-product-from-gallery .58s cubic-bezier(.2,.78,.2,1) both; }
 .site-canvas.is-phone-preview .product-preview-backdrop.from-category-viewer .preview-art-entry { animation: none; }
 .site-canvas.is-phone-preview .product-preview-backdrop.from-category-viewer .product-preview-details { animation: phone-details-top-in .44s .04s cubic-bezier(.2,.75,.2,1) both; }
-.site-canvas.is-phone-preview .product-preview-modal.is-upsell .preview-art-rotator { --bottle-shift: 0%; --upsell-bottle-scale: .72; --bottle-y: 0deg; --bottle-z: 0deg; bottom: -10%; }
+.site-canvas.is-phone-preview .product-preview-modal.is-upsell .preview-art-rotator { left: -38%; right: auto; bottom: -9%; width: 92%; height: 82%; --bottle-shift: 0%; --upsell-bottle-scale: .72; --bottle-y: 0deg; --bottle-z: 0deg; transform-origin: center bottom; }
 .site-canvas.is-phone-preview .conditioner-upsell { position: absolute; left: 20px; right: 20px; top: 72px; grid-column: auto; width: auto; height: calc(100% - 88px); padding: 0; }
 .site-canvas.is-phone-preview .conditioner-upsell h2 { max-width: 68%; font-size: 25px; line-height: 1; }
 .site-canvas.is-phone-preview .upsell-copy { margin: 12px 0 16px; font-size: 9px; line-height: 1.45; }
@@ -786,7 +786,7 @@ body.phone-preview-active { overflow: hidden; background: radial-gradient(circle
   .product-preview-backdrop.from-category-viewer .preview-art-rotator { animation: phone-product-from-gallery .58s cubic-bezier(.2,.78,.2,1) both; }
   .product-preview-backdrop.from-category-viewer .preview-art-entry { animation: none; }
   .product-preview-backdrop.from-category-viewer .product-preview-details { animation: phone-details-top-in .44s .04s cubic-bezier(.2,.75,.2,1) both; }
-  .product-preview-modal.is-upsell .preview-art-rotator { --bottle-shift: 0%; --upsell-bottle-scale: .72; --bottle-y: 0deg; --bottle-z: 0deg; bottom: -10%; }
+  .product-preview-modal.is-upsell .preview-art-rotator { left: -38vw; right: auto; bottom: -9%; width: 92vw; height: 82svh; --bottle-shift: 0%; --upsell-bottle-scale: .72; --bottle-y: 0deg; --bottle-z: 0deg; transform-origin: center bottom; }
   .conditioner-upsell { position: absolute; left: 20px; right: 20px; top: 72px; grid-column: auto; width: auto; height: calc(100% - 88px); padding: 0; }
   .conditioner-upsell h2 { max-width: 68%; font-size: clamp(23px,6.5vw,29px); line-height: 1; }
   .upsell-copy { margin: 12px 0 16px; font-size: 9px; line-height: 1.45; }
