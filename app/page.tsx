@@ -178,7 +178,7 @@ function AcceptedRitual({ primary, companion, total, onPay }: {
 }
 
 export default function Home() {
-  const [previewMode, setPreviewMode] = useState<'desktop' | 'phone'>('desktop');
+  const [previewMode, setPreviewMode] = useState<'desktop' | 'phone'>('phone');
   const [searchOpen, setSearchOpen] = useState(false);
   const [navPanel, setNavPanel] = useState<'collection' | 'contact' | null>(null);
   const [cartOpen, setCartOpen] = useState(false);
@@ -512,7 +512,7 @@ export default function Home() {
           <i className="phone-preview-icon" aria-hidden="true" /> Telefonas
         </button>
       </div>
-      <main className={`site-canvas${previewMode === 'phone' ? ' is-phone-preview' : ''}`}>
+      <main className={`site-canvas${previewMode === 'phone' ? ' is-phone-preview' : ''}${menuOpen ? ' is-menu-open' : ''}`}>
       <section className="hero" id="namai">
         <header className="site-header">
           <button className="wordmark wordmark-button" type="button" onClick={showHome} aria-label="Sfinksas – pradžia">SFINKSAS</button>
@@ -882,10 +882,10 @@ export default function Home() {
         <div className="mobile-menu" role="dialog" aria-modal="true" aria-label="Mobilus meniu">
           <div className="mobile-menu-top"><span className="wordmark">SFINKSAS</span><button type="button" onClick={() => setMenuOpen(false)} aria-label="Uždaryti meniu">×</button></div>
           <nav>
-            <button type="button" onClick={showHome}><span>01</span>Namai</button>
-            <button type="button" onClick={showSearch}><span>02</span>Paieška</button>
-            <button type="button" onClick={() => showPanel('collection')}><span>03</span>Kolekcija</button>
-            <button type="button" onClick={() => showPanel('contact')}><span>04</span>Kontaktai</button>
+            <button type="button" onClick={showHome}>Namai</button>
+            <button type="button" onClick={showSearch}>Paieška</button>
+            <button type="button" onClick={() => showPanel('collection')}>Kolekcija</button>
+            <button type="button" onClick={() => showPanel('contact')}>Kontaktai</button>
           </nav>
           <button className="mobile-cart" type="button" onClick={showCart}>Krepšelis ({cartCount}) <span>↗</span></button>
         </div>
